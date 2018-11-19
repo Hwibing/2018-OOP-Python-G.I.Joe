@@ -1,5 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton
+from PyQt5.QtCore import QCoreApplication
 
 if __name__=="__main__":
     # 디버깅용...
@@ -39,6 +40,7 @@ class Intro_wind(Wind):
         self.setWindowTitle(self.name) # 창이 이름 지정
         start_btn=Push_button("Start","Start game.",self) # 게임 시작 버튼
         quit_btn=Push_button("Quit","Quit game.",self) # 종료 버튼
+        quit_btn.clicked.connect(QCoreApplication.instance().quit) # 종료 버튼을 누르면 꺼짐
         self.setGeometry(300,300,200,150) # 창 위치와 창 크기
         start_btn.move(45,35) # 버튼 위치 조정
         quit_btn.move(45,85) # 버튼 위치 조정
