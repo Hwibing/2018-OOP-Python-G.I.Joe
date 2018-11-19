@@ -13,3 +13,7 @@ class window(QWidget):
     def init_UI(self,name):
         self.setwindowTitle(name)
         self.show()
+
+app=QApplication(sys.argv)
+main_window=window("Millstone")
+sys.exit(app.exec_())
