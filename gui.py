@@ -5,14 +5,14 @@ if __name__=="__main__":
     print("Hello, world!")
     print("This is GUI.")
 
-class window(QWidget):
-    def __init__(self,name):
+class window(QWidget): # QWidget 클래스를 상속함(창)
+    def __init__(self,name): # 생성자
         super().__init__()
-        self.name=name
+        self.name=name # 창의 이름
         self.init_UI(self)
-    def init_UI(self,name):
-        self.setwindowTitle(name)
-        self.show()
+    def init_UI(self,name): # UI 초기화
+        self.setwindowTitle(name) # 창의 이름(init의 name)
+        self.show() # 보이기
 
 app=QApplication(sys.argv)
 main_window=window("Millstone")
