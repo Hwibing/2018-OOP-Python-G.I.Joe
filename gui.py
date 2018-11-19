@@ -11,7 +11,7 @@ class window(QWidget): # QWidget 클래스를 상속함(창)
         self.name=name # 창의 이름
         self.init_UI(self)
     def init_UI(self,name): # UI 초기화
-        self.setwindowTitle(name) # 창의 이름(init의 name)
+        self.setWindowTitle(name) # 창의 이름(init의 name)
         self.show() # 보이기
 
 app=QApplication(sys.argv)
