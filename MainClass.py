@@ -4,6 +4,15 @@ if __name__ == '__main__':
 
 # Define Class
 class Product:
+    def __init__(self, name, price, expire=-1):
+        self.name = name
+        self.price = price
+        self.expire = expire
+
+
+
+'''
+class Product:
     def __init__(self, name, price):
         self.name = name
         self.price = price
@@ -28,6 +37,7 @@ class Livestock_Product(Expire_Product):
 
 class Luxury_Product(Product):
     pass
+'''
 
 
 class Manufactured_Product(Product):
