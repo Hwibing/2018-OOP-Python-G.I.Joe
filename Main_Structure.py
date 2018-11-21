@@ -2,6 +2,7 @@ if __name__ == '__main__':
     print("HELLO WORLD :: BASE_CLASS MODULE")
 
 
+# Define Class
 class Product:
     def __init__(self, name, price):
         self.name = name
@@ -32,6 +33,5 @@ class Luxury_Product(Product):
 class Manufactured_Product(Product):
     pass
 
-a=Agriculture_Product('sample',1200,7)
-a.print_price()
+
 
