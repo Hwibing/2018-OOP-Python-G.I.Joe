@@ -1,10 +1,5 @@
 import MainClass
 
-'''
- initialize product prices by file
- returns pricelist
-'''
-
 
 def price_init(myclass, filename):
 
@@ -45,4 +40,6 @@ def init():
         price_init(c, 'prices_'+str(c.type))
         #c.printlist()
 
-    return cls
+    return tuple(cls)
+
+
