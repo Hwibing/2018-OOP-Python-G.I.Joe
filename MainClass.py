@@ -4,43 +4,34 @@ if __name__ == '__main__':
 
 # Define Class
 class Product:
-    def __init__(self, name, price, expire=-1):
-        self.name = name
-        self.price = price
-        self.expire = expire
+    productList = {}
+
+    def append(self, name, price):
+        self.productList[name] = price
+
+    def printlist(self):
+        print(self.productList)
 
 
+class ExpireProduct(Product):
 
-'''
-class Product:
-    def __init__(self, name, price):
-        self.name = name
-        self.price = price
-
-    def print_price(self):
-        print(self.price)
-
-
-class Expire_Product(Product):
-    def __init__(self, name, price, expire):
-        super().__init__(name, price)
-        self.expire = expire
-        #print(self.name,self.expire,self.price)
-
-class Agriculture_Product(Expire_Product):
+    def append(self, name, price, expire):
+        self.productList[name] = [price, expire]
     pass
 
 
-class Livestock_Product(Expire_Product):
+class AgricultureProduct(ExpireProduct):
     pass
 
 
-class Luxury_Product(Product):
+class LivestockProduct(ExpireProduct):
     pass
 
-class Manufactured_Product(Product):
+
+class LuxuryProduct(Product):
     pass
-'''
 
 
+class ManufacturedProduct(Product):
+    pass
 
