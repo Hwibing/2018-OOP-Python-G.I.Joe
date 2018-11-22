@@ -139,12 +139,29 @@ class Link_button(Push_button):
     """
     눌리면 새 창을 띄우는 버튼 클래스입니다. Push_button을 상속합니다.
     """
-    def __init__(self, name, tooltip, window, link):
+    def __init__(self, name, tooltip, window, link_class, link_name):
         # 상위 클래스로부터 오버라이드합니다.
         """
-        :parameter link: 띄울 새 창입니다.
+        :parameter link_class: 띄울 창의 클래스입니다.
+        :parameter link_name: 띄울 창의 이름입니다.
         """
-        raise NotImplementedError # 미구현 헤헤
+        super().__init__(name, tooltip, window) # 상위 클래스의 생성자 호출
+        self.resize(self.sizeHint()) # 글씨에 따라 버튼 크기 결정
+        self.setToolTip(tooltip) # 툴팁 설정
+        self.window_info=(link_class, link_name) # 창의 정보를 튜플로 만들기
+        self.utility_set(window)
+
+    def utility_set(self, window):
+        # 상위 클래스로부터 오버라이드합니다. 
+        self.clicked.connect(self.open_new_window)
+    
+    def open_new_window(self):
+        """
+        새 창을 여는 메소드입니다.
+        """
+        new_window=self.window_info[0](self.window_info[1])
+        new_window.show()
+        raise NotImplementedError
 
 class Moveto_button(Link_button):
     """
