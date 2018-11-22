@@ -1,7 +1,10 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QMainWindow, QAction, QApplication, QMessageBox, QPushButton
-from PyQt5.QtCore import QCoreApplication
 from abc import abstractmethod
+from time import sleep
+
+from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtWidgets import (QAction, QApplication, QLabel, QMainWindow,
+                             QMessageBox, QPushButton, QWidget)
 
 if __name__=="__main__":
     print("Hello, world!")
@@ -15,19 +18,19 @@ class Wind(QWidget):
     def __init__(self, name):
         """
         생성자입니다. 
-        띄울 창의 이름을 결정하며, 끝날 때 initUI를 호출합니다.
+        띄울 창의 이름을 결정하며, 끝날 때 setup을 호출합니다.
         :parameter name: 창의 이름입니다.   
         """
         super().__init__() # 상위 클래스의 생성자 호출
         self.name=name # 창의 이름 정하기
         self.strong=False # 되묻지 않고 닫을지에 대한 여부
-        self.setup()
+        self.setup() # 셋업
 
     def setup(self):
         """
         창을 세팅하고 띄웁니다.
         """
-        self.setWindowTitle(self.name) # 창의 제목(위쪽 바에 표시되는...)
+        self.setWindowTitle(self.name) # 창의 제목 지정
         self.show() # 보이기
 
     def closeEvent(self, QCloseEvent): # 창 닫기 이벤트(X자 누르거나 .close() 호출 시)
@@ -42,7 +45,7 @@ class Wind(QWidget):
             else:
                 QCloseEvent.ignore() # CloseEvent 거절
 
-    def strong_close(self, QCloseEvent): # 강하게 닫기 함수
+    def strong_close(self, QCloseEvent): # 강하게 닫기(물어봄 X)
         self.strong=True # 안 되묻기로 한 뒤
         self.close() # 닫는다(그냥 종료)
 
@@ -55,24 +58,38 @@ class Main_wind(QMainWindow):
     def __init__(self, name):
         """
         생성자입니다.
-        끝날 때 initUI를 호출합니다.
+        끝날 때 design 그리고 setup을 호출합니다.
         :parameter name: 창의 이름입니다. 
         """
         super().__init__() # 상위 클래스의 생성자 호출
         self.name=name # 창의 이름 정하기
         self.strong=False # 일단 약하게 닫기
+        self.design() # design 메소드 호출
         self.setup() # setup 메소드 호출
+
+    def design(self):
+        """
+        창을 디자인합니다. 
+        하는 일: 창 위치/크기 결정, 버튼/텍스트 띄우기
+        """
+        self.setGeometry(100,100,1300,800) # 위치, 크기
+
+        Balance_text=Text("Your Money", self, (100,200))
+        Capacity_text=Text("Storage space", self, (1000,200))
+        Prices_text=Text("Prices",self, (200, 600))
+
+        Next_day_button=Push_button("Sleep", "Next day", self, (1000, 600))
 
     def setup(self):
         """
         창을 세팅하고 띄웁니다. 
+        하는 일: 창의 제목, 상태 표시줄, 메뉴바 띄우기, 창 보이기
         """
         self.setWindowTitle(self.name) # 창의 제목
-        self.setGeometry(100,100,1300,800) # 위치, 크기
         self.statusBar().showMessage("Main") # 상태 표시줄
         
-        main_menu=self.menuBar() # 메뉴 바 만들기
-        main_menu_file=main_menu.addMenu("File") # 메뉴 항목 추가
+        # main_menu=self.menuBar() # 메뉴 바 만들기
+        # main_menu_file=main_menu.addMenu("File") # 메뉴 항목 추가
         self.show() # 창 보이기
 
     def closeEvent(self, QCloseEvent):
@@ -87,28 +104,24 @@ class Main_wind(QMainWindow):
             else:
                 QCloseEvent.ignore() # 이벤트 거절
 
-    def strong_close(self, QCloseEvent): # 강하게 닫기
-        self.strong=True
-        self.close()
+    def strong_close(self, QCloseEvent): # 강하게 닫기(물어봄 X)
+        self.strong=True # 안 되묻기로 하고
+        self.close() # 닫는다(그냥 종료)
 
 class Intro_wind(Wind):
     """
     프로그램을 작동하자마자 뜨는 창입니다. Wind를 상속합니다.
     게임 시작/종료 버튼만 존재합니다. 게임 시작을 누르면 게임이 열리고, 게임 종료를 누르면 끝납니다.
     """
+    def design(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        start_btn=Link_button("Start", "Start game.", self, (45, 35), Main_wind, "Main") # 게임 시작 버튼
+        quit_btn=Close_button("Quit", "Quit game.", self, (45, 85)) # 종료 버튼
+        self.setGeometry(300,300,200,150) # 창 위치와 창 크기
+
     def setup(self):
         # 상위 클래스로부터 오버라이드합니다.
-        """
-        띄울 창의 이름 결정, 시작/종료 버튼 생성, 위치/크기 조정을 담당합니다. 
-        :parameter name: 창의 이름입니다.
-        """
         self.setWindowTitle(self.name) # 창의 이름 지정
-        start_btn=Link_button("Start", "Start game.", self, Main_wind, "Main") # 게임 시작 버튼
-        quit_btn=Close_button("Quit", "Quit game.", self) # 종료 버튼
-
-        self.setGeometry(300,300,200,150) # 창 위치와 창 크기
-        start_btn.move(45,35) # 버튼 위치 조정
-        quit_btn.move(45,85) # 버튼 위치 조정   
         self.show() # 창 보이기
 
 class Push_button(QPushButton):
@@ -116,38 +129,42 @@ class Push_button(QPushButton):
     버튼 클래스입니다. QPushButton을 상속합니다.
     __init__의 매개변수로 이름과 툴팁, 띄울 Wind 클래스(혹은 그 상속)을 받습니다.
     """
-    def __init__(self, name, tooltip, window):
+    def __init__(self, name, tooltip, window, location):
         """
         생성자입니다. __init__이 끝날 때 utility_set을 호출합니다.
         :parameter name: 버튼의 이름(내용)입니다.
         :parameter tooltip: 버튼의 툴팁입니다. (마우스 올리면 나오는 내용)
         :parameter window: 버튼이 위치하는 Wind 객체입니다.
+        :parameter location: 위치(왼쪽, 위쪽 좌표 튜플)
         """
         super().__init__(name,window) # 상위 클래스의 생성자 호출
-        self.resize(self.sizeHint()) # 글씨에 따라 버튼 크기 결정
-        self.setToolTip(tooltip) # 툴팁 설정
-        self.utility_set(window)
+        self.design(tooltip,location) # 디자인하기
+        self.utility_set(window) # 기능 설정
 
+    def design(self, tooltip, location):
+        """
+        버튼을 디자인합니다.
+        하는 일: 버튼 툴팁 설정, 위치/크기 조정
+        """
+        self.setToolTip(tooltip) # 툴팁 설정
+        self.move(location[0], location[1]) # 위치 이동
+        self.resize(self.sizeHint()) # 글씨에 따라 버튼 크기 조정
+
+    # utility_set은 반드시 오버라이드해야 함
     @abstractmethod
     def utility_set(self, window):
-        """
-        기능 설정입니다. 기능을 부여하려면 Override해야 합니다.
-        """
         pass
 
 class Link_button(Push_button):
     """
     눌리면 새 창을 띄우는 버튼 클래스입니다. Push_button을 상속합니다.
     """
-    def __init__(self, name, tooltip, window, link_class, link_name):
+    def __init__(self, name, tooltip, window, location, link_class, link_name):
         # 상위 클래스로부터 오버라이드합니다.
         """
         :parameter link_class: 띄울 창의 클래스입니다.
         :parameter link_name: 띄울 창의 이름입니다.
         """
-        super().__init__(name, tooltip, window) # 상위 클래스의 생성자 호출
-        self.resize(self.sizeHint()) # 글씨에 따라 버튼 크기 결정
-        self.setToolTip(tooltip) # 툴팁 설정
         self.window_info=(link_class, link_name) # 창의 정보를 튜플로 만들기
         self.utility_set(window)
 
@@ -161,7 +178,7 @@ class Link_button(Push_button):
         """
         new_window=self.window_info[0](self.window_info[1])
         new_window.show()
-        raise NotImplementedError
+        raise NotImplementedError # 미구현 헤헤
 
 class Moveto_button(Link_button):
     """
@@ -185,7 +202,29 @@ class Quit_button(Close_button):
         # 상위 클래스로부터 오버라이드합니다. 
         self.clicked.connect(QCoreApplication.instance().quit) # 버튼을 누르면 다 종료되도록
 
+class Text(QLabel):
+    """
+    텍스트입니다. QLabel을 상속합니다.
+    """
+    def __init__(self, text, window, location):
+        """
+        생성자입니다. 끝날 때 setup을 호출합니다. 
+        :parameter text: 나타낼 텍스트
+        :parameter window: 텍스트를 띄울 창
+        :parameter location: 위치(튜플, 왼쪽 좌표, 위 좌표)
+        """
+        super().__init__(text,window) # 상위 클래스의 생성자 호출
+        self.setup(location) # 위치
+
+    def setup(self, location):
+        """
+        텍스트를 세팅하고 띄웁니다. 
+        """
+        self.move(location[0], location[1]) # 위치 설정
+        self.resize(self.sizeHint()) # 크기 설정
+        self.show() # 보이기
+
 if __name__=="__main__":
     app=QApplication(sys.argv) # application 객체 생성하기 위해 시스템 인수 넘김
-    intro=Intro_wind("Intro")
+    main=Main_wind("main")
     sys.exit(app.exec_()) # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
