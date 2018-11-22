@@ -28,17 +28,21 @@ def price_init(myclass, filename):
             continue
 
 
-cls = []
-agriculture = MainClass.ExpireProduct('agriculture')
-cls.append(agriculture)
-livestock = MainClass.ExpireProduct('livestock')
-cls.append(livestock)
-luxury = MainClass.Product('luxury')
-cls.append(luxury)
-manufactured = MainClass.Product('manufactured')
-cls.append(manufactured)
 
-for c in cls:
-    price_init(c, 'prices_'+str(c.type))
-    #c.printlist()
+def init():
 
+    cls = []
+    agriculture = MainClass.ExpireProduct('agriculture')
+    cls.append(agriculture)
+    livestock = MainClass.ExpireProduct('livestock')
+    cls.append(livestock)
+    luxury = MainClass.Product('luxury')
+    cls.append(luxury)
+    manufactured = MainClass.Product('manufactured')
+    cls.append(manufactured)
+
+    for c in cls:
+        price_init(c, 'prices_'+str(c.type))
+        #c.printlist()
+
+    return cls

@@ -21,7 +21,7 @@ class Wind(QWidget):
         super().__init__() # 상위 클래스의 생성자 호출
         self.name=name # 창의 이름 정하기
         self.strong=False # 되묻지 않고 닫을지에 대한 여부
-        self.setup() # setup 메소드 호출
+        self.setup()
 
     def setup(self):
         """
@@ -103,7 +103,7 @@ class Intro_wind(Wind):
         :parameter name: 창의 이름입니다.
         """
         self.setWindowTitle(self.name) # 창의 이름 지정
-        start_btn=Push_button("Start", "Start game.", self) # 게임 시작 버튼
+        start_btn=Link_button("Start", "Start game.", self, Main_wind, "Main") # 게임 시작 버튼
         quit_btn=Close_button("Quit", "Quit game.", self) # 종료 버튼
 
         self.setGeometry(300,300,200,150) # 창 위치와 창 크기
