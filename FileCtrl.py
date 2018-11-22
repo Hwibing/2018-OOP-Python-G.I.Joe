@@ -21,7 +21,7 @@ def init_price():
         pricelist = []
 
         f_name = "./prices/" + f_name
-        f = open(f_name, 'r')
+        f = open(f_name, 'r', encoding="UTF-8")
         while True:
             newline = f.readline()
             if not newline:
