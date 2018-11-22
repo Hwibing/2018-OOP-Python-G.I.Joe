@@ -48,10 +48,3 @@ def init_price():
     return products
 
 
-
-
-
-a = init_price()
-print('DISP')
-for i in a['agriculture']:
-    print(i.name, i.price, i.expire)
