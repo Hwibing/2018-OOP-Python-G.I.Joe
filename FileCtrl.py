@@ -35,20 +35,8 @@ def init_price():
             except IndexError as e:
                 continue
 
-            if type == 'agriculture':
-                new = MainClass.Agriculture_Product(name, price, default_expire_date)
-                pricelist.append(new)
-
-            elif type == 'livestock':
-                new = MainClass.Livestock_Product(name, price, default_expire_date)
-                pricelist.append(new)
-
-            elif type == 'luxury':
-                new = MainClass.Agriculture_Product(name, price, default_expire_date)
-                pricelist.append(new)
-            elif type == 'agriculture':
-                new = MainClass.Agriculture_Product(name, price, default_expire_date)
-                pricelist.append(new)
+            new = MainClass.Product(name, price, default_expire_date)
+            pricelist.append(new)
 
             if __name__ == '__main__':
                 print(type, name, price)
@@ -59,4 +47,11 @@ def init_price():
 
     return products
 
-print(init_price())
+
+
+
+
+a = init_price()
+print('DISP')
+for i in a['agriculture']:
+    print(i.name, i.price, i.expire)

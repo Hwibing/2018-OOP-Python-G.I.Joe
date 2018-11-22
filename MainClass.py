@@ -37,11 +37,10 @@ class Livestock_Product(Expire_Product):
 
 class Luxury_Product(Product):
     pass
-'''
-
 
 class Manufactured_Product(Product):
     pass
+'''
 
 
 
