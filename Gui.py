@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QMainWindow, QAction, QApplication, QMessageBox, QPushButton
 from PyQt5.QtCore import QCoreApplication
+from abc import abstractmethod
 
 if __name__=="__main__":
     print("Hello, world!")
@@ -48,8 +49,8 @@ class Wind(QWidget):
 class Main_wind(QMainWindow):
     """
     메인 윈도우입니다. QMainWindow를 상속합니다. (혼동을 막기 위해 Wind와의 다중 상속을 피했습니다.)
-    Wind와 상당히 유사합니다. 
-    게임 플레이의 중추입니다. Main window에서 모든 부가 창으로 이동할 수 있습니다.
+    Wind와 상당히 유사합니다. 게임 플레이의 중추입니다.
+    Main window에서 모든 부가 창으로 이동할 수 있습니다.
     """
     def __init__(self, name):
         """
@@ -69,6 +70,9 @@ class Main_wind(QMainWindow):
         self.setWindowTitle(self.name) # 창의 제목
         self.setGeometry(100,100,1300,800) # 위치, 크기
         self.statusBar().showMessage("Main") # 상태 표시줄
+        
+        main_menu=self.menuBar() # 메뉴 바 만들기
+        main_menu_file=main_menu.addMenu("File") # 메뉴 항목 추가
         self.show() # 창 보이기
 
     def closeEvent(self, QCloseEvent):
@@ -93,8 +97,8 @@ class Intro_wind(Wind):
     게임 시작/종료 버튼만 존재합니다. 게임 시작을 누르면 게임이 열리고, 게임 종료를 누르면 끝납니다.
     """
     def setup(self):
+        # 상위 클래스로부터 오버라이드합니다.
         """
-        상위 클래스로부터 오버라이딩합니다.
         띄울 창의 이름 결정, 시작/종료 버튼 생성, 위치/크기 조정을 담당합니다. 
         :parameter name: 창의 이름입니다.
         """
@@ -116,23 +120,44 @@ class Push_button(QPushButton):
         """
         생성자입니다. __init__이 끝날 때 utility_set을 호출합니다.
         :parameter name: 버튼의 이름(내용)입니다.
+        :parameter tooltip: 버튼의 툴팁입니다. (마우스 올리면 나오는 내용)
+        :parameter window: 버튼이 위치하는 Wind 객체입니다.
         """
         super().__init__(name,window) # 상위 클래스의 생성자 호출
         self.resize(self.sizeHint()) # 글씨에 따라 버튼 크기 결정
         self.setToolTip(tooltip) # 툴팁 설정
         self.utility_set(window)
 
+    @abstractmethod
     def utility_set(self, window):
         """
         기능 설정입니다. 기능을 부여하려면 Override해야 합니다.
         """
         pass
 
+class Link_button(Push_button):
+    """
+    눌리면 새 창을 띄우는 버튼 클래스입니다. Push_button을 상속합니다.
+    """
+    def __init__(self, name, tooltip, window, link):
+        # 상위 클래스로부터 오버라이드합니다.
+        """
+        :parameter link: 띄울 새 창입니다.
+        """
+        raise NotImplementedError # 미구현 헤헤
+
+class Moveto_button(Link_button):
+    """
+    눌리면 다른 창으로 이동하는 버튼 클래스입니다. Link_button을 상속합니다.
+    """
+    pass # Link_Button 구현하고 하자
+
 class Close_button(Push_button):
     """
     창을 닫을 때 쓰는 버튼 클래스입니다. Push_button을 상속합니다. 
     """
     def utility_set(self, window):
+        # 상위 클래스로부터 오버라이드합니다. 
         self.clicked.connect(window.strong_close) # 호출하는 window를 닫습니다. (강하게)
 
 class Quit_button(Close_button):
@@ -140,10 +165,10 @@ class Quit_button(Close_button):
     프로그램을 종료할 때 버튼 클래스입니다. Close_button을 상속합니다. 
     """
     def utility_set(self, window):
+        # 상위 클래스로부터 오버라이드합니다. 
         self.clicked.connect(QCoreApplication.instance().quit) # 버튼을 누르면 다 종료되도록
 
 if __name__=="__main__":
     app=QApplication(sys.argv) # application 객체 생성하기 위해 시스템 인수 넘김
     intro=Intro_wind("Intro")
-    main=Main_wind("Main")
     sys.exit(app.exec_()) # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
