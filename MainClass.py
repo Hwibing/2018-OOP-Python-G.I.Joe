@@ -4,7 +4,9 @@ if __name__ == '__main__':
 
 # Define Class
 class Product:
-    productList = {}
+    def __init__(self, type):
+        self.type = type
+        self.productList = {}
 
     def append(self, name, price):
         self.productList[name] = price
@@ -13,25 +15,9 @@ class Product:
         print(self.productList)
 
 
+# idx 0 --> price idx 1 --> expire
 class ExpireProduct(Product):
 
     def append(self, name, price, expire):
         self.productList[name] = [price, expire]
-    pass
-
-
-class AgricultureProduct(ExpireProduct):
-    pass
-
-
-class LivestockProduct(ExpireProduct):
-    pass
-
-
-class LuxuryProduct(Product):
-    pass
-
-
-class ManufacturedProduct(Product):
-    pass
 
