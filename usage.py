@@ -32,12 +32,14 @@ import random
 import Ctrl
 
 (agriculture, livestock, luxury, manufactured) = Ctrl.init()
-luxury.printlist()
-pl = list(luxury.productList.keys())
-random.shuffle(pl)
-print(pl)
-luxury.update(100, pl[0:2])
-luxury.printlist()
+
+import MainClass
+
+s = MainClass.Storage(10)
+s.buy('감자', agriculture, 1)
+s.buy('감자', agriculture, 2)
+s.buy('감자', agriculture, 3)
+s.buy('시계', luxury, 1)
 
 
 

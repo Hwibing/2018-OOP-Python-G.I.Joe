@@ -1,7 +1,7 @@
 import MainClass
 
 
-def price_init(myclass, filename):
+def readprice(myclass, filename):
 
     #print(type(myclass))
     #print(myclass)
@@ -23,9 +23,7 @@ def price_init(myclass, filename):
             continue
 
 
-
 def init():
-
     cls = []
     agriculture = MainClass.ExpireProduct('agriculture')
     cls.append(agriculture)
@@ -37,7 +35,7 @@ def init():
     cls.append(manufactured)
 
     for c in cls:
-        price_init(c, 'prices_'+str(c.type))
+        readprice(c, 'prices_'+str(c.type))
         #c.printlist()
 
     return tuple(cls)
