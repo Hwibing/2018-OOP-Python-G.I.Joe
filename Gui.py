@@ -3,8 +3,9 @@ from abc import abstractmethod
 from time import sleep
 
 from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtWidgets import (QAction, QApplication, QLabel, QMainWindow,
-                             QMessageBox, QPushButton, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
+                             QMainWindow, QMessageBox, QPushButton,
+                             QVBoxLayout, QWidget)
 
 if __name__=="__main__":
     print("Hello, world!")

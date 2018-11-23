@@ -2,7 +2,6 @@ if __name__ == '__main__':
     print("HELLO WORLD :: BASE_CLASS MODULE")
 
 
-# Define Class
 
 class GameSettings:
     def __init__(self, money):
@@ -15,6 +14,7 @@ class Storage:
         self.quantity = 0
         self.warehouse = {}
         self.warehouse_expire = {}
+        self.freezer = False
 
     def overflow(self, add):
         if self.quantity + add > self.maxsize: return True
@@ -39,8 +39,6 @@ class Storage:
         else:
             print('Error: STORAGE OVERFLOW')
             return -1
-
-        self.printstorage()
         return 0
 
     def sell(self, name, number):
@@ -67,24 +65,23 @@ class Storage:
         return 0
 
     def nextday(self, dec=1):
+        if self.freezer: dec = 1
         for name in list(self.warehouse_expire.keys()):
             for idx in range(len(self.warehouse_expire)): # size of list
                 self.warehouse_expire[name][idx][1] -= dec
                 if self.warehouse_expire[name][idx][1] <= 0:
-                    self.warehouse_expire[name].remove([self.warehouse_expire[name][idx][0], self.warehouse_expire[name][idx][1]])
                     self.quantity -= self.warehouse_expire[name][idx][0]
-
-
-
+                    self.warehouse[name] -= self.warehouse_expire[name][idx][0]
+                    self.warehouse_expire[name].remove([self.warehouse_expire[name][idx][0], self.warehouse_expire[name][idx][1]])
+            if self.warehouse[name] == 0:
+                del self.warehouse_expire[name]
+                del self.warehouse[name]
 
 
     def printstorage(self):
         print(self.warehouse)
         print(self.warehouse_expire)
         print()
-
-
-
 
 
 class Product:
