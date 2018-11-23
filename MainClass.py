@@ -2,13 +2,29 @@ if __name__ == '__main__':
     print("HELLO WORLD :: BASE_CLASS MODULE")
 
 
-
 class GameSettings:
+    pass
+
+
+class Money:
     def __init__(self, money):
         self.money = money
 
 
 class Storage:
+    """
+    사고팔 수 있는 게임 속 아이템들을 저장할 수 있는 창고 클래스입니다.
+    __init__ : 클래스를 정의할 때 창고의 최대크기를 지정합니다.
+    overflow : 창고에 추가할 아이템의 개수를 매개변수로 넘겼을 때 창고가 넘치면 True 그렇지 않다면 False를 반환합니다
+    buy : 아이템의 이름, 아이템의 클래스, 개수를 매개변수로 넘기면 창고에 추가
+        성공시 0 return, 실패시 -1 return
+        (만약 해당 아이템을 추가할 시 창고에 overflow가 발생할 경우 실패 -> returns -1)
+    sell : 아이템의 이름, 개수를 매개변수로 넘기면 창고에서 해당 아이템을 개수만큼 삭제
+        (유통기한이 있는 경우 유통기한이 적게 남은 것 부터 삭제)
+    nextday : 감소되는 유통기한인 정수 (DEFAULT = 1)를 입력해주면 해당 창고에 존재하는 유통기한이 존재하는 물품들의 유통기한을 입력값 만큼 줄임
+        ++  self.freezer 가 True 로 설정될 경우 (DEFAULT = FALSE) 입력값에 관계없이 무조건 유통기한 하루씩 감소 (냉장고 기능 구현)
+    """
+
     def __init__(self, maxsize):
         self.maxsize = maxsize
         self.quantity = 0
