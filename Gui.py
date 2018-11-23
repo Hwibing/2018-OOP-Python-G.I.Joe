@@ -3,6 +3,7 @@ from abc import abstractmethod
 from time import sleep
 
 from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
                              QMainWindow, QMessageBox, QPushButton,
                              QVBoxLayout, QWidget)
@@ -11,19 +12,24 @@ if __name__=="__main__":
     print("Hello, world!")
     print("This is GUI.")
 
+window_dict=dict() # 창 이름이 key, 창 객체가 value인 딕셔너리
+
 class Wind(QWidget):
     """
     창 클래스입니다. QWidget을 상속합니다.
     Wind 클래스를 만들면 창이 띄워집니다.
     """
-    def __init__(self, name):
+    def __init__(self, name, without_show=False):
         """
         생성자입니다. 
         띄울 창의 이름을 결정하며, 끝날 때 setup을 호출합니다.
-        :parameter name: 창의 이름입니다.   
+        :parameter name: 창의 이름입니다.
+        :parameter without_show: 창을 띄우지 않을 여부입니다. 
         """
         super().__init__() # 상위 클래스의 생성자 호출
+        window_dict[name]=self # 딕셔너리에 본인 추가하기
         self.name=name # 창의 이름 정하기
+        self.without_show=without_show # 창을 생성하자마자 띄우지 않을 건가?
         self.strong=False # 되묻지 않고 닫을지에 대한 여부
         self.design() # 디자인
         self.setup() # 셋업
@@ -39,16 +45,19 @@ class Wind(QWidget):
         하는 일: 창의 제목 설정, 창 보이기
         """
         self.setWindowTitle(self.name) # 창의 제목 지정
-        self.show() # 보이기
+        if not self.without_show:
+            self.show() # 보이기
 
     def closeEvent(self, QCloseEvent): # 창 닫기 이벤트(X자 누르거나 .close() 호출 시)
         if self.strong: # 만약 되묻지 않기로 했다면? 
+            del window_dict[self.name]
             QCloseEvent.accept() # 그냥 CloseEvent 수용
         else: # 되묻기
             # 메시지박스로 물어보기(Y/N), 그 결과를 ans에 저장
             ans=QMessageBox.question(self, "Confirm", "Do you want to quit?", 
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if ans==QMessageBox.Yes: # ~.Yes, ~.No는 상수여서 비교 가능
+                del window_dict[self.name]
                 QCloseEvent.accept() # CloseEvent 수용
             else:
                 QCloseEvent.ignore() # CloseEvent 거절
@@ -87,22 +96,6 @@ class Main_wind(Wind):
         self.setLayout(vbox)
         self.setGeometry(100,100,1300,800) # 위치, 크기
 
-    def closeEvent(self, QCloseEvent):
-        if self.strong: # 만약 되묻지 않기로 했다면? 
-            QCloseEvent.accept() # 그냥 CloseEvent 수용
-        else: # 되묻기
-            # 메시지박스로 물어보기(Y/N), 그 결과를 ans에 저장
-            ans=QMessageBox.question(self, "Confirm", "Do you want to quit? Changes will not be saved.", 
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            if ans==QMessageBox.Yes: # 결과를 보고 결정
-                QCloseEvent.accept() # 이벤트 수용
-            else:
-                QCloseEvent.ignore() # 이벤트 거절
-
-    def strong_close(self, QCloseEvent): # 강하게 닫기(물어봄 X)
-        self.strong=True # 안 되묻기로 하고
-        self.close() # 닫는다(그냥 종료)
-
 class Intro_wind(Wind):
     """
     프로그램을 작동하자마자 뜨는 창입니다. Wind를 상속합니다.
@@ -110,14 +103,9 @@ class Intro_wind(Wind):
     """
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        start_btn=Link_button("Start", "Start game.", self, (45, 35), Main_wind, "Main") # 게임 시작 버튼
+        start_btn=Moveto_button("Start", "Start game.", self, (45, 35), Main_wind, "Main") # 게임 시작 버튼
         quit_btn=Close_button("Quit", "Quit game.", self, (45, 85)) # 종료 버튼
         self.setGeometry(300,300,200,150) # 창 위치와 창 크기
-
-    def setup(self):
-        # 상위 클래스로부터 오버라이드합니다.
-        self.setWindowTitle(self.name) # 창의 이름 지정
-        self.show() # 창 보이기
 
 class Push_button(QPushButton):
     """
@@ -131,10 +119,12 @@ class Push_button(QPushButton):
         :parameter tooltip: 버튼의 툴팁입니다. (마우스 올리면 나오는 내용)
         :parameter window: 버튼이 위치하는 Wind 객체입니다.
         :parameter location: 위치(왼쪽, 위쪽 좌표 튜플)
+        :parameter not_for_layout: 레이아웃에 쓸 거면 False(레이아웃은 위치 지정 X)
         """
         super().__init__(name,window) # 상위 클래스의 생성자 호출
         self.not_for_layout=not_for_layout
         self.design(tooltip,location) # 디자인하기
+        self.window=window
         self.utility_set(window) # 기능 설정
 
     def design(self, tooltip, location):
@@ -158,7 +148,7 @@ class Link_button(Push_button):
     """
     눌리면 새 창을 띄우는 버튼 클래스입니다. Push_button을 상속합니다.
     """
-    def __init__(self, name, tooltip, window, location, link_class, link_name):
+    def __init__(self, name, tooltip, window, location, link_class, link_name, not_for_layout=True):
         # 상위 클래스로부터 오버라이드합니다.
         """
         :parameter link_class: 띄울 창의 클래스입니다.
@@ -169,22 +159,29 @@ class Link_button(Push_button):
         self.utility_set(window)
 
     def utility_set(self, window):
-        # 상위 클래스로부터 오버라이드합니다. 
+        # 상위 클래스로부터 오버라이드합니다.
+        # try except 제거 시 2번 클릭됨
+        # https://stackoverflow.com/questions/46747317/when-a-qpushbutton-is-clicked-it-fires-twice
+        try:
+            self.clicked.disconnect()
+        except Exception as e:
+            pass
         self.clicked.connect(self.open_new_window)
     
     def open_new_window(self):
         """
         새 창을 여는 메소드입니다.
         """
-        new_window=self.window_info[0](self.window_info[1])
-        new_window.show()
-        raise NotImplementedError # 미구현 헤헤
+        self.link=self.window_info[0](self.window_info[1])
 
 class Moveto_button(Link_button):
     """
     눌리면 다른 창으로 이동하는 버튼 클래스입니다. Link_button을 상속합니다.
     """
-    pass # Link_Button 구현하고 하자
+    def open_new_window(self):
+        # 상위 메소드로부터 오버라이드합니다.
+        super().open_new_window()
+        self.window.strong_close(QCloseEvent)
 
 class Close_button(Push_button):
     """
@@ -226,5 +223,6 @@ class Text(QLabel):
 
 if __name__=="__main__":
     app=QApplication(sys.argv) # application 객체 생성하기 위해 시스템 인수 넘김
-    main=Main_wind("main")
+    intro=Intro_wind("Intro")
+    #main=Main_wind("main")
     sys.exit(app.exec_()) # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
