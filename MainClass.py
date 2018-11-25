@@ -45,6 +45,18 @@ class Finance:
     def buy_warehouse(self):
         self.rent = False
 
+    def buy(self, name, cls, number):
+        if self.ismoneyleft(cls.productList[name]*number):
+            self.money -= cls.productList[name]*number
+            return True
+        else:
+            print('Not Enough Money')
+            return False
+
+    def sell(self, name, cls, number):
+        self.money += cls.productList[name]*number
+        return True
+
     def nextday(self):
         if self.debt:
             self.money -= int(self.debt * 0.1)
