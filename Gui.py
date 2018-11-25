@@ -48,7 +48,7 @@ def place_widget_in_layout(layout, widgets, arrange="spread"):
         for w in widgets:
             layout.addWidget(w)
             if arrange=="spread": layout.addStretch(1)
-        if arrange in ("spread", "front", "center"): layout.addStretch(1)
+        if arrange in ("front", "center"): layout.addStretch(1)
     
     return
 
