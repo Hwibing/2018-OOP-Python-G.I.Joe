@@ -30,7 +30,7 @@ def place_widget_in_layout(layout, widgets, arrange="spread"):
     spread: 고르게 분산
     center: 중심으로 쏠림
     front: 앞으로 쏠림 / back: 뒤로 쏠림
-    wing_f, wing_b: 양쪽으로 갈라짐, 홀수 개 위젯일 때 f는 앞에, b는 뒤에 붙임
+    wing_f, wing_b: 양쪽으로 갈라짐, 홀수 개 위젯일 때 가운데 것을 f는 앞에, b는 뒤에 붙임
     """
     # 이하는 크게 신경쓰지 않아도 됨(배치 방법에 따라 위젯 적절히 나열하기)
     if "wing" in arrange:
@@ -115,19 +115,23 @@ class Main_wind(Wind):
         창을 디자인합니다. 
         하는 일: 레이아웃, 창 위치/크기 결정, 버튼/텍스트 띄우기
         """
-        Balance_text=Text("Your Money", self, False, (0,0)) # 잔고
-        Capacity_text=Text("Storage space", self, False, (0,0)) # 창고용량
-        Prices_text=Text("Prices",self, False, (0,0)) # 가격
-        Next_day_button=Push_button("Sleep", "Next day", self, False, (0,0)) # '다음 날' 버튼
-        End_button=Quit_button("Quit","Changes will not be saved.",self,False,(0,0)) # '끝내기' 버튼
+        Balance_text=Text("Your Money\n??? Tau", self) # 잔고
+        Capacity_text=Text("Storage space\n0/50000", self) # 창고용량
+        Products=Text("Items", self)
+        Next_day_button=Push_button("Sleep", "Next day", self) # '다음 날' 버튼
+        End_button=Quit_button("Quit","Changes will not be saved.", self) # '끝내기' 버튼
 
         top_box=QHBoxLayout()
-        place_widget_in_layout(top_box,(Balance_text, Capacity_text, Prices_text))
+        place_widget_in_layout(top_box,(Balance_text, Capacity_text))
+        mid_box=QHBoxLayout()
+        place_widget_in_layout(mid_box,(Products,),"front")
         bottom_box=QHBoxLayout()
         place_widget_in_layout(bottom_box, (Next_day_button, End_button), "Back")
 
         vbox=QVBoxLayout()
         vbox.addLayout(top_box)
+        vbox.addStretch(1)
+        vbox.addLayout(mid_box)
         vbox.addStretch(1)
         vbox.addLayout(bottom_box)
 
@@ -161,8 +165,8 @@ class Push_button(QPushButton):
         :parameter name: 버튼의 이름(내용)입니다.
         :parameter tooltip: 버튼의 툴팁입니다. (마우스 올리면 나오는 내용)
         :parameter window: 버튼이 위치하는 Wind 객체입니다.
+        :parameter for_layout: 레이아웃에 쓸 거면 True(레이아웃은 위치 지정 X)
         :parameter location: 위치(왼쪽, 위쪽 좌표 튜플)
-        :parameter not_for_layout: 레이아웃에 쓸 거면 False(레이아웃은 위치 지정 X)
         """
         super().__init__(name,window) # 상위 클래스의 생성자 호출
         self.for_layout=for_layout
@@ -178,9 +182,9 @@ class Push_button(QPushButton):
         :parameter location: 버튼 위치입니다. 
         """
         self.setToolTip(tooltip) # 툴팁 설정
+        self.resize(self.sizeHint()) # 글씨에 따라 버튼 크기 조정
         if not self.for_layout:
             self.move(location[0], location[1]) # 위치 이동
-            self.resize(self.sizeHint()) # 글씨에 따라 버튼 크기 조정
 
     # utility_set은 반드시 오버라이드해야 함
     @abstractmethod
