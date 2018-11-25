@@ -109,13 +109,13 @@ class Storage:
 
         else:
             print('Error: STORAGE OVERFLOW')
-            return -1
-        return 0
+            return False
+        return True
 
     def sell(self, name, number):
         if name not in self.warehouse:
             print('Error: NOT ENOUGH ITEMS')
-            return -1
+            return False
         else:
             if self.warehouse[name] >= number:
                 self.warehouse[name] -= number
@@ -124,7 +124,7 @@ class Storage:
                     del self.warehouse[name]
             else:
                 print('Error: NOT ENOUGH ITEMS')
-                return -1
+                return False
 
         if name in self.warehouse_expire:
             for [count, expire] in self.warehouse_expire[name]:
@@ -133,7 +133,7 @@ class Storage:
                     self.warehouse_expire[name].append([count-number, expire])
                     break
                 else: number -= count
-        return 0
+        return True
 
     def nextday(self, dec=1):
         if self.freezer: dec = 1
