@@ -1,6 +1,5 @@
 import MainClass
 
-
 def readprice(myclass, filename):
 
     #print(type(myclass))
