@@ -9,9 +9,50 @@ class GameSettings:
 class Finance:
     def __init__(self, money):
         self.money = money
-        self.loan = 0
+        self.debt = 0
         self.bank = 0
-        pass
+        self.rent = True
+
+    def ismoneyleft(self, money):
+        if money <= self.money:
+            return True
+        else:
+            return False
+
+    def make_loan(self, money):
+        self.debt += money
+        self.money += money
+
+    # 돈을 빚보다 많이 갚았을 경우 별도의 처리 필요
+    def payoff_loan(self, money):
+        if self.ismoneyleft(money):
+            self.debt -= money
+            self.money -= money
+            return True
+        else:
+            print('Not Enough Money')
+            return False
+
+    def invest(self, money):
+        if self.ismoneyleft(money):
+            self.money -= money
+            self.bank += money
+            return True
+        else:
+            print('Not Enough Money')
+            return False
+
+    def buy_warehouse(self):
+        self.rent = False
+
+    def nextday(self):
+        if self.debt:
+            self.money -= int(self.debt * 0.1)
+        if self.bank:
+            self.money += int(self.bank * 0.05)
+        if self.rent:
+            self.money -= 50000
+
 
 class Storage:
     """
