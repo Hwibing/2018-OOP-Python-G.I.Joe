@@ -21,6 +21,12 @@ def sell(name, cls, number):
     else:
         return False
 
+
+def sleep():
+    money.nextday()
+    storage.nextday()
+
+
 def status():
     print('money : {}'.format(money.money))
     storage.printstorage()
@@ -30,6 +36,12 @@ def status():
 (agriculture, livestock, luxury, manufactured) = init()
 money = Finance(500000)
 storage = Storage(100)
+agriculture.printproductlist()
 
+# Usage notes FROM here
+buy('감자', agriculture, 10)
+sell('감자', agriculture, 10)
+sleep()
+status()
 
 

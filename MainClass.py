@@ -14,7 +14,7 @@ class Finance:
         self.rent = True
 
     def ismoneyleft(self, money):
-        if money <= self.money:
+        if int(money) <= self.money:
             return True
         else:
             return False
@@ -46,16 +46,28 @@ class Finance:
         self.rent = False
 
     def buy(self, name, cls, number):
-        if self.ismoneyleft(cls.productList[name]*number):
-            self.money -= cls.productList[name]*number
-            return True
+        if isinstance(cls, ExpireProduct):
+            if self.ismoneyleft(cls.productList[name][0] * number):
+                self.money -= cls.productList[name][0] * number
+                return True
+            else:
+                print('Not Enough Money')
+                return False
         else:
-            print('Not Enough Money')
-            return False
+            if self.ismoneyleft(cls.productList[name]*number):
+                self.money -= cls.productList[name]*number
+                return True
+            else:
+                print('Not Enough Money')
+                return False
 
     def sell(self, name, cls, number):
-        self.money += cls.productList[name]*number
-        return True
+        if isinstance(cls, ExpireProduct):
+            self.money += cls.productList[name][0] * number
+            return True
+        else:
+            self.money += cls.productList[name]*number
+            return True
 
     def nextday(self):
         if self.debt:
@@ -133,13 +145,15 @@ class Storage:
                     self.warehouse_expire[name].append([count-number, expire])
                     break
                 else: number -= count
+            if self.warehouse_expire[name] == []:
+                del self.warehouse_expire[name]
         return True
 
-    def nextday(self, dec=1):
-        if self.freezer: dec = 1
+    def nextday(self, decay=1):
+        if self.freezer: decay = 1
         for name in list(self.warehouse_expire.keys()):
             for idx in range(len(self.warehouse_expire)): # size of list
-                self.warehouse_expire[name][idx][1] -= dec
+                self.warehouse_expire[name][idx][1] -= decay
                 if self.warehouse_expire[name][idx][1] <= 0:
                     self.quantity -= self.warehouse_expire[name][idx][0]
                     self.warehouse[name] -= self.warehouse_expire[name][idx][0]
@@ -163,7 +177,7 @@ class Product:
     def append(self, name, price):
         self.productList[name] = price
 
-    def printlist(self):
+    def printproductlist(self):
         print(self.productList)
 
     def update(self, percent, products):
