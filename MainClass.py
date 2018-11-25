@@ -1,14 +1,69 @@
 if __name__ == '__main__':
-    print("HELLO WORLD :: BASE_CLASS MODULE")
+    print("MainClass")
 
 
 class GameSettings:
     pass
 
 
-class Money:
+class Finance:
     def __init__(self, money):
         self.money = money
+        self.debt = 0
+        self.bank = 0
+        self.rent = True
+
+    def ismoneyleft(self, money):
+        if money <= self.money:
+            return True
+        else:
+            return False
+
+    def make_loan(self, money):
+        self.debt += money
+        self.money += money
+
+    # 돈을 빚보다 많이 갚았을 경우 별도의 처리 필요
+    def payoff_loan(self, money):
+        if self.ismoneyleft(money):
+            self.debt -= money
+            self.money -= money
+            return True
+        else:
+            print('Not Enough Money')
+            return False
+
+    def invest(self, money):
+        if self.ismoneyleft(money):
+            self.money -= money
+            self.bank += money
+            return True
+        else:
+            print('Not Enough Money')
+            return False
+
+    def buy_warehouse(self):
+        self.rent = False
+
+    def buy(self, name, cls, number):
+        if self.ismoneyleft(cls.productList[name]*number):
+            self.money -= cls.productList[name]*number
+            return True
+        else:
+            print('Not Enough Money')
+            return False
+
+    def sell(self, name, cls, number):
+        self.money += cls.productList[name]*number
+        return True
+
+    def nextday(self):
+        if self.debt:
+            self.money -= int(self.debt * 0.1)
+        if self.bank:
+            self.money += int(self.bank * 0.05)
+        if self.rent:
+            self.money -= 50000
 
 
 class Storage:
@@ -18,7 +73,7 @@ class Storage:
     overflow : 창고에 추가할 아이템의 개수를 매개변수로 넘겼을 때 창고가 넘치면 True 그렇지 않다면 False를 반환합니다
     buy : 아이템의 이름, 아이템의 클래스, 개수를 매개변수로 넘기면 창고에 추가
         성공시 0 return, 실패시 -1 return
-        (만약 해당 아이템을 추가할 시 창고에 overflow가 발생할 경우 실패 -> returns -1)
+        (만약 해당 아이템을 추가할 시 창고에 overflow 가 발생할 경우 실패 -> returns -1)
     sell : 아이템의 이름, 개수를 매개변수로 넘기면 창고에서 해당 아이템을 개수만큼 삭제
         (유통기한이 있는 경우 유통기한이 적게 남은 것 부터 삭제)
     nextday : 감소되는 유통기한인 정수 (DEFAULT = 1)를 입력해주면 해당 창고에 존재하는 유통기한이 존재하는 물품들의 유통기한을 입력값 만큼 줄임
