@@ -12,9 +12,12 @@ if __name__ == "__main__":
     print("Hello, world!")
     print("This is GUI.")
 
-product_list={"apple": 1, "banana": 2, "cherry": 3, "dount": 4, "eclair": 5, "froyo": 6} # 전체 상품 목록
-news_list=[] # 뉴스 목록
-storage_list=[]
+# 전역 변수입니다... 헤헤!
+product_list = {"apple": 1, "banana": 2, "cherry": 3,
+                "dount": 4, "eclair": 5, "froyo": 6}  # 전체 상품 목록
+news_list = []  # 뉴스 목록
+storage_list = []  # 사용자 창고
+
 
 def place_in_layout(layout, details, arrange="spread"):
     """
@@ -23,7 +26,7 @@ def place_in_layout(layout, details, arrange="spread"):
     :parameter details: 레이아웃에 담을 것들의 iterable 객체입니다.
     :parameter arrange: 배치 방식입니다. 
     :return: None
-    :Exception: 위젯이 아님/유효하지 않은 배치 방식임
+    :Exception: 담을 내용 오류/유효하지 않은 배치 방식
     """
     arrange = arrange.lower()  # 소문자화(비교를 위해)
     if arrange not in ("spread", "center", "front", "back", "wing_f", "wing_b"):  # 배치 방식이 다음 중 없으면?
@@ -97,6 +100,10 @@ class Wind(QWidget):
     # 디자인 메소드는 반드시 오버라이드해야 합니다. (추상 메소드)
     @abstractmethod
     def design(self):
+        """
+        창을 디자인합니다. 
+        하는 일: 레이아웃, 창 위치/크기 결정, 버튼/텍스트 띄우기
+        """
         pass
 
     def setup(self):
@@ -133,10 +140,7 @@ class Main_wind(Wind):
     """
 
     def design(self):
-        """
-        창을 디자인합니다. 
-        하는 일: 레이아웃, 창 위치/크기 결정, 버튼/텍스트 띄우기
-        """
+        # 상위 클래스로부터 오버라이드합니다.
         global product_list
         plist = list(product_list.items())  # 튜플로 전부 추출
         Products = QListWidget()  # 물품 목록
@@ -182,10 +186,7 @@ class Intro_wind(Wind):
     """
 
     def design(self):
-        """
-        상위 클래스로부터 오버라이드합니다.
-        :parameter clss: 물품 리스트입니다. 
-        """
+        # 상위 클래스로부터 오버라이드합니다.
         start_btn = Moveto_button(
             "Start", "Start game.", self, Main_wind, "Main")  # 게임 시작 버튼
         quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
@@ -198,13 +199,12 @@ class Intro_wind(Wind):
 
 
 class List_wind(Wind):
-
     """
     리스트와 닫기 버튼이 있는 창입니다. Wind를 상속합니다.
     """
 
     def design(self):
-        # 상위 클래스로부터 오버라이드
+        # 상위 클래스로부터 오버라이드합니다.
         vbox = QVBoxLayout()
         vbox.addWidget(QListWidget())
         vbox.addWidget(Close_button("Close", "Close this window.", self))
@@ -222,35 +222,26 @@ class News_wind(List_wind):
 class Push_button(QPushButton):
     """
     버튼 클래스입니다. QPushButton을 상속합니다.
-    __init__의 매개변수로 이름과 툴팁, 띄울 Wind 클래스(혹은 그 상속)을 받습니다.
     """
 
-    def __init__(self, name, tooltip, window, for_layout=True, location=(0, 0)):
+    def __init__(self, name, tooltip, window):
         """
         생성자입니다. __init__이 끝날 때 utility_set을 호출합니다.
         :parameter name: 버튼의 이름(내용)입니다.
         :parameter tooltip: 버튼의 툴팁입니다. (마우스 올리면 나오는 내용)
-        :parameter window: 버튼이 위치하는 Wind 객체입니다.
-        :parameter for_layout: 레이아웃에 쓸 거면 True(레이아웃은 위치 지정 X)
-        :parameter location: 위치(왼쪽, 위쪽 좌표 튜플)
         """
         super().__init__(name, window)  # 상위 클래스의 생성자 호출
-        self.for_layout = for_layout
-        self.design(tooltip, location)  # 디자인하기
-        self.window = window  # 어디에 띄울 건지...
+        self.design(tooltip)  # 디자인하기
         self.utility_set(window)  # 기능 설정
 
-    def design(self, tooltip, location):
+    def design(self, tooltip):
         """
         버튼을 디자인합니다.
         하는 일: 버튼 툴팁 설정, 위치/크기 조정
         :parameter tooltip: 버튼 툴팁(마우스 올리면 나타나는 거)입니다.
-        :parameter location: 버튼 위치입니다. 
         """
         self.setToolTip(tooltip)  # 툴팁 설정
         self.resize(self.sizeHint())  # 글씨에 따라 버튼 크기 조정
-        if not self.for_layout:
-            self.move(location[0], location[1])  # 위치 이동
 
     # utility_set은 반드시 오버라이드해야 함
     @abstractmethod
@@ -272,14 +263,14 @@ class Link_button(Push_button):
     눌리면 새 창을 띄우는 버튼 클래스입니다. Push_button을 상속합니다.
     """
 
-    def __init__(self, name, tooltip, window, link_class, link_name, for_layout=True, location=(0, 0)):
+    def __init__(self, name, tooltip, window, link_class, link_name):
         """
         상위 클래스로부터 오버라이드합니다.
         :parameter link_class: 띄울 창의 클래스입니다.
         :parameter link_name: 띄울 창의 정보입니다. (이름)
         """
-        self.window_info = (link_class, link_name)  # 띄울 창의 정보를 튜플로 만들기
-        super().__init__(name, tooltip, window, for_layout, location)  # 상위 클래스의 생성자 호출
+        self.linkage_info = (link_class, link_name)  # 띄울 창의 정보를 튜플로 만들기
+        super().__init__(name, tooltip, window)  # 상위 클래스의 생성자 호출
 
     def utility_set(self, window):
         # 상위 클래스로부터 오버라이드합니다.
@@ -295,13 +286,18 @@ class Link_button(Push_button):
         """
         새 창을 여는 메소드입니다.
         """
-        self.link = self.window_info[0](self.window_info[1])
+        self.link = self.linkage_info[0](self.linkage_info[1])
 
 
 class Moveto_button(Link_button):
     """
     눌리면 다른 창으로 이동하는 버튼 클래스입니다. Link_button을 상속합니다.
     """
+
+    def __init__(self, name, tooltip, window, link_class, link_name):
+        # 상위 클래스로부터 오버라이드합니다.
+        self.window = window  # 지금 창!
+        super().__init__(name, tooltip, window, link_class, link_name)  # 상위 클래스의 생성자 호출
 
     def open_new_window(self):
         # 상위 메소드로부터 오버라이드합니다.
@@ -335,24 +331,18 @@ class Text(QLabel):
     텍스트입니다. QLabel을 상속합니다.
     """
 
-    def __init__(self, text, window, for_layout=True, location=(0, 0)):
+    def __init__(self, text, window):
         """
         생성자입니다. 끝날 때 setup을 호출합니다. 
         :parameter text: 나타낼 텍스트
         :parameter window: 텍스트를 띄울 창
-        :parameter location: 위치(튜플, 왼쪽 좌표, 위 좌표)
         """
         super().__init__(text, window)  # 상위 클래스의 생성자 호출
-        self.for_layout = for_layout
-        self.setup(location)  # 위치
 
-    def setup(self, location):
-        """
-        텍스트를 세팅하고 띄웁니다. 
-        """
-        if not self.for_layout:
-            self.move(location[0], location[1])  # 위치 설정
-            self.resize(self.sizeHint())  # 크기 설정
+    def setup(self):
+        # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
+        self.setFixedSize(self.sizeHint())  # 크기 설정
+        self.show()
 
 
 if __name__ == "__main__":
