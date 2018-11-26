@@ -31,7 +31,7 @@ def place_in_layout(layout, details, arrange="spread"):
     :Exception: 담을 내용 오류/유효하지 않은 배치 방식
     """
     arrange = arrange.lower()  # 소문자화(비교를 위해)
-    if arrange not in ("spread", "center", "front", "back", "wing_f", "wing_b"):  # 배치 방식이 다음 중 없으면?
+    if arrange not in ("spread", "center", "front", "back", "wing_f", "wing_b", "dispersion"):  # 배치 방식이 다음 중 없으면?
         raise Exception("Invalid arrangement.")  # 예외 발생
 
     """
@@ -68,15 +68,25 @@ def place_in_layout(layout, details, arrange="spread"):
     else:
         if arrange in ("spread", "back", "center"):
             layout.addStretch(1)
-        for w in details:
-            try:
-                layout.addWidget(w)
-            except Exception:
-                layout.addLayout(w)
-            if arrange == "spread":
+        if not arrange=="dispersion":
+            for w in details:
+                try:
+                    layout.addWidget(w)
+                except Exception:
+                    layout.addLayout(w)
+                if arrange == "spread":
+                    layout.addStretch(1)
+            if arrange in ("front", "center"):
                 layout.addStretch(1)
-        if arrange in ("front", "center"):
-            layout.addStretch(1)
+        else:
+            for i in range(len(details)):
+                w=details[i]
+                try:
+                    layout.addWidget(w)
+                except Exception:
+                    layout.addLayout(w)
+                if i<len(details)-1:
+                    layout.addStretch(1)
 
     return
 
@@ -159,10 +169,10 @@ class Main_wind(Wind):
         Storage_button = Link_button(
             "Storage", "Storage", self, Storage_wind, "Storage")  # 창고용량
 
-        buttons = QVBoxLayout()
-        buttons.addWidget(Basic_button("Buy", "Buy selected goods.", self))
-        buttons.addStretch(1)
-        buttons.addWidget(Basic_button("Sell", "Sell selected goods.", self))
+        self.item_info = QVBoxLayout()
+        self.item_info.addWidget(Basic_button("Buy", "Buy selected goods.", self))
+        self.item_info.addStretch(1)
+        self.item_info.addWidget(Basic_button("Sell", "Sell selected goods.", self))
 
         News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
@@ -174,7 +184,7 @@ class Main_wind(Wind):
         place_in_layout(top_box, (Info_text, Bank_button, Storage_button))
 
         mid_box = QHBoxLayout()  # 중간
-        place_in_layout(mid_box, (Products, buttons))
+        place_in_layout(mid_box, (Products, self.item_info))
 
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
