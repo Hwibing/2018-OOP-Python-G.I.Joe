@@ -144,8 +144,15 @@ class Main_wind(Wind):
         Products = QListWidget()  # 물품 목록
         for i in plist:
             Products.addItem(str(i))
-        product_buttons = QHBoxLayout()
-        product_buttons.addWidget(Text("Here, add buttons.", self))
+
+        buttons=QHBoxLayout()
+        product_info=QHBoxLayout()
+        Buy_button=Basic_button("Buy", "Buy selected object.", self)
+        Sell_button=Basic_button("Sell", "Sell selected object.", self)
+        place_in_layout(buttons, (Buy_button, Sell_button))
+        place_in_layout(product_info, (Text("Price", self), Text("Num", self)))
+        product_buttons = QVBoxLayout()
+        place_in_layout(product_buttons, (buttons, product_info))
 
         Balance_text = Text("Your Money\n??? Tau", self)  # 잔고
         Capacity_text = Link_button(
@@ -167,7 +174,7 @@ class Main_wind(Wind):
 
         vbox = QVBoxLayout()
         vbox.addLayout(top_box)
-        vbox.addStretch(1)
+        vbox.addStretch(2)
         vbox.addLayout(mid_box)
         vbox.addStretch(1)
         vbox.addLayout(bottom_box)
