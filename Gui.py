@@ -5,7 +5,7 @@ from time import sleep
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
-                             QListWidget, QMainWindow, QMessageBox,
+                             QLineEdit, QListWidget, QMainWindow, QMessageBox,
                              QPushButton, QVBoxLayout, QWidget)
 
 if __name__ == "__main__":
@@ -68,7 +68,7 @@ def place_in_layout(layout, details, arrange="spread"):
     else:
         if arrange in ("spread", "back", "center"):
             layout.addStretch(1)
-        if not arrange=="dispersion":
+        if not arrange == "dispersion":
             for w in details:
                 try:
                     layout.addWidget(w)
@@ -80,12 +80,12 @@ def place_in_layout(layout, details, arrange="spread"):
                 layout.addStretch(1)
         else:
             for i in range(len(details)):
-                w=details[i]
+                w = details[i]
                 try:
                     layout.addWidget(w)
                 except Exception:
                     layout.addLayout(w)
-                if i<len(details)-1:
+                if i < len(details)-1:
                     layout.addStretch(1)
 
     return
@@ -134,7 +134,6 @@ class Wind(QWidget):
             ans = QMessageBox.question(self, "Confirm", "Do you want to quit?",
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if ans == QMessageBox.Yes:  # ~.Yes, ~.No는 상수여서 비교 가능
-                # del window_dict[self.name] # 본인 이름 제거
                 QCloseEvent.accept()  # CloseEvent 수용
             else:
                 QCloseEvent.ignore()  # CloseEvent 거절
@@ -155,11 +154,12 @@ class Main_wind(Wind):
         # 상위 클래스로부터 오버라이드합니다.
         global Product_List
         plist = list(Product_List.items())  # 튜플로 전부 추출
-        Products = QListWidget()  # 물품 목록
+        self.Products = QListWidget()  # 물품 목록
         for i in plist:  # 각 항목을
             s = str(i[0])+"\t\t\t|\t\t"+str(i[1])+str(" Tau")
-            Products.addItem(s)  # 추가한다
-        Products.setFixedSize(500, 400)  # 크기 고정
+            self.Products.addItem(s)  # 추가한다
+        self.Products.setFixedSize(500, 400)  # 크기 고정
+        self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
 
         global Money, Day
         Info_text = Text("Your Money: {}\nDay: {}".format(
@@ -169,10 +169,17 @@ class Main_wind(Wind):
         Storage_button = Link_button(
             "Storage", "Storage", self, Storage_wind, "Storage")  # 창고용량
 
-        self.item_info = QVBoxLayout()
-        self.item_info.addWidget(Basic_button("Buy", "Buy selected goods.", self))
-        self.item_info.addStretch(1)
-        self.item_info.addWidget(Basic_button("Sell", "Sell selected goods.", self))
+        self.item_info = QVBoxLayout()  # 물품 정보 및 매매
+        self.item_name = Text("Select an item", self)  # 초기 텍스트1
+        self.item_price = Text("from left.", self)  # 초기 텍스트2
+        Buy_button = Basic_button("Buy", "Buy selected goods.", self)
+        Sell_button = Basic_button("Sell", "Sell selected goods.", self)
+        Buy_button.clicked.connect(self.buy_item)
+        Sell_button.clicked.connect(self.sell_item)
+
+        self.numCount = QLineEdit(self)
+        place_in_layout(self.item_info, (self.item_name,
+                                         self.item_price, Buy_button, self.numCount, Sell_button), "wing_b")
 
         News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
@@ -184,7 +191,7 @@ class Main_wind(Wind):
         place_in_layout(top_box, (Info_text, Bank_button, Storage_button))
 
         mid_box = QHBoxLayout()  # 중간
-        place_in_layout(mid_box, (Products, self.item_info))
+        place_in_layout(mid_box, (self.Products, self.item_info))
 
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
@@ -196,6 +203,43 @@ class Main_wind(Wind):
         self.setLayout(vbox)
         self.move(100, 100)  # 위치
         self.setFixedSize(800, 600)  # 크기(고정)
+
+    def selectionChanged_event(self):
+        k = str(self.Products.currentItem().text())
+        k = k.split("|")
+        k[0] = k[0].strip("\t")
+        k[1] = int(k[1].strip("\t").replace(" Tau", ""))
+        self.item_name.setText(str(k[0]))
+        self.item_price.setText(str(k[1]))
+        self.update()
+
+    def buy_item(self):
+        try:
+            self.num = self.numCount.text()
+            self.num = int(self.num)
+        except ValueError:
+            print("Invalid")
+        else:
+            ans = QMessageBox.question(self, "Confirm", "Are you sure to buy?",
+                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if ans==QMessageBox.Yes:
+                print("buy yes")
+            else:
+                print("buy no")
+
+    def sell_item(self):
+        try:
+            self.num = self.numCount.text()
+            self.num = int(self.num)
+        except ValueError:
+            print("Invalid")
+        else:
+            ans = QMessageBox.question(self, "Confirm", "Are you sure to sell?",
+                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if ans==QMessageBox.Yes:
+                print("sell yes")
+            else:
+                print("ell no")
 
 
 class Intro_wind(Wind):
