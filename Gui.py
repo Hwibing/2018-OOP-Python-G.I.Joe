@@ -14,6 +14,7 @@ if __name__ == "__main__":
     print("Hello, world!")
     print("This is GUI.")
 
+
 def place_in_layout(layout, details, arrange="spread"):
     """
     레이아웃과 담을 것들을 받아 배치합니다. (Stretch 이용)
@@ -38,24 +39,34 @@ def place_in_layout(layout, details, arrange="spread"):
         l = len(details)//2
         is_odd = (len(details) % 2 == 1)
         for i in range(l):
-            try: layout.addWidget(details[i])
-            except Exception: layout.addLayout(details[i])
+            try:
+                layout.addWidget(details[i])
+            except Exception:
+                layout.addLayout(details[i])
         if is_odd and "f" in arrange:
-            try: layout.addWidget(details[l])
-            except Exception: layout.addLayout(details[i])
+            try:
+                layout.addWidget(details[l])
+            except Exception:
+                layout.addLayout(details[i])
         layout.addStretch(1)
         if is_odd and "b" in arrange:
-            try: layout.addWidget(details[l])
-            except Exception: layout.addLayout(details[l])
+            try:
+                layout.addWidget(details[l])
+            except Exception:
+                layout.addLayout(details[l])
         for i in range(l):
-            try: layout.addWidget(details[i+l+(1 if is_odd else 0)])
-            except Exception: layout.addLayout(details[i+l+(1 if is_odd else 0)])
+            try:
+                layout.addWidget(details[i+l+(1 if is_odd else 0)])
+            except Exception:
+                layout.addLayout(details[i+l+(1 if is_odd else 0)])
     else:
         if arrange in ("spread", "back", "center"):
             layout.addStretch(1)
         for w in details:
-            try: layout.addWidget(w)
-            except Exception: layout.addLayout(w)
+            try:
+                layout.addWidget(w)
+            except Exception:
+                layout.addLayout(w)
             if arrange == "spread":
                 layout.addStretch(1)
         if arrange in ("front", "center"):
@@ -78,7 +89,7 @@ class Wind(QWidget):
         :parameter *info: 창의 정보입니다. 가변 매개변수, [0]은 항상 name
         """
         super().__init__()  # 상위 클래스의 생성자 호출
-        self.info=info[0] # 이중 튜플 꺼내기
+        self.info = info[0]  # 이중 튜플 꺼내기
         self.name = self.info[0]  # 창의 이름 정하기
         self.strong = False  # 되묻지 않고 닫을지에 대한 여부
         self.design(self.info)  # 디자인
@@ -123,19 +134,22 @@ class Main_wind(Wind):
     Main window에서 모든 부가 창으로 이동할 수 있습니다.
     """
 
-    def design(self,info):
+    def design(self, info):
         """
         창을 디자인합니다. 
         하는 일: 레이아웃, 창 위치/크기 결정, 버튼/텍스트 띄우기
         """
-        plist=info[1] # 물건 리스트
-        plist=list(plist.items())
+        plist = info[1]  # 물건 리스트
+        plist = list(plist.items())
         Products = QListWidget()  # 물품 목록
         for i in plist:
             Products.addItem(str(i))
+        product_buttons = QHBoxLayout()
+        product_buttons.addWidget(Text("Here, add buttons.", self))
 
         Balance_text = Text("Your Money\n??? Tau", self)  # 잔고
-        Capacity_text = Link_button("Storage","Storage",self,Wind,("Storage",[]))  # 창고용량
+        Capacity_text = Link_button(
+            "Storage", "Storage", self, Wind, ("Storage", []))  # 창고용량
         Next_day_button = Push_button("Sleep", "Next day", self)  # '다음 날' 버튼
         End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
@@ -143,8 +157,8 @@ class Main_wind(Wind):
         top_box = QHBoxLayout()
         place_in_layout(top_box, (Balance_text, Capacity_text))
         mid_box = QHBoxLayout()
+        place_in_layout(mid_box, (Products, product_buttons), "wing_f")
         mid_box.addStretch(1)
-        mid_box.addWidget(Products)
         bottom_box = QHBoxLayout()
         place_in_layout(
             bottom_box, (Next_day_button, End_button), "Back")
@@ -157,7 +171,7 @@ class Main_wind(Wind):
         vbox.addLayout(bottom_box)
 
         self.setLayout(vbox)
-        self.setGeometry(100, 100, 1300, 800)  # 위치, 크기
+        self.setGeometry(100, 100, 800, 500)  # 위치, 크기
 
 
 class Intro_wind(Wind):
@@ -165,13 +179,14 @@ class Intro_wind(Wind):
     프로그램을 작동하자마자 뜨는 창입니다. Wind를 상속합니다.
     게임 시작/종료 버튼만 존재합니다. 게임 시작을 누르면 게임이 열리고, 게임 종료를 누르면 끝납니다.
     """
+
     def design(self, info):
         """
         상위 클래스로부터 오버라이드합니다.
         :parameter clss: 물품 리스트입니다. 
         """
         start_btn = Moveto_button(
-            "Start", "Start game.", self, Main_wind, ("Main",info[1]))  # 게임 시작 버튼
+            "Start", "Start game.", self, Main_wind, ("Main", info[1]))  # 게임 시작 버튼
         quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
 
         vmid_box = QVBoxLayout()
@@ -310,5 +325,5 @@ class Text(QLabel):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)  # application 객체 생성하기 위해 시스템 인수 넘김
-    intro = Intro_wind(("Intro",{"apple": 1, "banana": 2, "cherry": 3}))
+    intro = Intro_wind(("Intro", {"apple": 1, "banana": 2, "cherry": 3}))
     sys.exit(app.exec_())  # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
