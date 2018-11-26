@@ -2,8 +2,6 @@ import sys
 from abc import abstractmethod
 from time import sleep
 
-from MainClass import *
-
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
@@ -14,6 +12,9 @@ if __name__ == "__main__":
     print("Hello, world!")
     print("This is GUI.")
 
+product_list={"apple": 1, "banana": 2, "cherry": 3, "dount": 4, "eclair": 5, "froyo": 6} # 전체 상품 목록
+news_list=[] # 뉴스 목록
+storage_list=[]
 
 def place_in_layout(layout, details, arrange="spread"):
     """
@@ -81,22 +82,21 @@ class Wind(QWidget):
     Wind 클래스를 만들면 창이 띄워집니다.
     """
 
-    def __init__(self, info):
+    def __init__(self, name):
         """
         생성자입니다. 
         띄울 창의 이름을 결정하며, 끝날 때 setup을 호출합니다.
         :parameter name: 창의 이름입니다.
-        :parameter *info: 창의 정보입니다. 가변 매개변수, [0]은 항상 name
         """
         super().__init__()  # 상위 클래스의 생성자 호출
-        self.name = info[0]  # 창의 이름 정하기
+        self.name = name  # 창의 이름 정하기
         self.strong = False  # 되묻지 않고 닫을지에 대한 여부
-        self.design(info)  # 디자인
+        self.design()  # 디자인
         self.setup()  # 셋업
 
     # 디자인 메소드는 반드시 오버라이드해야 합니다. (추상 메소드)
     @abstractmethod
-    def design(self, info):
+    def design(self):
         pass
 
     def setup(self):
@@ -132,13 +132,13 @@ class Main_wind(Wind):
     Main window에서 모든 부가 창으로 이동할 수 있습니다.
     """
 
-    def design(self, info):
+    def design(self):
         """
         창을 디자인합니다. 
         하는 일: 레이아웃, 창 위치/크기 결정, 버튼/텍스트 띄우기
         """
-        plist = info[1]  # 물건 리스트
-        plist = list(plist.items())  # 튜플로 전부 추출
+        global product_list
+        plist = list(product_list.items())  # 튜플로 전부 추출
         Products = QListWidget()  # 물품 목록
         for i in plist:  # 각 항목을
             s = str(i[0])+"\t\t\t|\t\t"+str(i[1])+str(" Tau")
@@ -147,9 +147,9 @@ class Main_wind(Wind):
 
         Balance_text = Text("Your Money\n??? Tau", self)  # 잔고
         Capacity_text = Link_button(
-            "Storage", "Storage", self, List_wind, ("Storage", []))  # 창고용량
+            "Storage", "Storage", self, List_wind, "Storage")  # 창고용량
         News_button = Link_button(
-            "News", "Show recent news.", self, List_wind, ("News", "Hi!"))  # 뉴스 버튼
+            "News", "Show recent news.", self, List_wind, "News")  # 뉴스 버튼
         Next_day_button = Push_button("Sleep", "Next day", self)  # '다음 날' 버튼
         End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
@@ -172,7 +172,7 @@ class Main_wind(Wind):
 
         self.setLayout(vbox)
         self.move(100, 100)  # 위치
-        self.setFixedSize(800, 600) # 크기(고정)
+        self.setFixedSize(800, 600)  # 크기(고정)
 
 
 class Intro_wind(Wind):
@@ -181,13 +181,13 @@ class Intro_wind(Wind):
     게임 시작/종료 버튼만 존재합니다. 게임 시작을 누르면 게임이 열리고, 게임 종료를 누르면 끝납니다.
     """
 
-    def design(self, info):
+    def design(self):
         """
         상위 클래스로부터 오버라이드합니다.
         :parameter clss: 물품 리스트입니다. 
         """
         start_btn = Moveto_button(
-            "Start", "Start game.", self, Main_wind, ("Main", info[1]))  # 게임 시작 버튼
+            "Start", "Start game.", self, Main_wind, "Main")  # 게임 시작 버튼
         quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
 
         vmid_box = QVBoxLayout()
@@ -203,7 +203,7 @@ class List_wind(Wind):
     리스트와 닫기 버튼이 있는 창입니다. Wind를 상속합니다.
     """
 
-    def design(self, info):
+    def design(self):
         # 상위 클래스로부터 오버라이드
         vbox = QVBoxLayout()
         vbox.addWidget(QListWidget())
@@ -272,13 +272,13 @@ class Link_button(Push_button):
     눌리면 새 창을 띄우는 버튼 클래스입니다. Push_button을 상속합니다.
     """
 
-    def __init__(self, name, tooltip, window, link_class, link_info, for_layout=True, location=(0, 0)):
+    def __init__(self, name, tooltip, window, link_class, link_name, for_layout=True, location=(0, 0)):
         """
         상위 클래스로부터 오버라이드합니다.
         :parameter link_class: 띄울 창의 클래스입니다.
-        :parameter link_info: 띄울 창의 정보입니다. (이름)
+        :parameter link_name: 띄울 창의 정보입니다. (이름)
         """
-        self.window_info = (link_class, link_info)  # 띄울 창의 정보를 튜플로 만들기
+        self.window_info = (link_class, link_name)  # 띄울 창의 정보를 튜플로 만들기
         super().__init__(name, tooltip, window, for_layout, location)  # 상위 클래스의 생성자 호출
 
     def utility_set(self, window):
@@ -357,6 +357,5 @@ class Text(QLabel):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)  # application 객체 생성하기 위해 시스템 인수 넘김
-    intro = Intro_wind(
-        ("Intro", {"apple": 1, "banana": 2, "cherry": 3, "dount": 4, "eclair": 5, "Froyo": 6}))
+    intro = Intro_wind("Intro")
     sys.exit(app.exec_())  # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
