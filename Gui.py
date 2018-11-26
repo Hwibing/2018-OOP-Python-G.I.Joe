@@ -81,7 +81,7 @@ class Wind(QWidget):
     Wind 클래스를 만들면 창이 띄워집니다.
     """
 
-    def __init__(self, *info):
+    def __init__(self, info):
         """
         생성자입니다. 
         띄울 창의 이름을 결정하며, 끝날 때 setup을 호출합니다.
@@ -89,10 +89,9 @@ class Wind(QWidget):
         :parameter *info: 창의 정보입니다. 가변 매개변수, [0]은 항상 name
         """
         super().__init__()  # 상위 클래스의 생성자 호출
-        self.info = info[0]  # 이중 튜플 꺼내기
-        self.name = self.info[0]  # 창의 이름 정하기
+        self.name = info[0]  # 창의 이름 정하기
         self.strong = False  # 되묻지 않고 닫을지에 대한 여부
-        self.design(self.info)  # 디자인
+        self.design(info)  # 디자인
         self.setup()  # 셋업
 
     # 디자인 메소드는 반드시 오버라이드해야 합니다. (추상 메소드)
@@ -110,12 +109,11 @@ class Wind(QWidget):
 
     def closeEvent(self, QCloseEvent):  # 창 닫기 이벤트(X자 누르거나 .close() 호출 시)
         if self.strong:  # 만약 되묻지 않기로 했다면?
-            # del window_dict[self.name] # 딕셔너리에서 본인의 이름 제거
             QCloseEvent.accept()  # 그냥 CloseEvent 수용
         else:  # 되묻기
             # 메시지박스로 물어보기(Y/N), 그 결과를 ans에 저장
             ans = QMessageBox.question(self, "Confirm", "Do you want to quit?",
-                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if ans == QMessageBox.Yes:  # ~.Yes, ~.No는 상수여서 비교 가능
                 # del window_dict[self.name] # 본인 이름 제거
                 QCloseEvent.accept()  # CloseEvent 수용
@@ -143,16 +141,9 @@ class Main_wind(Wind):
         plist = list(plist.items())
         Products = QListWidget()  # 물품 목록
         for i in plist:
-            Products.addItem(str(i))
-
-        buttons=QHBoxLayout()
-        product_info=QHBoxLayout()
-        Buy_button=Basic_button("Buy", "Buy selected object.", self)
-        Sell_button=Basic_button("Sell", "Sell selected object.", self)
-        place_in_layout(buttons, (Buy_button, Sell_button))
-        place_in_layout(product_info, (Text("Price", self), Text("Num", self)))
-        product_buttons = QVBoxLayout()
-        place_in_layout(product_buttons, (buttons, product_info))
+            s=str(i[0])+"\t\t\t|\t\t"+str(i[1])+str(" Tau")
+            Products.addItem(s)
+        Products.setFixedHeight(400)
 
         Balance_text = Text("Your Money\n??? Tau", self)  # 잔고
         Capacity_text = Link_button(
@@ -166,7 +157,6 @@ class Main_wind(Wind):
         top_box = QHBoxLayout()
         place_in_layout(top_box, (Balance_text, Capacity_text))
         mid_box = QHBoxLayout()
-        place_in_layout(mid_box, (Products, product_buttons), "wing_f")
         mid_box.addStretch(1)
         bottom_box = QHBoxLayout()
         place_in_layout(
@@ -174,13 +164,14 @@ class Main_wind(Wind):
 
         vbox = QVBoxLayout()
         vbox.addLayout(top_box)
-        vbox.addStretch(2)
+        vbox.addStretch(1)
+        vbox.addWidget(Products)
         vbox.addLayout(mid_box)
         vbox.addStretch(1)
         vbox.addLayout(bottom_box)
 
         self.setLayout(vbox)
-        self.setGeometry(100, 100, 800, 500)  # 위치, 크기
+        self.setGeometry(100, 100, 800, 600)  # 위치, 크기
 
 
 class Intro_wind(Wind):
@@ -264,7 +255,7 @@ class Link_button(Push_button):
         :parameter link_class: 띄울 창의 클래스입니다.
         :parameter link_info: 띄울 창의 정보입니다. (이름)
         """
-        self.window_info = (link_class, link_info)  # 창의 정보를 튜플로 만들기
+        self.window_info = (link_class, link_info)  # 띄울 창의 정보를 튜플로 만들기
         super().__init__(name, tooltip, window, for_layout, location)  # 상위 클래스의 생성자 호출
 
     def utility_set(self, window):
@@ -343,5 +334,5 @@ class Text(QLabel):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)  # application 객체 생성하기 위해 시스템 인수 넘김
-    intro = Intro_wind(("Intro", {"apple": 1, "banana": 2, "cherry": 3}))
+    intro = Intro_wind(("Intro", {"apple": 1, "banana": 2, "cherry": 3, "dount": 4, "eclair":5, "Froyo":6}))
     sys.exit(app.exec_())  # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
