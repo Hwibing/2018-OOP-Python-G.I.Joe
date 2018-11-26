@@ -460,8 +460,9 @@ class Text(QLabel):
         self.setFixedSize(self.sizeHint())  # 크기 설정
         self.show()
 
-
-if __name__ == "__main__":
+def game_start():
     app = QApplication(sys.argv)  # application 객체 생성하기 위해 시스템 인수 넘김
     intro = Intro_wind("Intro")
     sys.exit(app.exec_())  # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
+
+    return intro
