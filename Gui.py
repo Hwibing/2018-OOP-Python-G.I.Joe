@@ -12,7 +12,7 @@ if __name__ == "__main__":
     print("Hello, world!")
     print("This is GUI.")
 
-# 전역 변수입니다... 헤헤!
+# 전역 변수입니다... 헤헤...
 Product_List = {"apple": 1, "banana": 2, "cherry": 3,
                 "dount": 4, "eclair": 5, "froyo": 6}  # 전체 상품 목록
 News_List = ["Sun", "Moon", "Stars"]  # 뉴스 목록
@@ -134,7 +134,7 @@ class Wind(QWidget):
         self.close()  # 닫는다(그냥 종료)
 
 
-class Main_wind(Wind):  
+class Main_wind(Wind):
     """
     메인 윈도우입니다. Wind를 상속합니다.
     게임 플레이의 중추입니다.
@@ -159,27 +159,29 @@ class Main_wind(Wind):
         Storage_button = Link_button(
             "Storage", "Storage", self, Storage_wind, "Storage")  # 창고용량
 
+        buttons = QVBoxLayout()
+        buttons.addWidget(Basic_button("Buy", "Buy selected goods.", self))
+        buttons.addStretch(1)
+        buttons.addWidget(Basic_button("Sell", "Sell selected goods.", self))
+
         News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
         Next_day_button = Push_button("Sleep", "Next day", self)  # '다음 날' 버튼
         End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
 
-        top_box = QHBoxLayout()
+        top_box = QHBoxLayout()  # 상부
         place_in_layout(top_box, (Info_text, Bank_button, Storage_button))
-        mid_box = QHBoxLayout()
-        mid_box.addWidget(Products)
-        mid_box.addStretch(1)
-        bottom_box = QHBoxLayout()
+
+        mid_box = QHBoxLayout()  # 중간
+        place_in_layout(mid_box, (Products, buttons))
+
+        bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
             bottom_box, (News_button, Next_day_button, End_button), "wing_b")
 
         vbox = QVBoxLayout()
-        vbox.addLayout(top_box)
-        vbox.addStretch(1)
-        vbox.addLayout(mid_box)
-        vbox.addStretch(1)
-        vbox.addLayout(bottom_box)
+        place_in_layout(vbox, (top_box, mid_box, bottom_box), arrange="spread")
 
         self.setLayout(vbox)
         self.move(100, 100)  # 위치
