@@ -150,6 +150,8 @@ class Main_wind(Wind):
         Balance_text = Text("Your Money\n??? Tau", self)  # 잔고
         Capacity_text = Link_button(
             "Storage", "Storage", self, Wind, ("Storage", []))  # 창고용량
+        Graph_button = Push_button(
+            "Charts", "Show price graphs.", self)  # 차트 버튼
         Next_day_button = Push_button("Sleep", "Next day", self)  # '다음 날' 버튼
         End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
@@ -161,7 +163,7 @@ class Main_wind(Wind):
         mid_box.addStretch(1)
         bottom_box = QHBoxLayout()
         place_in_layout(
-            bottom_box, (Next_day_button, End_button), "Back")
+            bottom_box, (Graph_button, Next_day_button, End_button), "wing_b")
 
         vbox = QVBoxLayout()
         vbox.addLayout(top_box)
@@ -190,9 +192,9 @@ class Intro_wind(Wind):
         quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
 
         vmid_box = QVBoxLayout()
-        place_in_layout(vmid_box, (start_btn, quit_btn))
+        place_in_layout(vmid_box, (start_btn, quit_btn))  # 버튼 수직 레이아웃
 
-        self.setLayout(vmid_box)
+        self.setLayout(vmid_box)  # 배치
         self.setGeometry(300, 300, 200, 150)  # 창 위치와 창 크기
 
 
@@ -214,7 +216,7 @@ class Push_button(QPushButton):
         super().__init__(name, window)  # 상위 클래스의 생성자 호출
         self.for_layout = for_layout
         self.design(tooltip, location)  # 디자인하기
-        self.window = window
+        self.window = window  # 어디에 띄울 건지...
         self.utility_set(window)  # 기능 설정
 
     def design(self, tooltip, location):
@@ -231,6 +233,15 @@ class Push_button(QPushButton):
 
     # utility_set은 반드시 오버라이드해야 함
     @abstractmethod
+    def utility_set(self, window):
+        pass
+
+
+class Basic_button(Push_button):
+    """
+    아무 기능이 없는 버튼 클래스입니다. Push_button을 상속합니다. 
+    """
+
     def utility_set(self, window):
         pass
 
