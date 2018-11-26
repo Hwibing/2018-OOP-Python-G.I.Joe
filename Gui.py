@@ -13,10 +13,12 @@ if __name__ == "__main__":
     print("This is GUI.")
 
 # 전역 변수입니다... 헤헤!
-product_list = {"apple": 1, "banana": 2, "cherry": 3,
+Product_List = {"apple": 1, "banana": 2, "cherry": 3,
                 "dount": 4, "eclair": 5, "froyo": 6}  # 전체 상품 목록
-news_list = []  # 뉴스 목록
-storage_list = []  # 사용자 창고
+News_List = ["Sun", "Moon", "Stars"]  # 뉴스 목록
+Storage_List = []  # 사용자 창고
+Money = 39824
+Day = 128
 
 
 def place_in_layout(layout, details, arrange="spread"):
@@ -132,7 +134,7 @@ class Wind(QWidget):
         self.close()  # 닫는다(그냥 종료)
 
 
-class Main_wind(Wind):
+class Main_wind(Wind):  
     """
     메인 윈도우입니다. Wind를 상속합니다.
     게임 플레이의 중추입니다.
@@ -141,26 +143,32 @@ class Main_wind(Wind):
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        global product_list
-        plist = list(product_list.items())  # 튜플로 전부 추출
+        global Product_List
+        plist = list(Product_List.items())  # 튜플로 전부 추출
         Products = QListWidget()  # 물품 목록
         for i in plist:  # 각 항목을
             s = str(i[0])+"\t\t\t|\t\t"+str(i[1])+str(" Tau")
             Products.addItem(s)  # 추가한다
         Products.setFixedSize(500, 400)  # 크기 고정
 
-        Balance_text = Text("Your Money\n??? Tau", self)  # 잔고
-        Capacity_text = Link_button(
-            "Storage", "Storage", self, List_wind, "Storage")  # 창고용량
+        global Money, Day
+        Info_text = Text("Your Money: {}\nDay: {}".format(
+            Money, Day), self)  # 잔고
+        Bank_button = Link_button(
+            "Bank", "Bank", self, List_wind_with_menu, "Bank")  # 은행
+        Storage_button = Link_button(
+            "Storage", "Storage", self, Storage_wind, "Storage")  # 창고용량
+
         News_button = Link_button(
-            "News", "Show recent news.", self, List_wind, "News")  # 뉴스 버튼
+            "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
         Next_day_button = Push_button("Sleep", "Next day", self)  # '다음 날' 버튼
         End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
 
         top_box = QHBoxLayout()
-        place_in_layout(top_box, (Balance_text, Capacity_text))
+        place_in_layout(top_box, (Info_text, Bank_button, Storage_button))
         mid_box = QHBoxLayout()
+        mid_box.addWidget(Products)
         mid_box.addStretch(1)
         bottom_box = QHBoxLayout()
         place_in_layout(
@@ -169,7 +177,6 @@ class Main_wind(Wind):
         vbox = QVBoxLayout()
         vbox.addLayout(top_box)
         vbox.addStretch(1)
-        vbox.addWidget(Products)
         vbox.addLayout(mid_box)
         vbox.addStretch(1)
         vbox.addLayout(bottom_box)
@@ -187,15 +194,16 @@ class Intro_wind(Wind):
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        start_btn = Moveto_button(
+        _start_btn = Moveto_button(
             "Start", "Start game.", self, Main_wind, "Main")  # 게임 시작 버튼
-        quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
+        _quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
 
-        vmid_box = QVBoxLayout()
-        place_in_layout(vmid_box, (start_btn, quit_btn))  # 버튼 수직 레이아웃
+        _vmid_box = QVBoxLayout()
+        place_in_layout(_vmid_box, (_start_btn, _quit_btn))  # 버튼 수직 레이아웃
 
-        self.setLayout(vmid_box)  # 배치
-        self.setGeometry(300, 300, 200, 150)  # 창 위치와 창 크기
+        self.setLayout(_vmid_box)  # 배치
+        self.move(300, 300)  # 창 위치
+        self.setFixedSize(self.sizeHint())  # 창 크기(고정)
 
 
 class List_wind(Wind):
@@ -205,18 +213,70 @@ class List_wind(Wind):
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        vbox = QVBoxLayout()
-        vbox.addWidget(QListWidget())
-        vbox.addWidget(Close_button("Close", "Close this window.", self))
-        self.setLayout(vbox)
-        self.setFixedSize(600, 400)
+        _vbox = QVBoxLayout()  # 수직 레이아웃
+        self.List = QListWidget()  # 리스트
+        _vbox.addWidget(self.List)  # 수직 레이아웃에 리스트 추가
+        _hbox = QHBoxLayout()  # 수평 레이아웃
+        place_in_layout(
+            _hbox, (Close_button("Close", "Close this window.", self),), "center")  # 수평 레이아웃에 닫기 버튼 추가
+        _vbox.addLayout(_hbox)  # 수직 레이아웃에 수평 레이아웃 추가
+        self.setLayout(_vbox)  # 수직 레이아웃 배치
+        self.setFixedSize(600, 400)  # 창 크기 고정
+
+
+class List_wind_with_menu(List_wind):
+    """
+    버튼으로 메뉴를 만들어둔 창입니다. List_wind를 상속합니다.
+    """
+
+    def design(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        _vbox = QVBoxLayout()
+        _hbox_1 = QHBoxLayout()
+        self.buttons = QVBoxLayout()
+        _hbox_2 = QHBoxLayout()
+
+        self.buttons.addWidget(Basic_button("asdf", "", self))
+        self.buttons.addWidget(Basic_button("qwer", "", self))
+        self.buttons.addWidget(Basic_button("zxcv", "", self))
+
+        self.List = QListWidget()
+        _hbox_1.addWidget(self.List)
+        _hbox_1.addLayout(self.buttons)
+
+        place_in_layout(
+            _hbox_2, (Close_button("Close", "Close this window.", self),), "center")
+        _vbox.addLayout(_hbox_1)
+        _vbox.addLayout(_hbox_2)
+
+        self.setLayout(_vbox)
+        self.setFixedSize(600, 400)  # 창 크기 고정
 
 
 class News_wind(List_wind):
     """
-    뉴스를 표시해주는 창입니다. List_wind를 상속합니다.
+    뉴스를 띄우는 창입니다. List_Wind를 상속합니다. 
     """
-    pass
+
+    def design(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        super().design()
+        global News_List
+        for i in News_List:
+            self.List.addItem(i)
+
+
+class Storage_wind(List_wind):
+    """
+    창고를 띄우는 창입니다. List_wind를 상속합니다.
+    """
+
+    def design(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        super().design()
+        global Storage_List
+        for i in Storage_List:
+            self.List.addItem(i)
 
 
 class Push_button(QPushButton):
@@ -241,7 +301,7 @@ class Push_button(QPushButton):
         :parameter tooltip: 버튼 툴팁(마우스 올리면 나타나는 거)입니다.
         """
         self.setToolTip(tooltip)  # 툴팁 설정
-        self.resize(self.sizeHint())  # 글씨에 따라 버튼 크기 조정
+        self.setFixedSize(self.sizeHint())  # 글씨에 따라 버튼 크기 조정
 
     # utility_set은 반드시 오버라이드해야 함
     @abstractmethod
