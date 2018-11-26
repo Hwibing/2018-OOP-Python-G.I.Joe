@@ -138,18 +138,18 @@ class Main_wind(Wind):
         하는 일: 레이아웃, 창 위치/크기 결정, 버튼/텍스트 띄우기
         """
         plist = info[1]  # 물건 리스트
-        plist = list(plist.items())
+        plist = list(plist.items())  # 튜플로 전부 추출
         Products = QListWidget()  # 물품 목록
-        for i in plist:
-            s=str(i[0])+"\t\t\t|\t\t"+str(i[1])+str(" Tau")
-            Products.addItem(s)
-        Products.setFixedHeight(400)
+        for i in plist:  # 각 항목을
+            s = str(i[0])+"\t\t\t|\t\t"+str(i[1])+str(" Tau")
+            Products.addItem(s)  # 추가한다
+        Products.setFixedSize(500, 400)  # 크기 고정
 
         Balance_text = Text("Your Money\n??? Tau", self)  # 잔고
         Capacity_text = Link_button(
-            "Storage", "Storage", self, Wind, ("Storage", []))  # 창고용량
-        Graph_button = Push_button(
-            "Charts", "Show price graphs.", self)  # 차트 버튼
+            "Storage", "Storage", self, List_wind, ("Storage", []))  # 창고용량
+        News_button = Link_button(
+            "News", "Show recent news.", self, List_wind, ("News", "Hi!"))  # 뉴스 버튼
         Next_day_button = Push_button("Sleep", "Next day", self)  # '다음 날' 버튼
         End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
@@ -160,7 +160,7 @@ class Main_wind(Wind):
         mid_box.addStretch(1)
         bottom_box = QHBoxLayout()
         place_in_layout(
-            bottom_box, (Graph_button, Next_day_button, End_button), "wing_b")
+            bottom_box, (News_button, Next_day_button, End_button), "wing_b")
 
         vbox = QVBoxLayout()
         vbox.addLayout(top_box)
@@ -171,7 +171,8 @@ class Main_wind(Wind):
         vbox.addLayout(bottom_box)
 
         self.setLayout(vbox)
-        self.setGeometry(100, 100, 800, 600)  # 위치, 크기
+        self.move(100, 100)  # 위치
+        self.setFixedSize(800, 600) # 크기(고정)
 
 
 class Intro_wind(Wind):
@@ -194,6 +195,28 @@ class Intro_wind(Wind):
 
         self.setLayout(vmid_box)  # 배치
         self.setGeometry(300, 300, 200, 150)  # 창 위치와 창 크기
+
+
+class List_wind(Wind):
+
+    """
+    리스트와 닫기 버튼이 있는 창입니다. Wind를 상속합니다.
+    """
+
+    def design(self, info):
+        # 상위 클래스로부터 오버라이드
+        vbox = QVBoxLayout()
+        vbox.addWidget(QListWidget())
+        vbox.addWidget(Close_button("Close", "Close this window.", self))
+        self.setLayout(vbox)
+        self.setFixedSize(600, 400)
+
+
+class News_wind(List_wind):
+    """
+    뉴스를 표시해주는 창입니다. List_wind를 상속합니다.
+    """
+    pass
 
 
 class Push_button(QPushButton):
@@ -334,5 +357,6 @@ class Text(QLabel):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)  # application 객체 생성하기 위해 시스템 인수 넘김
-    intro = Intro_wind(("Intro", {"apple": 1, "banana": 2, "cherry": 3, "dount": 4, "eclair":5, "Froyo":6}))
+    intro = Intro_wind(
+        ("Intro", {"apple": 1, "banana": 2, "cherry": 3, "dount": 4, "eclair": 5, "Froyo": 6}))
     sys.exit(app.exec_())  # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
