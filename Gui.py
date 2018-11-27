@@ -267,13 +267,13 @@ class Main_wind(Wind):
                 except AttributeError:
                     pass
                 else:
-                    status()
-                    print(money.money)
+                    #status()
+                    #print(money.money)
                     self.Info_text.setText("Your Money: {}\nDay: {}".format(
                         money.money, Day))  # 잔고
                     self.update()
             else:
-                print("buy no")
+                 print("buy no")
 
     def sell_item(self):
         try:
@@ -287,7 +287,7 @@ class Main_wind(Wind):
             if ans == QMessageBox.Yes:
                 print("sell yes")
                 sell(self.productname, getclass(self.productname), self.num)
-                status()
+                #status()
                 self.Info_text.setText("Your Money: {}\nDay: {}".format(
                     money.money, Day))  # 잔고
                 self.update()
@@ -405,7 +405,7 @@ class Storage_wind(List_wind):
         self.List.addItem('-'*40)
         for (name, data) in list(storage.warehouse.items()):
             if not isinstance(getclass(name), ExpireProduct):
-                print(name, data)
+                # print(name, data)
                 self.List.addItem(name + '\t' + str(data))
         for (name, datelist) in list(storage.warehouse_expire.items()):
             for [number, date] in datelist:

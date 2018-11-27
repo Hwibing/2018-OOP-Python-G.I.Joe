@@ -140,11 +140,8 @@ class Storage:
 
         if name in self.warehouse_expire:
 
-            print(self.warehouse_expire[name])
-
             while True:
                 mylist = list(self.warehouse_expire[name])
-                print(mylist)
 
                 count = mylist[0][0]
                 expire = mylist[0][1]
@@ -156,7 +153,6 @@ class Storage:
                     break
                 else:
                     number -= count
-                print(self.warehouse_expire[name])
 
             if self.warehouse_expire[name] == []:
                 del self.warehouse_expire[name]
