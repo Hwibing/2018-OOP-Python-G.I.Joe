@@ -56,69 +56,15 @@ def getclass(name):
 
 '''
 Initialize Game
-Initialize Game
-Initialize Game
-Initialize Game
-Initialize Game
-Initialize Game
-Initialize Game
-Initialize Game
-Initialize Game
-Initialize Game
 '''
 
 (agriculture, livestock, luxury, manufactured) = init()
-money = Finance(500000)
-storage = Storage(100)
-agriculture.printproductlist()
-
-
-'''
-# Usage notes FROM here
-buy('감자', agriculture, 10)
-sell('감자', agriculture, 10)
-sleep()
-status()
-'''
-
-
-'''
-Global Variables
-Global Variables
-Global Variables
-Global Variables
-Global Variables
-Global Variables
-Global Variables
-Global Variables
-Global Variables
-Global Variables
-'''
-
-
-# Global Variables
-Product_List = {} # 전체 상품 목록
-Product_List.update(luxury.productList)
-Product_List.update(manufactured.productList)
-
+money = Finance(500000)  # 초기 자본금
+storage = Storage(100)  # 초기 창고용량
 News_List = ["News1", "New2", "New3"]  # 뉴스 목록
-Storage_List = storage.warehouse # 사용자 창고
-Money = money.money
 Day = 1
 
-
-
 '''
-GUI CODE STARTS
-GUI CODE STARTS
-GUI CODE STARTS
-GUI CODE STARTS
-GUI CODE STARTS
-GUI CODE STARTS
-GUI CODE STARTS
-GUI CODE STARTS
-GUI CODE STARTS
-GUI CODE STARTS
 GUI CODE STARTS
 '''
 
@@ -273,9 +219,8 @@ class Main_wind(Wind):
         self.Products.setFixedSize(500, 400)  # 크기 고정
         self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
 
-        global Money, Day
         self.Info_text = Text("Your Money: {}\nDay: {}".format(
-            Money, Day), self)  # 잔고
+            money.money, Day), self)  # 잔고
         Bank_button = Link_button(
             "Bank", "Bank", self, List_wind_with_menu, "Bank")  # 은행
         Storage_button = Link_button(
