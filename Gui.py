@@ -10,6 +10,22 @@ from MainClass import *
 from Ctrl import *
 
 
+
+'''
+Initialize Game
+'''
+
+(agriculture, livestock, luxury, manufactured) = init()
+money = Finance(500000)  # 초기 자본금
+storage = Storage(100)  # 초기 창고용량
+News_List = ["News1", "New2", "New3"]  # 뉴스 목록
+Day = 1
+
+
+'''
+Game main code
+'''
+
 def buy(name, cls, number):
     if storage.quantity + number <= storage.maxsize:
         if money.buy(name, cls, number):
@@ -35,8 +51,10 @@ def sell(name, cls, number):
 
 
 def sleep():
+    global Day
     money.nextday()
     storage.nextday()
+    Day += 1
 
 
 def status():
@@ -53,16 +71,6 @@ def getclass(name):
         return luxury
     if name in manufactured.productList:
         return manufactured
-
-'''
-Initialize Game
-'''
-
-(agriculture, livestock, luxury, manufactured) = init()
-money = Finance(500000)  # 초기 자본금
-storage = Storage(100)  # 초기 창고용량
-News_List = ["News1", "New2", "New3"]  # 뉴스 목록
-Day = 1
 
 '''
 GUI CODE STARTS
