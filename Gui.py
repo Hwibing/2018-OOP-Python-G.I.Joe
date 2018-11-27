@@ -451,16 +451,18 @@ class Storage_wind(List_wind):
     """
 
     def design(self):
+        status()
         # 상위 클래스로부터 오버라이드합니다.
         super().design()
         self.List.addItem('이름:\t수량:\t유통기한:')
         self.List.addItem('-'*40)
         for (name, data) in list(storage.warehouse.items()):
-            if getclass(name) != ExpireProduct:
+            if not isinstance(getclass(name), ExpireProduct):
                 print(name, data)
                 self.List.addItem(name + '\t' + str(data))
-        for (name,[number, date]) in list(storage.warehouse_expire.items()):
-            self.List.addItem(name + '\t' + str(number) + '\t' + str(date))
+        for (name, datelist) in list(storage.warehouse_expire.items()):
+            for [number, date] in datelist:
+                self.List.addItem(name + '\t' + str(number) + '\t' + str(date))
 
 
 class Push_button(QPushButton):
