@@ -263,10 +263,10 @@ class Main_wind(Wind):
 
         self.Products.addItem("-----------공산품------------")
         for (name, price) in list(manufactured.productList.items()):
-            self.Products.addItem(name+"\t\t"+str(price))
+            self.Products.addItem(name+"\t"+str(price))
         self.Products.addItem("-----------사치품------------")
         for (name, price) in list(luxury.productList.items()):
-            self.Products.addItem(name+"\t\t"+str(price))
+            self.Products.addItem(name+"\t"+str(price))
         
         self.Products.setFixedSize(500, 400)  # 크기 고정
         self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
@@ -316,9 +316,9 @@ class Main_wind(Wind):
 
     def selectionChanged_event(self):
         k = str(self.Products.currentItem().text())
-        k = k.split("|")
+        k = k.split("\t")
         k[0] = k[0].strip("\t")
-        k[1] = int(k[1].strip("\t").replace(" Tau", ""))
+        k[1] = int(k[1].strip("\t").replace("\t", ""))
         self.item_name.setText(str(k[0]))
         self.productname = str(k[0])
         self.item_price.setText(str(k[1]))
