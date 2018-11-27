@@ -11,7 +11,7 @@ from Ctrl import *
 
 
 def buy(name, cls, number):
-    if storage.quantity + number > storage.maxsize:
+    if storage.quantity + number <= storage.maxsize:
         if money.buy(name, cls, number):
             if storage.buy(name, cls, number):
                 return True
@@ -43,6 +43,17 @@ def status():
     print('money : {}'.format(money.money))
     storage.printstorage()
 
+
+def getclass(name):
+    if name in agriculture.productList:
+        return agriculture
+    if name in livestock.productList:
+        return livestock
+    if name in luxury.productList:
+        return luxury
+    if name in manufactured.productList:
+        return manufactured
+
 '''
 Initialize Game
 Initialize Game
@@ -61,17 +72,6 @@ money = Finance(500000)
 storage = Storage(100)
 agriculture.printproductlist()
 
-
-def getclass(name):
-    global agriculture, livestock, luxury, manufactured
-    if name in agriculture.productList:
-        return agriculture
-    if name in livestock.productList:
-        return livestock
-    if name in luxury.productList:
-        return luxury
-    if name in manufactured.productList:
-        return manufactured
 
 '''
 # Usage notes FROM here
@@ -344,8 +344,13 @@ class Main_wind(Wind):
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if ans==QMessageBox.Yes:
                 print("sell yes")
+                sell(self.productname, getclass(self.productname), self.num)
+                status()
+                self.Info_text.setText("Your Money: {}\nDay: {}".format(
+                    money.money, Day))  # 잔고
+                self.update()
             else:
-                print("ell no")
+                print("sell no")
 
 
 class Intro_wind(Wind):
