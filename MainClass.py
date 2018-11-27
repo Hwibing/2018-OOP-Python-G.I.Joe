@@ -139,12 +139,25 @@ class Storage:
                 return False
 
         if name in self.warehouse_expire:
-            for [count, expire] in self.warehouse_expire[name]:
-                self.warehouse_expire[name].remove([count, expire])
+
+            print(self.warehouse_expire[name])
+
+            while True:
+                mylist = list(self.warehouse_expire[name])
+                print(mylist)
+
+                count = mylist[0][0]
+                expire = mylist[0][1]
+
+                self.warehouse_expire[name].remove(mylist[0])
+
                 if count > number:
                     self.warehouse_expire[name].append([count-number, expire])
                     break
-                else: number -= count
+                else:
+                    number -= count
+                print(self.warehouse_expire[name])
+
             if self.warehouse_expire[name] == []:
                 del self.warehouse_expire[name]
         return True
