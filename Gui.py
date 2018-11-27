@@ -6,17 +6,16 @@ from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
                              QLineEdit, QListWidget, QMainWindow, QMessageBox,
                              QPushButton, QVBoxLayout, QWidget)
-from MainClass import *
-from Ctrl import *
 
+from MainStream import *
 
 '''
 Initialize Game
 '''
 
 (agriculture, livestock, luxury, manufactured) = init()
-money = Finance(500000)  # 초기 자본금
-storage = Storage(100)  # 초기 창고용량
+# money = Finance(500000)  # 초기 자본금
+# storage = Storage(100)  # 초기 창고용량
 News_List = ["News1", "New2", "New3"]  # 뉴스 목록
 Day = 1
 
@@ -24,42 +23,6 @@ Day = 1
 '''
 Game main code
 '''
-
-
-def buy(name, cls, number):
-    if storage.quantity + number <= storage.maxsize:
-        if money.buy(name, cls, number):
-            if storage.buy(name, cls, number):
-                return True
-            else:
-                return False
-        else:
-            return False
-    else:
-        print('Storage Overflow')
-        return False
-
-
-def sell(name, cls, number):
-    if storage.sell(name, number):
-        if money.sell(name, cls, number):
-            return True
-        else:
-            return False
-    else:
-        return False
-
-
-def sleep():
-    global Day
-    money.nextday()
-    storage.nextday()
-    Day += 1
-
-
-def status():
-    print('money : {}'.format(money.money))
-    storage.printstorage()
 
 
 def getclass(name):
@@ -171,14 +134,14 @@ class Wind(QWidget):
     def design(self):
         """
         창을 디자인합니다. 
-        하는 일: 레이아웃, 창 위치/크기 결정, 버튼/텍스트 띄우기
+        하는 일: 레이아웃, 버튼/텍스트 띄우기
         """
         pass
 
     def setup(self):
         """
         창을 세팅하고 띄웁니다.
-        하는 일: 창의 제목 설정, 창 보이기
+        하는 일: 창의 제목 설정, 창 보이기, 창 위치/크기 설정
         """
         self.setWindowTitle(self.name)  # 창의 제목 지정
         self.show()  # 보이기
@@ -188,7 +151,7 @@ class Wind(QWidget):
             QCloseEvent.accept()  # 그냥 CloseEvent 수용
         else:  # 되묻기
             # 메시지박스로 물어보기(Y/N), 그 결과를 ans에 저장
-            ans = QMessageBox.question(self, "Confirm", "Do you want to quit?",
+            ans = QMessageBox.question(self, "Confirm", "Do you want to close?",
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if ans == QMessageBox.Yes:  # ~.Yes, ~.No는 상수여서 비교 가능
                 QCloseEvent.accept()  # CloseEvent 수용
@@ -210,20 +173,7 @@ class Main_wind(Wind):
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         self.Products = QListWidget()  # 물품 목록
-
-        self.Products.addItem("-----------농산물------------")
-        for (name, [price, date]) in list(agriculture.productList.items()):
-            self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
-        self.Products.addItem("-----------축/수산물------------")
-        for (name, [price, date]) in list(livestock.productList.items()):
-            self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
-
-        self.Products.addItem("-----------공산품------------")
-        for (name, price) in list(manufactured.productList.items()):
-            self.Products.addItem(name+"\t"+str(price))
-        self.Products.addItem("-----------사치품------------")
-        for (name, price) in list(luxury.productList.items()):
-            self.Products.addItem(name+"\t"+str(price))
+        self.showProducts()  # 물품 리스트 출력
 
         self.Products.setFixedSize(500, 400)  # 크기 고정
         self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
@@ -250,6 +200,7 @@ class Main_wind(Wind):
         News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
         Next_day_button = Push_button("Sleep", "Next day", self)  # '다음 날' 버튼
+        Next_day_button.clicked.connect(self.next_day)
         End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
 
@@ -267,8 +218,26 @@ class Main_wind(Wind):
         place_in_layout(vbox, (top_box, mid_box, bottom_box), arrange="spread")
 
         self.setLayout(vbox)
+
+    def setup(self):
         self.move(100, 100)  # 위치
         self.setFixedSize(800, 600)  # 크기(고정)
+        super().setup()
+
+    def showProducts(self):
+        self.Products.addItem("-----------농산물------------")
+        for (name, [price, date]) in list(agriculture.productList.items()):
+            self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
+        self.Products.addItem("-----------축/수산물------------")
+        for (name, [price, date]) in list(livestock.productList.items()):
+            self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
+
+        self.Products.addItem("-----------공산품------------")
+        for (name, price) in list(manufactured.productList.items()):
+            self.Products.addItem(name+"\t"+str(price))
+        self.Products.addItem("-----------사치품------------")
+        for (name, price) in list(luxury.productList.items()):
+            self.Products.addItem(name+"\t"+str(price))
 
     def selectionChanged_event(self):
         k = str(self.Products.currentItem().text())
@@ -293,11 +262,16 @@ class Main_wind(Wind):
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if ans == QMessageBox.Yes:
                 print("buy yes")
-                buy(self.productname, getclass(self.productname), self.num)
-                status()
-                self.Info_text.setText("Your Money: {}\nDay: {}".format(
-                    money.money, Day))  # 잔고
-                self.update()
+                try:
+                    buy(self.productname, getclass(self.productname), self.num)
+                except AttributeError:
+                    pass
+                else:
+                    status()
+                    print(money.money)
+                    self.Info_text.setText("Your Money: {}\nDay: {}".format(
+                        money.money, Day))  # 잔고
+                    self.update()
             else:
                 print("buy no")
 
@@ -320,6 +294,14 @@ class Main_wind(Wind):
             else:
                 print("sell no")
 
+    def next_day(self):
+        global Day
+        Day += 1
+        sleep()
+        self.Info_text.setText(
+            "Your Money: {}\nDay: {}".format(money.money, Day))  # 잔고
+        self.update()
+
 
 class Intro_wind(Wind):
     """
@@ -331,14 +313,21 @@ class Intro_wind(Wind):
         # 상위 클래스로부터 오버라이드합니다.
         _start_btn = Moveto_button(
             "Start", "Start game.", self, Main_wind, "Main")  # 게임 시작 버튼
+        _start_hbox = QHBoxLayout()
+        place_in_layout(_start_hbox, (_start_btn,), "center")
         _quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
+        _quit_hbox = QHBoxLayout()
+        place_in_layout(_quit_hbox, (_quit_btn,), "center")
 
         _vmid_box = QVBoxLayout()
-        place_in_layout(_vmid_box, (_start_btn, _quit_btn))  # 버튼 수직 레이아웃
+        place_in_layout(_vmid_box, (_start_hbox, _quit_hbox))  # 버튼 수직 레이아웃
 
         self.setLayout(_vmid_box)  # 배치
+
+    def setup(self):
         self.move(300, 300)  # 창 위치
-        self.setFixedSize(self.sizeHint())  # 창 크기(고정)
+        self.setFixedSize(200, 150)  # 창 크기(고정)
+        super().setup()
 
 
 class List_wind(Wind):
@@ -356,7 +345,10 @@ class List_wind(Wind):
             _hbox, (Close_button("Close", "Close this window.", self),), "center")  # 수평 레이아웃에 닫기 버튼 추가
         _vbox.addLayout(_hbox)  # 수직 레이아웃에 수평 레이아웃 추가
         self.setLayout(_vbox)  # 수직 레이아웃 배치
+
+    def setup(self):
         self.setFixedSize(600, 400)  # 창 크기 고정
+        super().setup()
 
 
 class List_wind_with_menu(List_wind):
@@ -385,7 +377,6 @@ class List_wind_with_menu(List_wind):
         _vbox.addLayout(_hbox_2)
 
         self.setLayout(_vbox)
-        self.setFixedSize(600, 400)  # 창 크기 고정
 
 
 class News_wind(List_wind):
@@ -551,8 +542,6 @@ def game_start():
     app = QApplication(sys.argv)  # application 객체 생성하기 위해 시스템 인수 넘김
     intro = Intro_wind("Intro")
     sys.exit(app.exec_())  # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
-
-    return intro
 
 
 game_start()
