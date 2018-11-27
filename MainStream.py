@@ -3,12 +3,16 @@ from Ctrl import *
 
 
 def buy(name, cls, number):
-    if money.buy(name, cls, number):
-        if storage.buy(name, cls, number):
-            return True
+    if storage.quantity + number <= storage.maxsize:
+        if money.buy(name, cls, number):
+            if storage.buy(name, cls, number):
+                return True
+            else:
+                return False
         else:
             return False
     else:
+        print('Storage Overflow')
         return False
 
 
@@ -39,9 +43,8 @@ storage = Storage(100)
 agriculture.printproductlist()
 
 # Usage notes FROM here
-buy('감자', agriculture, 10)
-sell('감자', agriculture, 10)
-sleep()
-status()
-
-
+if __name__=="__main__":
+    buy('감자', agriculture, 10)
+    sell('감자', agriculture, 10)
+    sleep()
+    status()
