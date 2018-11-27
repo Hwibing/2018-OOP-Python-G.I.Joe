@@ -40,10 +40,10 @@ def status():
 (agriculture, livestock, luxury, manufactured) = init()
 money = Finance(500000)
 storage = Storage(100)
-agriculture.printproductlist()
 
 # Usage notes FROM here
 if __name__=="__main__":
+    agriculture.printproductlist()
     buy('감자', agriculture, 10)
     sell('감자', agriculture, 10)
     sleep()
