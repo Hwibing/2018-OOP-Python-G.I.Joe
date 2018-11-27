@@ -7,18 +7,115 @@ from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
                              QLineEdit, QListWidget, QMainWindow, QMessageBox,
                              QPushButton, QVBoxLayout, QWidget)
+from MainClass import *
+from Ctrl import *
 
-if __name__ == "__main__":
-    print("Hello, world!")
-    print("This is GUI.")
 
-# 전역 변수입니다... 헤헤...
-Product_List = {"apple": 1, "banana": 2, "cherry": 3,
-                "dount": 4, "eclair": 5, "froyo": 6}  # 전체 상품 목록
-News_List = ["Sun", "Moon", "Stars"]  # 뉴스 목록
-Storage_List = []  # 사용자 창고
-Money = 39824
-Day = 128
+def buy(name, cls, number):
+    if money.buy(name, cls, number):
+        if storage.buy(name, cls, number):
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def sell(name, cls, number):
+    if storage.sell(name, number):
+        if money.sell(name, cls, number):
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def sleep():
+    money.nextday()
+    storage.nextday()
+
+
+def status():
+    print('money : {}'.format(money.money))
+    storage.printstorage()
+
+'''
+Initialize Game
+Initialize Game
+Initialize Game
+Initialize Game
+Initialize Game
+Initialize Game
+Initialize Game
+Initialize Game
+Initialize Game
+Initialize Game
+'''
+
+(agriculture, livestock, luxury, manufactured) = init()
+money = Finance(500000)
+storage = Storage(100)
+agriculture.printproductlist()
+
+
+def getclass(name):
+    global agriculture, livestock, luxury, manufactured
+    if name in agriculture.productList:
+        return agriculture
+    if name in livestock.productList:
+        return livestock
+    if name in luxury.productList:
+        return luxury
+    if name in manufactured.productList:
+        return manufactured
+
+'''
+# Usage notes FROM here
+buy('감자', agriculture, 10)
+sell('감자', agriculture, 10)
+sleep()
+status()
+'''
+
+
+'''
+Global Variables
+Global Variables
+Global Variables
+Global Variables
+Global Variables
+Global Variables
+Global Variables
+Global Variables
+Global Variables
+Global Variables
+'''
+
+
+# Global Variables
+Product_List = {} # 전체 상품 목록
+Product_List.update(luxury.productList)
+Product_List.update(manufactured.productList)
+News_List = ["News1", "New2", "New3"]  # 뉴스 목록
+Storage_List = storage.warehouse # 사용자 창고
+Money = money.money
+Day = 1
+
+
+'''
+GUI CODE STARTS
+GUI CODE STARTS
+GUI CODE STARTS
+GUI CODE STARTS
+GUI CODE STARTS
+GUI CODE STARTS
+GUI CODE STARTS
+GUI CODE STARTS
+GUI CODE STARTS
+GUI CODE STARTS
+GUI CODE STARTS
+'''
 
 
 def place_in_layout(layout, details, arrange="spread"):
@@ -162,7 +259,7 @@ class Main_wind(Wind):
         self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
 
         global Money, Day
-        Info_text = Text("Your Money: {}\nDay: {}".format(
+        self.Info_text = Text("Your Money: {}\nDay: {}".format(
             Money, Day), self)  # 잔고
         Bank_button = Link_button(
             "Bank", "Bank", self, List_wind_with_menu, "Bank")  # 은행
@@ -188,7 +285,7 @@ class Main_wind(Wind):
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
 
         top_box = QHBoxLayout()  # 상부
-        place_in_layout(top_box, (Info_text, Bank_button, Storage_button))
+        place_in_layout(top_box, (self.Info_text, Bank_button, Storage_button))
 
         mid_box = QHBoxLayout()  # 중간
         place_in_layout(mid_box, (self.Products, self.item_info))
@@ -210,6 +307,7 @@ class Main_wind(Wind):
         k[0] = k[0].strip("\t")
         k[1] = int(k[1].strip("\t").replace(" Tau", ""))
         self.item_name.setText(str(k[0]))
+        self.productname = str(k[0])
         self.item_price.setText(str(k[1]))
         self.update()
 
@@ -224,6 +322,11 @@ class Main_wind(Wind):
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if ans==QMessageBox.Yes:
                 print("buy yes")
+                buy(self.productname, getclass(self.productname), self.num)
+                status()
+                self.Info_text.setText("Your Money: {}\nDay: {}".format(
+                    money.money, Day))  # 잔고
+                self.update()
             else:
                 print("buy no")
 
@@ -466,3 +569,6 @@ def game_start():
     sys.exit(app.exec_())  # 이벤트 처리를 위한 루프 실행(메인 루프), 루프가 끝나면 프로그램도 종료
 
     return intro
+
+
+game_start()
