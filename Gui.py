@@ -1,6 +1,5 @@
 import sys
 from abc import abstractmethod
-from time import sleep
 
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QCloseEvent
@@ -12,12 +11,16 @@ from Ctrl import *
 
 
 def buy(name, cls, number):
-    if money.buy(name, cls, number):
-        if storage.buy(name, cls, number):
-            return True
+    if storage.quantity + number > storage.maxsize:
+        if money.buy(name, cls, number):
+            if storage.buy(name, cls, number):
+                return True
+            else:
+                return False
         else:
             return False
     else:
+        print('Storage Overflow')
         return False
 
 
