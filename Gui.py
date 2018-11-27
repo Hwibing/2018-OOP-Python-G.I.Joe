@@ -100,10 +100,12 @@ Global Variables
 Product_List = {} # 전체 상품 목록
 Product_List.update(luxury.productList)
 Product_List.update(manufactured.productList)
+
 News_List = ["News1", "New2", "New3"]  # 뉴스 목록
 Storage_List = storage.warehouse # 사용자 창고
 Money = money.money
 Day = 1
+
 
 
 '''
@@ -441,9 +443,14 @@ class Storage_wind(List_wind):
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         super().design()
-        global Storage_List
-        for i in Storage_List:
-            self.List.addItem(i)
+        self.List.addItem('이름:\t수량:\t유통기한:')
+        self.List.addItem('-'*40)
+        for (name, data) in list(storage.warehouse.items()):
+            if getclass(name) != ExpireProduct:
+                print(name, data)
+                self.List.addItem(name + '\t' + str(data))
+        for (name,[number, date]) in list(storage.warehouse_expire.items()):
+            self.List.addItem(name + '\t' + str(number) + '\t' + str(date))
 
 
 class Push_button(QPushButton):
