@@ -10,7 +10,6 @@ from MainClass import *
 from Ctrl import *
 
 
-
 '''
 Initialize Game
 '''
@@ -25,6 +24,7 @@ Day = 1
 '''
 Game main code
 '''
+
 
 def buy(name, cls, number):
     if storage.quantity + number <= storage.maxsize:
@@ -71,6 +71,7 @@ def getclass(name):
         return luxury
     if name in manufactured.productList:
         return manufactured
+
 
 '''
 GUI CODE STARTS
@@ -223,7 +224,7 @@ class Main_wind(Wind):
         self.Products.addItem("-----------사치품------------")
         for (name, price) in list(luxury.productList.items()):
             self.Products.addItem(name+"\t"+str(price))
-        
+
         self.Products.setFixedSize(500, 400)  # 크기 고정
         self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
 
@@ -271,6 +272,8 @@ class Main_wind(Wind):
 
     def selectionChanged_event(self):
         k = str(self.Products.currentItem().text())
+        if "-" in k:
+            return
         k = k.split("\t")
         k[0] = k[0].strip("\t")
         k[1] = int(k[1].strip("\t").replace("\t", ""))
@@ -288,7 +291,7 @@ class Main_wind(Wind):
         else:
             ans = QMessageBox.question(self, "Confirm", "Are you sure to buy?",
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            if ans==QMessageBox.Yes:
+            if ans == QMessageBox.Yes:
                 print("buy yes")
                 buy(self.productname, getclass(self.productname), self.num)
                 status()
@@ -307,7 +310,7 @@ class Main_wind(Wind):
         else:
             ans = QMessageBox.question(self, "Confirm", "Are you sure to sell?",
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            if ans==QMessageBox.Yes:
+            if ans == QMessageBox.Yes:
                 print("sell yes")
                 sell(self.productname, getclass(self.productname), self.num)
                 status()
@@ -542,6 +545,7 @@ class Text(QLabel):
         # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
         self.setFixedSize(self.sizeHint())  # 크기 설정
         self.show()
+
 
 def game_start():
     app = QApplication(sys.argv)  # application 객체 생성하기 위해 시스템 인수 넘김
