@@ -254,12 +254,22 @@ class Main_wind(Wind):
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        global Product_List
-        plist = list(Product_List.items())  # 튜플로 전부 추출
         self.Products = QListWidget()  # 물품 목록
-        for i in plist:  # 각 항목을
-            s = str(i[0])+"\t\t\t|\t\t"+str(i[1])+str(" Tau")
-            self.Products.addItem(s)  # 추가한다
+
+        self.Products.addItem("-----------농산물------------")
+        for (name, [price, date]) in list(agriculture.productList.items()):
+            self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
+        self.Products.addItem("-----------축/수산물------------")
+        for (name, [price, date]) in list(livestock.productList.items()):
+            self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
+
+        self.Products.addItem("-----------공산품------------")
+        for (name, price) in list(manufactured.productList.items()):
+            self.Products.addItem(name+"\t"+str(price))
+        self.Products.addItem("-----------사치품------------")
+        for (name, price) in list(luxury.productList.items()):
+            self.Products.addItem(name+"\t"+str(price))
+        
         self.Products.setFixedSize(500, 400)  # 크기 고정
         self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
 
@@ -308,9 +318,9 @@ class Main_wind(Wind):
 
     def selectionChanged_event(self):
         k = str(self.Products.currentItem().text())
-        k = k.split("|")
+        k = k.split("\t")
         k[0] = k[0].strip("\t")
-        k[1] = int(k[1].strip("\t").replace(" Tau", ""))
+        k[1] = int(k[1].strip("\t").replace("\t", ""))
         self.item_name.setText(str(k[0]))
         self.productname = str(k[0])
         self.item_price.setText(str(k[1]))
