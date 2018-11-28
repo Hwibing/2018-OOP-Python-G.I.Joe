@@ -138,6 +138,8 @@ class Storage:
                 print('Error: NOT ENOUGH ITEMS')
                 return False
 
+        print(self.warehouse_expire)
+
         if name in self.warehouse_expire:
 
             while True:
@@ -150,6 +152,8 @@ class Storage:
 
                 if count > number:
                     self.warehouse_expire[name].append([count-number, expire])
+                    break
+                elif count == number:
                     break
                 else:
                     number -= count
