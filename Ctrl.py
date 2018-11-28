@@ -22,6 +22,17 @@ def readprice(myclass, filename):
             continue
 
 
+def readnews():
+    f = open('news', 'r', encoding="UTF-8")
+    while True:
+        newline = f.readline()
+        if not newline:
+            break
+        if newline.split(' ')[0] != '#':
+            print(newline)
+
+
+
 def init():
     cls = []
     agriculture = MainClass.ExpireProduct('agriculture')
@@ -39,4 +50,5 @@ def init():
 
     return tuple(cls)
 
+readnews()
 
