@@ -113,7 +113,7 @@ def YN_question(window, question_name, question_str):
     :return: bool타입의 대답(True: Yes, False: No)
     """
     ans = QMessageBox.question(window, question_name, question_str,
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+                               QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
     return (ans == QMessageBox.Yes)
 
 
@@ -254,11 +254,10 @@ class Main_wind(Wind):
         if "-" in k:
             return
         k = k.split("\t")
-        k[0] = k[0].strip("\t")
-        k[1] = int(k[1].strip("\t").replace("\t", ""))
-        self.item_name.setText(str(k[0]))
-        self.productname = str(k[0])
-        self.item_price.setText(str(k[1]))
+        self.current_item_name = str(k[0].strip("\t"))
+        self.current_item_price = str(int(k[1].strip("\t").replace("\t", "")))
+        self.item_name.setText(self.current_item_name)
+        self.item_price.setText(self.current_item_price)
         self.update()
 
     def buy_item(self):
@@ -268,11 +267,13 @@ class Main_wind(Wind):
         except ValueError:
             print("Invalid")
         else:
-            self.ans = YN_question(self, "Confirm", "Are you sure to buy?")
-            if self.ans:
+            ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
+                self.num*int(self.current_item_price)))
+            if ans:
                 print("buy yes")
                 try:
-                    buy(self.productname, getclass(self.productname), self.num)
+                    buy(self.current_item_name, getclass(
+                        self.current_item_name), self.num)
                 except AttributeError:
                     pass
                 else:
@@ -291,10 +292,12 @@ class Main_wind(Wind):
         except ValueError:
             print("Invalid")
         else:
-            self.ans = YN_question(self, "Confirm", "Are you sure to sell?")
-            if self.ans:
+            ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
+                self.num*int(self.current_item_price)))
+            if ans:
                 print("sell yes")
-                sell(self.productname, getclass(self.productname), self.num)
+                sell(self.current_item_name, getclass(
+                    self.current_item_name), self.num)
                 # status()
                 self.Info_text.setText("Your Money: {}\nDay: {}".format(
                     money.money, Day))  # 잔고
