@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
 from MainStream import *
 
 '''
-Initialize Game
+Game Main Code
 '''
 
 (agriculture, livestock, luxury, manufactured) = init()
@@ -20,9 +20,7 @@ News_List = ["News1", "New2", "New3"]  # 뉴스 목록
 Day = 1
 
 
-'''
-Game main code
-'''
+# functions
 
 
 def getclass(name):
@@ -34,11 +32,6 @@ def getclass(name):
         return luxury
     if name in manufactured.productList:
         return manufactured
-
-
-'''
-GUI CODE STARTS
-'''
 
 
 def place_in_layout(layout, details, arrange="spread"):
@@ -111,6 +104,22 @@ def place_in_layout(layout, details, arrange="spread"):
     return
 
 
+def YN_question(window, question_name, question_str):
+    """
+    QMessagebox로 예/아니오를 물어봅니다.
+    :parameter window: 어디 창에서 질문을 띄울 건지
+    :parameter question_name: 질문 창 이름
+    :parameter question_str: 질문 내용
+    :return: bool타입의 대답(True: Yes, False: No)
+    """
+    ans = QMessageBox.question(window, question_name, question_str,
+                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+    return (ans == QMessageBox.Yes)
+
+
+# Classes
+
+
 class Wind(QWidget):
     """
     창 클래스입니다. QWidget을 상속합니다.
@@ -151,9 +160,9 @@ class Wind(QWidget):
             QCloseEvent.accept()  # 그냥 CloseEvent 수용
         else:  # 되묻기
             # 메시지박스로 물어보기(Y/N), 그 결과를 ans에 저장
-            ans = QMessageBox.question(self, "Confirm", "Do you want to close?",
-                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            if ans == QMessageBox.Yes:  # ~.Yes, ~.No는 상수여서 비교 가능
+            self.ans = YN_question(
+                self, "Confirm", "Do you want to close this window?")
+            if self.ans:
                 QCloseEvent.accept()  # CloseEvent 수용
             else:
                 QCloseEvent.ignore()  # CloseEvent 거절
@@ -181,7 +190,7 @@ class Main_wind(Wind):
         self.Info_text = Text("Your Money: {}\nDay: {}".format(
             money.money, Day), self)  # 잔고
         Bank_button = Link_button(
-            "Bank", "Bank", self, List_wind_with_menu, "Bank")  # 은행
+            "Bank", "Bank", self, Bank_Wind, "Bank")  # 은행
         Storage_button = Link_button(
             "Storage", "Storage", self, Storage_wind, "Storage")  # 창고용량
 
@@ -225,17 +234,18 @@ class Main_wind(Wind):
         super().setup()
 
     def showProducts(self):
-        self.Products.addItem("-----------농산물------------")
+        self.Products.addItem("물품-----요금(τ)----유통기한(일)")
+        self.Products.addItem("----------[농산물]-----------")
         for (name, [price, date]) in list(agriculture.productList.items()):
             self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
-        self.Products.addItem("-----------축/수산물------------")
+        self.Products.addItem("----------[축/수산물]-----------")
         for (name, [price, date]) in list(livestock.productList.items()):
             self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
 
-        self.Products.addItem("-----------공산품------------")
+        self.Products.addItem("----------[공산품]-----------")
         for (name, price) in list(manufactured.productList.items()):
             self.Products.addItem(name+"\t"+str(price))
-        self.Products.addItem("-----------사치품------------")
+        self.Products.addItem("----------[사치품]-----------")
         for (name, price) in list(luxury.productList.items()):
             self.Products.addItem(name+"\t"+str(price))
 
@@ -258,22 +268,21 @@ class Main_wind(Wind):
         except ValueError:
             print("Invalid")
         else:
-            ans = QMessageBox.question(self, "Confirm", "Are you sure to buy?",
-                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            if ans == QMessageBox.Yes:
+            self.ans = YN_question(self, "Confirm", "Are you sure to buy?")
+            if self.ans:
                 print("buy yes")
                 try:
                     buy(self.productname, getclass(self.productname), self.num)
                 except AttributeError:
                     pass
                 else:
-                    #status()
-                    #print(money.money)
+                    # status()
+                    # print(money.money)
                     self.Info_text.setText("Your Money: {}\nDay: {}".format(
                         money.money, Day))  # 잔고
                     self.update()
             else:
-                 print("buy no")
+                print("buy no")
 
     def sell_item(self):
         try:
@@ -282,12 +291,11 @@ class Main_wind(Wind):
         except ValueError:
             print("Invalid")
         else:
-            ans = QMessageBox.question(self, "Confirm", "Are you sure to sell?",
-                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            if ans == QMessageBox.Yes:
+            self.ans = YN_question(self, "Confirm", "Are you sure to sell?")
+            if self.ans:
                 print("sell yes")
                 sell(self.productname, getclass(self.productname), self.num)
-                #status()
+                # status()
                 self.Info_text.setText("Your Money: {}\nDay: {}".format(
                     money.money, Day))  # 잔고
                 self.update()
@@ -351,7 +359,7 @@ class List_wind(Wind):
         super().setup()
 
 
-class List_wind_with_menu(List_wind):
+class Bank_Wind(List_wind):
     """
     버튼으로 메뉴를 만들어둔 창입니다. List_wind를 상속합니다.
     """
@@ -363,9 +371,11 @@ class List_wind_with_menu(List_wind):
         self.buttons = QVBoxLayout()
         _hbox_2 = QHBoxLayout()
 
-        self.buttons.addWidget(Basic_button("asdf", "", self))
-        self.buttons.addWidget(Basic_button("qwer", "", self))
-        self.buttons.addWidget(Basic_button("zxcv", "", self))
+        self.button1 = Moveto_button("Save", "Save", self, Wind, "")
+        self.button2 = Moveto_button("Loan", "Loan", self, Wind, "")
+        self.button3 = Moveto_button("????", "????", self, Wind, "")
+        place_in_layout(self.buttons, (self.button1,
+                                       self.button2, self.button3))
 
         self.List = QListWidget()
         _hbox_1.addWidget(self.List)
@@ -398,7 +408,7 @@ class Storage_wind(List_wind):
     """
 
     def design(self):
-        status()
+        # status()
         # 상위 클래스로부터 오버라이드합니다.
         super().design()
         self.List.addItem('이름:\t수량:\t유통기한:')
