@@ -306,7 +306,7 @@ class Main_wind(Wind):
                 print("sell no")
 
     def next_day(self):
-        ans=YN_question(self, "Sleep confirm", "Sleep and move on next day.")
+        ans = YN_question(self, "Sleep confirm", "Sleep and move on next day.")
         if ans:
             global Day
             Day += 1
