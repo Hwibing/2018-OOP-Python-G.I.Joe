@@ -23,12 +23,25 @@ def readprice(myclass, filename):
 
 
 def readnews():
-    f = open('news', 'r', encoding="UTF-8")
+    # READ NORMAL NEWS
+    news_normal = []
+    f = open('news_normal', 'r', encoding="UTF-8")
     while True:
         newline = f.readline()
         if not newline:
             break
-        if newline.split(' ') != '#':
+        news_normal.append([newline.split('/')[0], int(newline.split('/')[1])])
+
+    # READ DISASTER NEWS
+    news_disaster = []
+    f = open('news_disaster', 'r', encoding="UTF-8")
+    while True:
+        newline = f.readline()
+        if not newline:
+            break
+        news_disaster.append([newline.split('/')[0], int(newline.split('/')[1])])
+
+    return (news_normal, news_disaster)
 
 
 def readinfo():
