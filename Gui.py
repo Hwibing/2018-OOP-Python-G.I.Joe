@@ -9,15 +9,6 @@ from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
 
 from MainStream import *
 
-'''
-Game Main Code
-'''
-
-(agriculture, livestock, luxury, manufactured) = init()
-News_List = ["News1", "New2", "New3"]  # 뉴스 목록
-Day = 1
-
-
 # functions
 
 
@@ -330,6 +321,8 @@ class Main_wind(Wind):
             pass
 
     def refresh(self):
+        self.Info_text.setText("Your Money: {}\nDay: {}".format(
+            money.money, Day))
         self.update()
 
 class Intro_wind(Wind):
