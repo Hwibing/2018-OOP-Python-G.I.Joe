@@ -1,5 +1,6 @@
 from MainClass import *
 from Ctrl import *
+import random
 
 
 def buy(name, cls, number):
@@ -34,6 +35,16 @@ def sleep():
 def status():
     print('money : {}'.format(money.money))
     storage.printstorage()
+
+
+def pick_random(classlist, number=1):
+    names = []
+    for i in classlist:
+        names + list(i.productList.keys())
+
+    random.shuffle(names)
+    names = names[:number]
+    return names
 
 
 # Initialize Game
