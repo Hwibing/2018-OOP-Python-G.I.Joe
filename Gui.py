@@ -183,7 +183,8 @@ class Main_wind(Wind):
         self.showProducts()  # 물품 리스트 출력
 
         self.Products.setFixedSize(500, 400)  # 크기 고정
-        self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
+        self.Products.itemSelectionChanged.connect(
+            self.selectionChanged_event)  # 선택 아이템이 바뀌었을 때
 
         self.Info_text = Text("Your Money: {}\nDay: {}".format(
             money.money, Day), self)  # 잔고
@@ -192,17 +193,18 @@ class Main_wind(Wind):
         Storage_button = Link_button(
             "Storage", "Storage", self, Storage_wind, "Storage")  # 창고용량
 
-        self.item_info = QVBoxLayout()  # 물품 정보 및 매매
+        self.item_deal = QVBoxLayout()  # 물품 정보 및 매매
         self.item_name = Text("Select an item", self)  # 초기 텍스트1
         self.item_price = Text("from left.", self)  # 초기 텍스트2
-        Buy_button = Basic_button("Buy", "Buy selected goods.", self)
-        Sell_button = Basic_button("Sell", "Sell selected goods.", self)
+        Buy_button = Basic_button("Buy", "Buy selected goods.", self) # 구입 버튼
+        Sell_button = Basic_button("Sell", "Sell selected goods.", self) # 판매 버튼
+        # 각각의 버튼에 기능 연결
         Buy_button.clicked.connect(self.buy_item)
         Sell_button.clicked.connect(self.sell_item)
 
-        self.numCount = QLineEdit(self)
-        self.numCount.setPlaceholderText("Insert quantity. (int)")
-        place_in_layout(self.item_info, (self.item_name,
+        self.numCount = QLineEdit(self) # 개수 입력하는 부분
+        self.numCount.setPlaceholderText("Insert quantity(Natural)") # 힌트 메시지
+        place_in_layout(self.item_deal, (self.item_name,
                                          self.item_price, Buy_button, self.numCount, Sell_button), "wing_b")
 
         News_button = Link_button(
@@ -216,13 +218,13 @@ class Main_wind(Wind):
         place_in_layout(top_box, (self.Info_text, Bank_button, Storage_button))
 
         mid_box = QHBoxLayout()  # 중간
-        place_in_layout(mid_box, (self.Products, self.item_info))
+        place_in_layout(mid_box, (self.Products, self.item_deal))
 
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
             bottom_box, (News_button, Next_day_button, End_button), "wing_b")
 
-        vbox = QVBoxLayout()
+        vbox = QVBoxLayout() # 전체 레이아웃
         place_in_layout(vbox, (top_box, mid_box, bottom_box), arrange="spread")
 
         self.setLayout(vbox)
@@ -263,7 +265,7 @@ class Main_wind(Wind):
         try:
             self.num = self.numCount.text()
             self.num = int(self.num)
-            if self.num<=0:
+            if self.num <= 0:
                 return
         except ValueError:
             return
@@ -275,7 +277,7 @@ class Main_wind(Wind):
                 return
             if ans:
                 try:
-                    if self.num<=0:
+                    if self.num <= 0:
                         return
                     buy(self.current_item_name, getclass(
                         self.current_item_name), self.num)
@@ -292,7 +294,7 @@ class Main_wind(Wind):
         try:
             self.num = self.numCount.text()
             self.num = int(self.num)
-            if self.num<=0:
+            if self.num <= 0:
                 return
         except ValueError:
             return
@@ -387,9 +389,7 @@ class Bank_Wind(List_wind):
 
         self.button1 = Push_button("Save", "Save", self)
         self.button2 = Push_button("Loan", "Loan", self)
-        self.button3 = Push_button("????", "????", self)
-        place_in_layout(self.buttons, (self.button1,
-                                       self.button2, self.button3))
+        place_in_layout(self.buttons, (self.button1, self.button2))
 
         self.List = QListWidget()
         _hbox_1.addWidget(self.List)
