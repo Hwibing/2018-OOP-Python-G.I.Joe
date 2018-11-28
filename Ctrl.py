@@ -28,9 +28,9 @@ def readnews():
         newline = f.readline()
         if not newline:
             break
-        if newline.split(' ')[0] != '#':
-            print(newline)
 
+def readinfo():
+    pass
 
 
 def init():
