@@ -28,6 +28,8 @@ def readnews():
         newline = f.readline()
         if not newline:
             break
+        if newline.split(' ') != '#':
+
 
 def readinfo():
     pass
