@@ -306,12 +306,16 @@ class Main_wind(Wind):
                 print("sell no")
 
     def next_day(self):
-        global Day
-        Day += 1
-        sleep()
-        self.Info_text.setText(
-            "Your Money: {}\nDay: {}".format(money.money, Day))  # 잔고
-        self.update()
+        ans=YN_question(self, "Sleep confirm", "Sleep and move on next day.")
+        if ans:
+            global Day
+            Day += 1
+            sleep()
+            self.Info_text.setText(
+                "Your Money: {}\nDay: {}".format(money.money, Day))  # 잔고
+            self.update()
+        else:
+            pass
 
 
 class Intro_wind(Wind):
