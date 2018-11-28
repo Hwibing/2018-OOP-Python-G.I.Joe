@@ -14,8 +14,6 @@ Game Main Code
 '''
 
 (agriculture, livestock, luxury, manufactured) = init()
-# money = Finance(500000)  # 초기 자본금
-# storage = Storage(100)  # 초기 창고용량
 News_List = ["News1", "New2", "New3"]  # 뉴스 목록
 Day = 1
 
@@ -203,6 +201,7 @@ class Main_wind(Wind):
         Sell_button.clicked.connect(self.sell_item)
 
         self.numCount = QLineEdit(self)
+        self.numCount.setPlaceholderText("Insert quantity. (int)")
         place_in_layout(self.item_info, (self.item_name,
                                          self.item_price, Buy_button, self.numCount, Sell_button), "wing_b")
 
@@ -264,46 +263,54 @@ class Main_wind(Wind):
         try:
             self.num = self.numCount.text()
             self.num = int(self.num)
+            if self.num<=0:
+                return
         except ValueError:
-            print("Invalid")
+            return
         else:
-            ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
-                self.num*int(self.current_item_price)))
+            try:
+                ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
+                    self.num*int(self.current_item_price)))
+            except AttributeError:
+                return
             if ans:
-                print("buy yes")
                 try:
+                    if self.num<=0:
+                        return
                     buy(self.current_item_name, getclass(
                         self.current_item_name), self.num)
                 except AttributeError:
                     pass
                 else:
-                    # status()
-                    # print(money.money)
                     self.Info_text.setText("Your Money: {}\nDay: {}".format(
                         money.money, Day))  # 잔고
                     self.update()
             else:
-                print("buy no")
+                pass
 
     def sell_item(self):
         try:
             self.num = self.numCount.text()
             self.num = int(self.num)
+            if self.num<=0:
+                return
         except ValueError:
-            print("Invalid")
+            return
         else:
-            ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
-                self.num*int(self.current_item_price)))
-            if ans:
-                print("sell yes")
-                sell(self.current_item_name, getclass(
-                    self.current_item_name), self.num)
-                # status()
-                self.Info_text.setText("Your Money: {}\nDay: {}".format(
-                    money.money, Day))  # 잔고
-                self.update()
+            try:
+                ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
+                    self.num*int(self.current_item_price)))
+            except AttributeError:
+                pass
             else:
-                print("sell no")
+                if ans:
+                    sell(self.current_item_name, getclass(
+                        self.current_item_name), self.num)
+                    self.Info_text.setText("Your Money: {}\nDay: {}".format(
+                        money.money, Day))  # 잔고
+                    self.update()
+                else:
+                    pass
 
     def next_day(self):
         ans = YN_question(self, "Sleep confirm", "Sleep and move on next day.")
@@ -378,9 +385,9 @@ class Bank_Wind(List_wind):
         self.buttons = QVBoxLayout()
         _hbox_2 = QHBoxLayout()
 
-        self.button1 = Moveto_button("Save", "Save", self, Wind, "")
-        self.button2 = Moveto_button("Loan", "Loan", self, Wind, "")
-        self.button3 = Moveto_button("????", "????", self, Wind, "")
+        self.button1 = Push_button("Save", "Save", self)
+        self.button2 = Push_button("Loan", "Loan", self)
+        self.button3 = Push_button("????", "????", self)
         place_in_layout(self.buttons, (self.button1,
                                        self.button2, self.button3))
 
