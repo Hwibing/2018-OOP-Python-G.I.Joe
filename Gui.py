@@ -196,20 +196,21 @@ class Main_wind(Wind):
         self.item_deal = QVBoxLayout()  # 물품 정보 및 매매
         self.item_name = Text("Select an item", self)  # 초기 텍스트1
         self.item_price = Text("from left.", self)  # 초기 텍스트2
-        Buy_button = Basic_button("Buy", "Buy selected goods.", self) # 구입 버튼
-        Sell_button = Basic_button("Sell", "Sell selected goods.", self) # 판매 버튼
+        Buy_button = Basic_button("Buy", "Buy selected goods.", self)  # 구입 버튼
+        Sell_button = Basic_button(
+            "Sell", "Sell selected goods.", self)  # 판매 버튼
         # 각각의 버튼에 기능 연결
         Buy_button.clicked.connect(self.buy_item)
         Sell_button.clicked.connect(self.sell_item)
 
-        self.numCount = QLineEdit(self) # 개수 입력하는 부분
-        self.numCount.setPlaceholderText("Insert quantity(Natural)") # 힌트 메시지
+        self.numCount = QLineEdit(self)  # 개수 입력하는 부분
+        self.numCount.setPlaceholderText("Insert quantity(Natural)")  # 힌트 메시지
         place_in_layout(self.item_deal, (self.item_name,
                                          self.item_price, Buy_button, self.numCount, Sell_button), "wing_b")
 
         News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
-        Next_day_button = Push_button("Sleep", "Next day", self)  # '다음 날' 버튼
+        Next_day_button = Basic_button("Sleep", "Next day", self)  # '다음 날' 버튼
         Next_day_button.clicked.connect(self.next_day)
         End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
@@ -224,7 +225,7 @@ class Main_wind(Wind):
         place_in_layout(
             bottom_box, (News_button, Next_day_button, End_button), "wing_b")
 
-        vbox = QVBoxLayout() # 전체 레이아웃
+        vbox = QVBoxLayout()  # 전체 레이아웃
         place_in_layout(vbox, (top_box, mid_box, bottom_box), arrange="spread")
 
         self.setLayout(vbox)
@@ -375,32 +376,44 @@ class List_wind(Wind):
         super().setup()
 
 
-class Bank_Wind(List_wind):
+class Bank_Wind(Wind):
     """
     버튼으로 메뉴를 만들어둔 창입니다. List_wind를 상속합니다.
     """
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        _vbox = QVBoxLayout()
-        _hbox_1 = QHBoxLayout()
-        self.buttons = QVBoxLayout()
-        _hbox_2 = QHBoxLayout()
+        self.vbox = QVBoxLayout()
+        self.hbox_1 = QHBoxLayout()
+        self.hbox_2 = QHBoxLayout()
+        self.hbox_3 = QHBoxLayout()
 
-        self.button1 = Push_button("Save", "Save", self)
-        self.button2 = Push_button("Loan", "Loan", self)
-        place_in_layout(self.buttons, (self.button1, self.button2))
+        self.hbox_1.addWidget(Text("씨발", self))
+        self.hbox_1.addWidget(Text("좆같다", self))
 
-        self.List = QListWidget()
-        _hbox_1.addWidget(self.List)
-        _hbox_1.addLayout(self.buttons)
+        self.save_button = Basic_button("Save", "Save", self)  # 저축 버튼
+        self.loan_button = Basic_button("Loan", "Loan", self)  # 대출 버튼
+        place_in_layout(self.hbox_2, (self.save_button, self.loan_button))
 
-        place_in_layout(
-            _hbox_2, (Close_button("Close", "Close this window.", self),), "center")
-        _vbox.addLayout(_hbox_1)
-        _vbox.addLayout(_hbox_2)
+        place_in_layout(self.hbox_3, (Close_button(
+            "Close", "Close bank.", self),), "center")
 
-        self.setLayout(_vbox)
+        self.vbox.addStretch(1)
+        self.vbox.addLayout(self.hbox_1)
+        self.vbox.addLayout(self.hbox_2)
+        self.vbox.addStretch(1)
+        self.vbox.addLayout(self.hbox_3)
+        self.setLayout(self.vbox)
+
+    def save_money(self):
+        pass
+
+    def get_loan(self):
+        pass
+
+    def setup(self):
+        self.setFixedSize(800, 450)
+        self.show()
 
 
 class News_wind(List_wind):
