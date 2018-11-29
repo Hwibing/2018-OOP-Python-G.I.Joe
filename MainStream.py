@@ -53,9 +53,9 @@ def pick_random(classlist, number=1):
 
 def pick_news(newstype, normal_number=10):
     randnews = []
-    for i in range(newstype):
+    for i in range(normal_number):
         random.shuffle(newstype)
-        randnews = news_normal[:normal_number]
+        randnews += [newstype[0]]
     '''
     if random.randint(1, 10) == 1:
         random.shuffle(news_disaster)
@@ -90,12 +90,15 @@ def sleep():
         cls.update(rate, name)
         News_List.append(news.replace('(?)', name[0]))
 
-    if random.randint(1, 10) == 1:  # 10% 확률로 disaster event 발생
+    if random.randint(1, 10) >= 1:  # 10% 확률로 disaster event 발생
         disastertypes = list(news_disaster.keys())
         random.shuffle(disastertypes)
         news_type = disastertypes[0]
 
+
         randnews = pick_news(news_disaster[news_type], 1)
+        print(randnews)
+        randnews = randnews[0]
 
         if news_type == 'a':
             News_List.append(randnews[0])
