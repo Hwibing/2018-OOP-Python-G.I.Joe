@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
 from MainStream import *
 
 
+
 def place_in_layout(layout, details, arrange="spread"):
     """
     레이아웃과 담을 것들을 받아 배치합니다. (Stretch 이용)
