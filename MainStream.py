@@ -46,7 +46,7 @@ def pick_random(classlist, number=1):
     names = names[:number]
     return names
 
-
+'''
 def pick_news(normal_number=10):
     random.shuffle(news_normal)
     randnews = news_normal[:normal_number]
@@ -54,11 +54,11 @@ def pick_news(normal_number=10):
         random.shuffle(news_disaster)
         randnews = randnews + news_disaster[0]
     return randnews
-
+'''
 
 # Initialize Game
 (agriculture, livestock, luxury, manufactured) = init()
-(news_normal, news_disaster) = readnews()
+#(news_normal, news_disaster) = readnews()
 News_List = []
 Day = 1
 money = Finance(500000)
