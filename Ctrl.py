@@ -34,13 +34,14 @@ def readnews():
 
     # READ DISASTER NEWS
     news_disaster = []
+    '''
     f = open('news_disaster', 'r', encoding="UTF-8")
     while True:
         newline = f.readline()
         if not newline:
             break
         news_disaster.append([newline.split('/')[0], int(newline.split('/')[1])])
-
+    '''
     return (news_normal, news_disaster)
 
 
