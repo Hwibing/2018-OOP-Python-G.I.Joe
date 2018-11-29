@@ -296,6 +296,7 @@ class Main_wind(Wind):
                     pass
 
     def next_day(self):
+        global Day
         ans = YN_question(self, "Sleep confirm",
                           "Sleep and move on next day.")  # "주무시게요?"
         if ans:  # 넹
@@ -449,7 +450,6 @@ class News_wind(List_wind):
     """
     뉴스를 띄우는 창입니다. List_Wind를 상속합니다. 
     """
-
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         super().design()
