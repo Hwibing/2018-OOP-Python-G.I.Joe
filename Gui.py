@@ -145,7 +145,7 @@ class Wind(QWidget):
         self.close()  # 닫는다(그냥 종료)
 
     def refresh(self):
-        pass
+        self.update()
 
 
 class Main_wind(Wind):
@@ -295,10 +295,10 @@ class Main_wind(Wind):
                     pass
 
     def next_day(self):
-        global Day
         ans = YN_question(self, "Sleep confirm",
                           "Sleep and move on next day.")  # "주무시게요?"
         if ans:  # 넹
+            global Day
             Day += 1
             sleep()
             self.Info_text.setText(
@@ -310,7 +310,7 @@ class Main_wind(Wind):
     def refresh(self):
         self.Info_text.setText("Your Money: {}\nDay: {}".format(
             money.money, Day))
-        self.update()
+        super().refresh()
 
 
 class Intro_wind(Wind):
@@ -528,6 +528,7 @@ class Link_button(Push_button):
         상위 클래스로부터 오버라이드합니다.
         :parameter link_class: 띄울 창의 클래스입니다.
         :parameter link_name: 띄울 창의 이름입니다.
+        :parameter link_origin: 어떤 창에서 띄우는지를 저장합니다.
         """
         self.linkage_info = (link_class, link_name,
                              link_origin)  # 띄울 창의 정보를 튜플로 만들기

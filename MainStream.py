@@ -80,7 +80,8 @@ def getclass(name):
 def sleep():
     money.nextday()
     storage.nextday()
-    News_List = []
+    global News_List
+    News_List.clear()
     randnews = pick_news()
     for [news, rate] in randnews:
         name = pick_random(allproduct)
