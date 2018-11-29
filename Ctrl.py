@@ -25,7 +25,7 @@ def readprice(myclass, filename):
 def readnews():
     # READ NORMAL NEWS
     news_normal = []
-    f = open('news_normal', 'r', encoding="UTF-8")
+    f = open('./news/news_normal', 'r', encoding="UTF-8")
     while True:
         newline = f.readline()
         if not newline:
@@ -33,15 +33,53 @@ def readnews():
         news_normal.append([newline.split('/')[0], int(newline.split('/')[1])])
 
     # READ DISASTER NEWS
-    news_disaster = []
-    '''
-    f = open('news_disaster', 'r', encoding="UTF-8")
+    news_disaster = {}
+    news_agri = []
+    f = open('./news/news_agri', 'r', encoding="UTF-8")
     while True:
         newline = f.readline()
         if not newline:
             break
-        news_disaster.append([newline.split('/')[0], int(newline.split('/')[1])])
-    '''
+        news_agri.append([newline.split('/')[0], int(newline.split('/')[1])])
+
+    news_agri_live = []
+    f = open('./news/news_agri+live', 'r', encoding="UTF-8")
+    while True:
+        newline = f.readline()
+        if not newline:
+            break
+        news_agri_live.append([newline.split('/')[0], int(newline.split('/')[1])])
+
+    news_event = []
+    f = open('./news/news_event', 'r', encoding="UTF-8")
+    while True:
+        newline = f.readline()
+        if not newline:
+            break
+        news_event.append([newline.split('/')[0], int(newline.split('/')[1])])
+
+    news_live = []
+    f = open('./news/news_live', 'r', encoding="UTF-8")
+    while True:
+        newline = f.readline()
+        if not newline:
+            break
+        news_live.append([newline.split('/')[0], int(newline.split('/')[1])])
+
+    news_manu = []
+    f = open('./news/news_manu', 'r', encoding="UTF-8")
+    while True:
+        newline = f.readline()
+        if not newline:
+            break
+        news_manu.append([newline.split('/')[0], int(newline.split('/')[1])])
+
+    news_disaster['a'] = news_agri
+    news_disaster['al'] = news_agri_live
+    news_disaster['e'] = news_event
+    news_disaster['l'] = news_live
+    news_disaster['m'] = news_manu
+
     return (news_normal, news_disaster)
 
 
