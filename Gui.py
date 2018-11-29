@@ -304,7 +304,7 @@ class Main_wind(Wind):
             sleep()
             self.Info_text.setText(
                 "Your Money: {}\nDay: {}".format(money.money, Day))  # 잔고
-            self.update()
+            self.refresh()
         else:  # 아녀
             pass  # 그럼 나중에 뵈요!
 
