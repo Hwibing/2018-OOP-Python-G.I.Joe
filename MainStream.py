@@ -7,6 +7,7 @@ import random
 allproduct = [agriculture, livestock, luxury, manufactured]
 (news_normal, news_disaster) = readnews()
 (info_global, info_specific) = readinfo()
+Next_Update = []
 News_List = []
 Day = 1
 money = Finance(500000)
@@ -122,6 +123,19 @@ def sleep():
         if news_type == 'm':
             News_List.append(randnews[0])
             manufactured.update(randnews[1], list(manufactured.productList.keys()))
+
+
+def getinfo():
+    if random.randint(1,10) >= 2:
+        newinfo = pick_news(info_specific, 1)
+        name = pick_random(allproduct)
+        Next_Update.append([newinfo[1], name[0]])
+        return newinfo[0].replace('(?)', name[0])
+    else:
+        newinfo = pick_news(info_global, 1)
+        Next_Update.append([newinfo[1], list(agriculture.productList.keys())+list(livestock.productList.keys())+list(luxury.productList.keys())+list(manufactured.productList.keys()))
+        return newinfo[0]
+
 
 
 
