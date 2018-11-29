@@ -84,7 +84,28 @@ def readnews():
 
 
 def readinfo():
-    pass
+    f = open('./info/info_global', 'r', encoding="UTF-8")
+    info_global = []
+    while True:
+        newline = f.readline()
+        if not newline:
+            break
+        info_global.append([newline.split('/')[0], int(newline.split('/')[1])])
+
+    f = open('./info/info_specific', 'r', encoding="UTF-8")
+    info_specific = []
+    while True:
+        newline = f.readline()
+        if not newline:
+            break
+        info_specific.append([newline.split('/')[0], int(newline.split('/')[1])])
+
+    '''
+    print(info_global)
+    print(info_specific)
+    '''
+
+    return (info_global, info_specific)
 
 
 def init():
@@ -103,4 +124,3 @@ def init():
         #c.printlist()
 
     return tuple(cls)
-

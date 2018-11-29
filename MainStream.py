@@ -6,6 +6,7 @@ import random
 (agriculture, livestock, luxury, manufactured) = init()
 allproduct = [agriculture, livestock, luxury, manufactured]
 (news_normal, news_disaster) = readnews()
+(info_global, info_specific) = readinfo()
 News_List = []
 Day = 1
 money = Finance(500000)
@@ -97,7 +98,6 @@ def sleep():
 
 
         randnews = pick_news(news_disaster[news_type], 1)
-        print(randnews)
         randnews = randnews[0]
 
         if news_type == 'a':
