@@ -44,7 +44,7 @@ def status():
 def pick_random(classlist, number=1):
     names = []
     for i in classlist:
-        names + list(i.productList.keys())
+        names += list(i.productList.keys())
 
     random.shuffle(names)
     names = names[:number]
@@ -55,7 +55,7 @@ def pick_news(normal_number=10):
     randnews = []
     for i in range(normal_number):
         random.shuffle(news_normal)
-        randnews += news_normal[0]
+        randnews += [news_normal[0]]
     '''
     if random.randint(1, 10) == 1:
         random.shuffle(news_disaster)
@@ -65,6 +65,8 @@ def pick_news(normal_number=10):
 
 
 def getclass(name):
+    name = str(name)
+    global agriculture, livestock, luxury, manufactured
     if name in agriculture.productList:
         return agriculture
     if name in livestock.productList:
@@ -82,9 +84,9 @@ def sleep():
     randnews = pick_news()
     for [news, rate] in randnews:
         name = pick_random(allproduct)
-        cls = getclass(name)
+        cls = getclass(name[0])
         cls.update(rate, name)
-        News_List.append(news.replace('(?)',name))
+        News_List.append(news.replace('(?)', name[0]))
 
 
 # Usage notes FROM here
