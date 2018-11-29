@@ -116,9 +116,12 @@ class Wind(QWidget):
     def design(self):
         """
         창을 디자인합니다. 
-        하는 일: 레이아웃, 버튼/텍스트 띄우기
+        하는 일: 레이아웃, 버튼/텍스트 띄우기, 크기 결정
         """
-        pass
+        self.x_loc = 100
+        self.y_loc = 100
+        self.width = 800
+        self.height = 600
 
     def setup(self):
         """
@@ -126,6 +129,8 @@ class Wind(QWidget):
         하는 일: 창의 제목 설정, 창 보이기, 창 위치/크기 설정
         """
         self.setWindowTitle(self.name)  # 창의 제목 지정
+        self.move(self.x_loc, self.y_loc)  # 창의 위치
+        self.setFixedSize(self.width, self.height)  # 창의 크기
         self.show()  # 보이기
 
     def closeEvent(self, QCloseEvent):  # 창 닫기 이벤트(X자 누르거나 .close() 호출 시)
@@ -188,6 +193,8 @@ class Main_wind(Wind):
 
         News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
+        Predict_button = Link_button(
+            "Predict", "Show predictions.", self, Predict_wind, "Predict")  # 뉴스 버튼
 
         Next_day_button = Basic_button("Sleep", "Next day", self)  # '다음 날' 버튼
         Next_day_button.clicked.connect(self.next_day)
@@ -202,17 +209,17 @@ class Main_wind(Wind):
 
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
-            bottom_box, (News_button, Next_day_button, End_button), "wing_b")
+            bottom_box, (News_button, Predict_button, Next_day_button, End_button), "wing_b")
 
         vbox = QVBoxLayout()  # 전체 레이아웃
         place_in_layout(vbox, (top_box, mid_box, bottom_box), arrange="spread")
 
+        # 창의 위치, 크기
+        self.x_loc = 225
+        self.y_loc = 225
+        self.width = 800
+        self.height = 600
         self.setLayout(vbox)
-
-    def setup(self):
-        self.move(100, 100)  # 위치
-        self.setFixedSize(800, 600)  # 크기(고정)
-        super().setup()
 
     def showProducts(self):
         self.Products.clear()
@@ -336,10 +343,11 @@ class Intro_wind(Wind):
 
         self.setLayout(_vmid_box)  # 배치
 
-    def setup(self):
-        self.move(300, 300)  # 창 위치
-        self.setFixedSize(200, 150)  # 창 크기(고정)
-        super().setup()
+        # 창의 위치, 크기
+        self.x_loc = 300
+        self.y_loc = 300
+        self.width = 200
+        self.height = 150
 
 
 class Popup_wind(Wind):
@@ -365,20 +373,18 @@ class Bank_Wind(Popup_wind):
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         self.vbox = QVBoxLayout()  # 수직 레이아웃(hbox들 담을 예정)
-        self.hbox_0 = QHBoxLayout()  # 위에서 0번째: 돈 보여주기
         self.hbox_1 = QHBoxLayout()  # 위에서 1번째: 버튼 모음
         self.hbox_2 = QHBoxLayout()  # 위에서 2번째: 숫자 입력하기
         self.hbox_3 = QHBoxLayout()  # 위에서 3번째: 닫기
 
-        place_in_layout(self.hbox_0, (Text("저축, 대출", self),))
         self.save_button = Basic_button(
             "Installment", "Instalment saving account. Cannot be closed.", self)  # 저축 버튼
-        self.save_button.clicked.connect(self.save_money)
+        self.save_button.clicked.connect(self.save_money)  # 버튼-기능 연결(저축)
         self.loan_button = Basic_button("Loan", "Loan", self)  # 대출 버튼
-        self.loan_button.clicked.connect(self.get_loan)
+        self.loan_button.clicked.connect(self.get_loan)  # 버튼-기능 연결(대출)
         self.pay_button = Basic_button(
             "Payoff", "Loan payoff", self)  # 대출 갚기 버튼
-        self.pay_button.clicked.connect(self.pay_for_loan)
+        self.pay_button.clicked.connect(self.pay_for_loan)  # 버튼-기능 연결(갚기)
         place_in_layout(self.hbox_1, (self.save_button,
                                       self.loan_button, self.pay_button))
 
@@ -389,18 +395,17 @@ class Bank_Wind(Popup_wind):
             "Close", "Close bank.", self),), "center")
 
         self.vbox.addStretch(1)
-        self.vbox.addLayout(self.hbox_0)
-        self.vbox.addStretch(1)
         self.vbox.addLayout(self.hbox_1)
         self.vbox.addLayout(self.hbox_2)
         self.vbox.addStretch(1)
         self.vbox.addLayout(self.hbox_3)
         self.setLayout(self.vbox)
 
-    def setup(self):
-        self.setWindowTitle(self.name)
-        self.setFixedSize(500, 200)
-        self.show()
+        # 창의 크기, 위치
+        self.x_loc = 150
+        self.y_loc = 150
+        self.width = 500
+        self.height = 200
 
     # 저축하기 함수
     def save_money(self):
@@ -448,23 +453,25 @@ class List_wind(Wind):
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        _vbox = QVBoxLayout()  # 수직 레이아웃
+        self._vbox = QVBoxLayout()  # 수직 레이아웃
         self.List = QListWidget()  # 리스트
-        _vbox.addWidget(self.List)  # 수직 레이아웃에 리스트 추가
-        _hbox = QHBoxLayout()  # 수평 레이아웃
+        self._vbox.addWidget(self.List)  # 수직 레이아웃에 리스트 추가
+        self._hbox = QHBoxLayout()  # 수평 레이아웃
         place_in_layout(
-            _hbox, (Close_button("Close", "Close this window.", self),), "center")  # 수평 레이아웃에 닫기 버튼 추가
-        _vbox.addLayout(_hbox)  # 수직 레이아웃에 수평 레이아웃 추가
-        self.setLayout(_vbox)  # 수직 레이아웃 배치
+            self._hbox, (Close_button("Close", "Close this window.", self),), "center")  # 수평 레이아웃에 닫기 버튼 추가
+        self._vbox.addLayout(self._hbox)  # 수직 레이아웃에 수평 레이아웃 추가
+        self.setLayout(self._vbox)  # 수직 레이아웃 배치
 
-    def setup(self):
-        self.setFixedSize(600, 400)  # 창 크기 고정
-        super().setup()
+        # 창의 위치, 크기
+        self.x_loc = 100
+        self.y_loc = 100
+        self.width = 400
+        self.height = 300
 
 
 class News_wind(List_wind):
     """
-    뉴스를 띄우는 창입니다. List_Wind를 상속합니다. 
+    뉴스를 띄우는 창입니다. List_wind를 상속합니다. 
     """
 
     def design(self):
@@ -472,6 +479,37 @@ class News_wind(List_wind):
         super().design()
         for i in News_List:  # 뉴스 리스트(문자열 원소 iterable)에서 하나씩 꺼내어
             self.List.addItem(i)  # 뉴스를 리스트에 띄운다
+        self.width = 600
+
+
+class Predict_wind(List_wind):
+    """
+    정보를 예측해주는 창입니다. News_wind를 상속합니다.
+    """
+
+    def design(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        self.Prediction_list = QListWidget()
+        self.get_info_button = Basic_button(
+            "Get Info", "Purchace prediction of tomorrow", self)
+        self.hbox_1 = QHBoxLayout()
+        self.hbox_2 = QHBoxLayout()
+        self.vbox = QVBoxLayout()
+
+        place_in_layout(
+            self.hbox_1, (self.Prediction_list, self.get_info_button),)
+        self.Prediction_list.setFixedSize(360, 240)
+        place_in_layout(self.hbox_2, (Close_button(
+            "Close", "Close this window", self), ))
+        place_in_layout(self.vbox, (self.hbox_1, self.hbox_2))
+
+        self.setLayout(self.vbox)
+
+        # 창의 위치, 크기
+        self.x_loc = 160
+        self.y_loc = 160
+        self.width = 570
+        self.height = 360
 
 
 class Storage_wind(List_wind):
