@@ -51,11 +51,11 @@ def pick_random(classlist, number=1):
     return names
 
 
-def pick_news(normal_number=10):
+def pick_news(newstype, normal_number=10):
     randnews = []
     for i in range(normal_number):
-        random.shuffle(news_normal)
-        randnews += [news_normal[0]]
+        random.shuffle(newstype)
+        randnews += [newstype[0]]
     '''
     if random.randint(1, 10) == 1:
         random.shuffle(news_disaster)
@@ -82,12 +82,49 @@ def sleep():
     storage.nextday()
     global News_List
     News_List.clear()
-    randnews = pick_news()
+
+    randnews = pick_news(news_normal)
     for [news, rate] in randnews:
         name = pick_random(allproduct)
         cls = getclass(name[0])
         cls.update(rate, name)
         News_List.append(news.replace('(?)', name[0]))
+
+    if random.randint(1, 10) >= 1:  # 10% 확률로 disaster event 발생
+        disastertypes = list(news_disaster.keys())
+        random.shuffle(disastertypes)
+        news_type = disastertypes[0]
+
+
+        randnews = pick_news(news_disaster[news_type], 1)
+        print(randnews)
+        randnews = randnews[0]
+
+        if news_type == 'a':
+            News_List.append(randnews[0])
+            agriculture.update(randnews[1], list(agriculture.productList.keys()))
+
+        if news_type == 'al':
+            News_List.append(randnews[0])
+            agriculture.update(randnews[1], list(agriculture.productList.keys()))
+            livestock.update(randnews[1], list(livestock.productList.keys()))
+
+        if news_type == 'e':
+            name = pick_random(allproduct)
+            cls = getclass(name[0])
+            cls.update(randnews[1], name)
+            News_List.append(randnews.replace('(?)', name[0]))
+
+        if news_type == 'l':
+            News_List.append(randnews[0])
+            livestock.update(randnews[1], list(livestock.productList.keys()))
+
+        if news_type == 'm':
+            News_List.append(randnews[0])
+            manufactured.update(randnews[1], list(manufactured.productList.keys()))
+
+
+
 
 
 # Usage notes FROM here
