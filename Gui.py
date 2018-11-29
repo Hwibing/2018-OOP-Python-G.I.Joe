@@ -215,6 +215,7 @@ class Main_wind(Wind):
         super().setup()
 
     def showProducts(self):
+        self.Products.clear()
         self.Products.addItem("물품-----요금(τ)----유통기한(일)")
         self.Products.addItem("----------[농산물]-----------")
         for (name, [price, date]) in list(agriculture.productList.items()):
@@ -310,6 +311,7 @@ class Main_wind(Wind):
     def refresh(self):
         self.Info_text.setText("Your Money: {}\nDay: {}".format(
             money.money, Day))
+        self.showProducts()
         super().refresh()
 
 
@@ -376,6 +378,7 @@ class Bank_Wind(Popup_wind):
         self.loan_button.clicked.connect(self.get_loan)
         self.pay_button = Basic_button(
             "Payoff", "Loan payoff", self)  # 대출 갚기 버튼
+        self.pay_button.clicked.connect(self.pay_for_loan)
         place_in_layout(self.hbox_1, (self.save_button,
                                       self.loan_button, self.pay_button))
 
@@ -402,16 +405,16 @@ class Bank_Wind(Popup_wind):
     # 저축하기 함수
     def save_money(self):
         try:
-            self.save_amount = int(self.money_amount.text()) # 저축 금액
-        except ValueError: # 입력값이 이상하면
-            return # 돌려보낸다
+            self.save_amount = int(self.money_amount.text())  # 저축 금액
+        except ValueError:  # 입력값이 이상하면
+            return  # 돌려보낸다
         else:
-            if self.save_amount <= 0: # 양수가 아니어도
-                return # 돌려보낸다
-            else: # 문제 없는 경우
-                money.invest(self.save_amount) # 저축을 하고
-                self.origin.refresh() # 원래 창을 새로고침
-    
+            if self.save_amount <= 0:  # 양수가 아니어도
+                return  # 돌려보낸다
+            else:  # 문제 없는 경우
+                money.invest(self.save_amount)  # 저축을 하고
+                self.origin.refresh()  # 원래 창을 새로고침
+
     # 대출받기 함수
     def get_loan(self):
         try:
@@ -423,6 +426,18 @@ class Bank_Wind(Popup_wind):
                 return
             else:
                 money.make_loan(self.loan_amount)
+                self.origin.refresh()
+
+    def pay_for_loan(self):
+        try:
+            self.pay_amount = int(self.money_amount.text())
+        except ValueError:
+            return
+        else:
+            if self.pay_amount <= 0:
+                return
+            else:
+                money.payoff_loan(self.pay_amount)
                 self.origin.refresh()
 
 
@@ -451,6 +466,7 @@ class News_wind(List_wind):
     """
     뉴스를 띄우는 창입니다. List_Wind를 상속합니다. 
     """
+
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         super().design()
@@ -466,7 +482,7 @@ class Storage_wind(List_wind):
     def design(self):
         # status()
         # 상위 클래스로부터 오버라이드합니다.
-        super().design() # List_Wind의 design 호출
+        super().design()  # List_Wind의 design 호출
         self.List.addItem('이름:\t수량:\t유통기한:')
         self.List.addItem('-'*40)
         for (name, data) in list(storage.warehouse.items()):
@@ -567,8 +583,8 @@ class Moveto_button(Link_button):
 
     def open_new_window(self):
         # 상위 메소드로부터 오버라이드합니다.
-        super().open_new_window() # 새로운 창을 열고
-        self.window.strong_close(QCloseEvent) # 지금 창을 닫는다
+        super().open_new_window()  # 새로운 창을 열고
+        self.window.strong_close(QCloseEvent)  # 지금 창을 닫는다
 
 
 class Close_button(Push_button):
