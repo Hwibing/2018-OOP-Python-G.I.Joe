@@ -10,7 +10,6 @@ from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
 from MainStream import *
 
 
-
 def place_in_layout(layout, details, arrange="spread"):
     """
     레이아웃과 담을 것들을 받아 배치합니다. (Stretch 이용)
@@ -356,27 +355,6 @@ class Popup_wind(Wind):
         super().__init__(name)
 
 
-class List_wind(Wind):
-    """
-    리스트와 닫기 버튼이 있는 창입니다. Wind를 상속합니다.
-    """
-
-    def design(self):
-        # 상위 클래스로부터 오버라이드합니다.
-        _vbox = QVBoxLayout()  # 수직 레이아웃
-        self.List = QListWidget()  # 리스트
-        _vbox.addWidget(self.List)  # 수직 레이아웃에 리스트 추가
-        _hbox = QHBoxLayout()  # 수평 레이아웃
-        place_in_layout(
-            _hbox, (Close_button("Close", "Close this window.", self),), "center")  # 수평 레이아웃에 닫기 버튼 추가
-        _vbox.addLayout(_hbox)  # 수직 레이아웃에 수평 레이아웃 추가
-        self.setLayout(_vbox)  # 수직 레이아웃 배치
-
-    def setup(self):
-        self.setFixedSize(600, 400)  # 창 크기 고정
-        super().setup()
-
-
 class Bank_Wind(Popup_wind):
     """
     은행 업무를 맡는 창입니다. List_wind를 상속합니다.
@@ -421,18 +399,20 @@ class Bank_Wind(Popup_wind):
         self.setFixedSize(500, 200)
         self.show()
 
+    # 저축하기 함수
     def save_money(self):
         try:
-            self.save_amount = int(self.money_amount.text())
-        except ValueError:
-            return
+            self.save_amount = int(self.money_amount.text()) # 저축 금액
+        except ValueError: # 입력값이 이상하면
+            return # 돌려보낸다
         else:
-            if self.save_amount <= 0:
-                return
-            else:
-                money.invest(self.save_amount)
-                self.origin.refresh()
-
+            if self.save_amount <= 0: # 양수가 아니어도
+                return # 돌려보낸다
+            else: # 문제 없는 경우
+                money.invest(self.save_amount) # 저축을 하고
+                self.origin.refresh() # 원래 창을 새로고침
+    
+    # 대출받기 함수
     def get_loan(self):
         try:
             self.loan_amount = int(self.money_amount.text())
@@ -444,6 +424,27 @@ class Bank_Wind(Popup_wind):
             else:
                 money.make_loan(self.loan_amount)
                 self.origin.refresh()
+
+
+class List_wind(Wind):
+    """
+    리스트와 닫기 버튼이 있는 창입니다. Wind를 상속합니다.
+    """
+
+    def design(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        _vbox = QVBoxLayout()  # 수직 레이아웃
+        self.List = QListWidget()  # 리스트
+        _vbox.addWidget(self.List)  # 수직 레이아웃에 리스트 추가
+        _hbox = QHBoxLayout()  # 수평 레이아웃
+        place_in_layout(
+            _hbox, (Close_button("Close", "Close this window.", self),), "center")  # 수평 레이아웃에 닫기 버튼 추가
+        _vbox.addLayout(_hbox)  # 수직 레이아웃에 수평 레이아웃 추가
+        self.setLayout(_vbox)  # 수직 레이아웃 배치
+
+    def setup(self):
+        self.setFixedSize(600, 400)  # 창 크기 고정
+        super().setup()
 
 
 class News_wind(List_wind):
@@ -465,7 +466,7 @@ class Storage_wind(List_wind):
     def design(self):
         # status()
         # 상위 클래스로부터 오버라이드합니다.
-        super().design()
+        super().design() # List_Wind의 design 호출
         self.List.addItem('이름:\t수량:\t유통기한:')
         self.List.addItem('-'*40)
         for (name, data) in list(storage.warehouse.items()):
@@ -509,7 +510,8 @@ class Push_button(QPushButton):
 
 class Basic_button(Push_button):
     """
-    아무 기능이 없는 버튼 클래스입니다. Push_button을 상속합니다. 
+    아무 기능이 없는 버튼 클래스입니다. Push_button을 상속합니다.
+    (가장 무난, 후에 clicked.connect()로 기능 추가 가능)
     """
 
     def utility_set(self, window):
@@ -564,8 +566,8 @@ class Moveto_button(Link_button):
 
     def open_new_window(self):
         # 상위 메소드로부터 오버라이드합니다.
-        super().open_new_window()
-        self.window.strong_close(QCloseEvent)
+        super().open_new_window() # 새로운 창을 열고
+        self.window.strong_close(QCloseEvent) # 지금 창을 닫는다
 
 
 class Close_button(Push_button):
