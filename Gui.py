@@ -251,15 +251,14 @@ class Main_wind(Wind):
             return
         k = k.split("\t")
 
-        self.current_item_name = str(k[0].strip("\t"))
-        self.current_item_price = str(int(k[1].strip("\t").replace("\t", "")))
-        self.item_name.setText(self.current_item_name)
-        self.item_price.setText(self.current_item_price)
+        self.current_item_name = str(k[0].strip("\t")) # 아이템 이름
+        self.current_item_price = str(int(k[1].strip("\t").replace("\t", ""))) # 아이템 가격
+        self.item_name.setText(self.current_item_name) # 이름을 띄우고
+        self.item_price.setText(self.current_item_price) # 가격도 띄우고
 
-        self.item_class=getclass(self.current_item_name)
-        print(self.item_class)
-        self.Image = QPixmap("images/agriculture.png")
-        self.ProductImageLabel.setPixmap(self.Image)
+        self.item_class=getclass(self.current_item_name).type # 물건의 클래스를 받아
+        self.Image = QPixmap("images/{}.png".format(self.item_class)) # 사진을 따온 뒤
+        self.ProductImageLabel.setPixmap(self.Image) # 사진을 바꿔준다
 
         self.update()
 
