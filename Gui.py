@@ -194,9 +194,9 @@ class Main_wind(Wind):
         place_in_layout(self.item_deal, (self.item_name,
                                          self.item_price, self.ProductImageLabel, self.Buy_button, self.numCount, self.Sell_button))
 
-        News_button = Link_button(
+        self.News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
-        Predict_button = Link_button(
+        self.Predict_button = Link_button(
             "Predict", "Show predictions.", self, Predict_wind, "Predict")  # 뉴스 버튼
 
         Next_day_button = Basic_button("Sleep", "Next day", self)  # '다음 날' 버튼
@@ -212,14 +212,14 @@ class Main_wind(Wind):
 
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
-            bottom_box, (News_button, Predict_button, Next_day_button, End_button), "wing_b")
+            bottom_box, (self.News_button, self.Predict_button, Next_day_button, End_button), "wing_b")
 
         vbox = QVBoxLayout()  # 전체 레이아웃
         place_in_layout(vbox, (top_box, mid_box, bottom_box), arrange="spread")
 
         # 창의 위치, 크기
-        self.x_loc = 225
-        self.y_loc = 225
+        self.x_loc = 150
+        self.y_loc = 150
         self.width = 800
         self.height = 600
         self.setLayout(vbox)
@@ -251,14 +251,16 @@ class Main_wind(Wind):
             return
         k = k.split("\t")
 
-        self.current_item_name = str(k[0].strip("\t")) # 아이템 이름
-        self.current_item_price = str(int(k[1].strip("\t").replace("\t", ""))) # 아이템 가격
-        self.item_name.setText(self.current_item_name) # 이름을 띄우고
-        self.item_price.setText(self.current_item_price) # 가격도 띄우고
+        self.current_item_name = str(k[0].strip("\t"))  # 아이템 이름
+        self.current_item_price = str(
+            int(k[1].strip("\t").replace("\t", "")))  # 아이템 가격
+        self.item_name.setText(self.current_item_name)  # 이름을 띄우고
+        self.item_price.setText(self.current_item_price)  # 가격도 띄우고
 
-        self.item_class=getclass(self.current_item_name).type # 물건의 클래스를 받아
-        self.Image = QPixmap("images/{}.png".format(self.item_class)) # 사진을 따온 뒤
-        self.ProductImageLabel.setPixmap(self.Image) # 사진을 바꿔준다
+        self.item_class = getclass(self.current_item_name).type  # 물건의 클래스를 받아
+        self.Image = QPixmap(
+            "images/{}.png".format(self.item_class))  # 사진을 따온 뒤
+        self.ProductImageLabel.setPixmap(self.Image)  # 사진을 바꿔준다
 
         self.update()
 
@@ -320,13 +322,15 @@ class Main_wind(Wind):
                           "Sleep and move on next day.")  # "주무시게요?"
         if ans:  # 넹
             global Day
-            Day += 1
-            sleep()
+            Day += 1  # 하루 더하기
+            sleep()  # 잠자기
             self.Info_text.setText(
-                "Your Money: {}\nDay: {}".format(money.money, Day))  # 잔고
-            self.refresh()
-            if money.money<0:
-                QMessageBox().about(self, "Title", "Message")
+                "Your Money: {}\nDay: {}".format(money.money, Day))  # 텍스트 재설정
+            self.refresh()  # 다시 창 띄우기
+            self.News_button.click()  # 뉴스 띄우기
+            if money.money < 0:
+                QMessageBox().about(self, "Bankrupt", "You are bankrupt!")
+                self.strong_close(QCloseEvent)
         else:  # 아녀
             pass  # 그럼 나중에 뵈요!
 
@@ -345,18 +349,22 @@ class Intro_wind(Wind):
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        _start_btn = Moveto_button(
+        self.wiimage = QLabel(self)
+        self.wiimage.setPixmap(QPixmap("images/intro.png"))
+
+        self._start_btn = Moveto_button(
             "Start", "Start game.", self, Main_wind, "Main")  # 게임 시작 버튼
-        _start_hbox = QHBoxLayout()
-        place_in_layout(_start_hbox, (_start_btn,), "center")
-        _quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
-        _quit_hbox = QHBoxLayout()
-        place_in_layout(_quit_hbox, (_quit_btn,), "center")
+        self._start_hbox = QHBoxLayout()
+        place_in_layout(self._start_hbox, (self._start_btn,), "center")
+        self._quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
+        self._quit_hbox = QHBoxLayout()
+        place_in_layout(self._quit_hbox, (self._quit_btn,), "center")
 
-        _vmid_box = QVBoxLayout()
-        place_in_layout(_vmid_box, (_start_hbox, _quit_hbox))  # 버튼 수직 레이아웃
+        self._vmid_box = QVBoxLayout()
+        place_in_layout(self._vmid_box, (self._start_hbox,
+                                         self._quit_hbox))  # 버튼 수직 레이아웃
 
-        self.setLayout(_vmid_box)  # 배치
+        self.setLayout(self._vmid_box)  # 배치
 
         # 창의 위치, 크기
         self.x_loc = 300
@@ -417,8 +425,8 @@ class Bank_Wind(Popup_wind):
         self.setLayout(self.vbox)
 
         # 창의 크기, 위치
-        self.x_loc = 150
-        self.y_loc = 150
+        self.x_loc = 225
+        self.y_loc = 250
         self.width = 500
         self.height = 200
 
@@ -507,6 +515,7 @@ class Predict_wind(List_wind):
         self.Prediction_list = QListWidget()
         self.get_info_button = Basic_button(
             "Get Info", "Purchace prediction of tomorrow", self)
+        self.get_info_button.clicked.connect(함수명)
         self.hbox_1 = QHBoxLayout()
         self.hbox_2 = QHBoxLayout()
         self.vbox = QVBoxLayout()
