@@ -536,7 +536,13 @@ class Predict_wind(List_wind):
         self.height = 360
 
     def addinfo(self):
-        self.Prediction_list.addItem(getinfo())
+        if money.ismoneyleft(Info_Cost):
+            money.money -= Info_Cost
+            self.Prediction_list.addItem(getinfo())
+
+        # REFRESH 요망
+        # 방법을 모름ㅠㅠ
+        # 돈 까이는데 슬립 누르기 전까지 업데이트가 안됌
 
 
 

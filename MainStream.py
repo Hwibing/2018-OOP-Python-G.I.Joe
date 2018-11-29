@@ -12,6 +12,7 @@ News_List = []
 Day = 1
 money = Finance(500000)
 storage = Storage(100)
+Info_Cost = 100000
 
 
 def buy(name, cls, number):
