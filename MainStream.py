@@ -47,15 +47,30 @@ def pick_random(classlist, number=1):
     return names
 
 
+def pick_news(normal_number=10):
+    random.shuffle(news_normal)
+    randnews = news_normal[:normal_number]
+    if random.randint(1, 10) == 1:
+        random.shuffle(news_disaster)
+        randnews = randnews + news_disaster[0]
+    return randnews
+
+
 # Initialize Game
 (agriculture, livestock, luxury, manufactured) = init()
+(news_normal, news_disaster) = readnews()
+News_List = []
+Day = 1
 money = Finance(500000)
 storage = Storage(100)
 
 # Usage notes FROM here
 if __name__=="__main__":
+    '''
     agriculture.printproductlist()
     buy('감자', agriculture, 10)
     sell('감자', agriculture, 10)
     sleep()
     status()
+    '''
+    print(pick_news())
