@@ -2,6 +2,15 @@ from MainClass import *
 from Ctrl import *
 import random
 
+# Initialize Game
+(agriculture, livestock, luxury, manufactured) = init()
+allproduct = [agriculture, livestock, luxury, manufactured]
+(news_normal, news_disaster) = readnews()
+News_List = []
+Day = 1
+money = Finance(500000)
+storage = Storage(100)
+
 
 def buy(name, cls, number):
     if storage.quantity + number <= storage.maxsize:
@@ -27,11 +36,6 @@ def sell(name, cls, number):
         return False
 
 
-def sleep():
-    money.nextday()
-    storage.nextday()
-
-
 def status():
     print('money : {}'.format(money.money))
     storage.printstorage()
@@ -46,23 +50,42 @@ def pick_random(classlist, number=1):
     names = names[:number]
     return names
 
-'''
+
 def pick_news(normal_number=10):
-    random.shuffle(news_normal)
-    randnews = news_normal[:normal_number]
+    randnews = []
+    for i in range(normal_number):
+        random.shuffle(news_normal)
+        randnews += news_normal[0]
+    '''
     if random.randint(1, 10) == 1:
         random.shuffle(news_disaster)
         randnews = randnews + news_disaster[0]
+    '''
     return randnews
-'''
 
-# Initialize Game
-(agriculture, livestock, luxury, manufactured) = init()
-#(news_normal, news_disaster) = readnews()
-News_List = []
-Day = 1
-money = Finance(500000)
-storage = Storage(100)
+
+def getclass(name):
+    if name in agriculture.productList:
+        return agriculture
+    if name in livestock.productList:
+        return livestock
+    if name in luxury.productList:
+        return luxury
+    if name in manufactured.productList:
+        return manufactured
+
+
+def sleep():
+    money.nextday()
+    storage.nextday()
+    News_List = []
+    randnews = pick_news()
+    for [news, rate] in randnews:
+        name = pick_random(allproduct)
+        cls = getclass(name)
+        cls.update(rate, name)
+        News_List.append(news.replace('(?)',name))
+
 
 # Usage notes FROM here
 if __name__=="__main__":

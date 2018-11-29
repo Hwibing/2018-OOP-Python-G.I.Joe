@@ -12,15 +12,7 @@ from MainStream import *
 # functions
 
 
-def getclass(name):
-    if name in agriculture.productList:
-        return agriculture
-    if name in livestock.productList:
-        return livestock
-    if name in luxury.productList:
-        return luxury
-    if name in manufactured.productList:
-        return manufactured
+
 
 
 def place_in_layout(layout, details, arrange="spread"):
