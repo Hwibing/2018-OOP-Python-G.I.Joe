@@ -113,7 +113,7 @@ def sleep():
             name = pick_random(allproduct)
             cls = getclass(name[0])
             cls.update(randnews[1], name)
-            News_List.append(randnews.replace('(?)', name[0]))
+            News_List.append(randnews[0].replace('(?)', name[0]))
 
         if news_type == 'l':
             News_List.append(randnews[0])
