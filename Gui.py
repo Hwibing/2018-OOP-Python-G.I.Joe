@@ -9,15 +9,6 @@ from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
 
 from MainStream import *
 
-'''
-Game Main Code
-'''
-
-(agriculture, livestock, luxury, manufactured) = init()
-News_List = ["News1", "New2", "New3"]  # 뉴스 목록
-Day = 1
-
-
 # functions
 
 
@@ -183,7 +174,8 @@ class Main_wind(Wind):
         self.showProducts()  # 물품 리스트 출력
 
         self.Products.setFixedSize(500, 400)  # 크기 고정
-        self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
+        self.Products.itemSelectionChanged.connect(
+            self.selectionChanged_event)  # 선택 아이템이 바뀌었을 때
 
         self.Info_text = Text("Your Money: {}\nDay: {}".format(
             money.money, Day), self)  # 잔고
@@ -192,22 +184,26 @@ class Main_wind(Wind):
         Storage_button = Link_button(
             "Storage", "Storage", self, Storage_wind, "Storage")  # 창고용량
 
-        self.item_info = QVBoxLayout()  # 물품 정보 및 매매
+        self.item_deal = QVBoxLayout()  # 물품 정보 및 매매
         self.item_name = Text("Select an item", self)  # 초기 텍스트1
         self.item_price = Text("from left.", self)  # 초기 텍스트2
-        Buy_button = Basic_button("Buy", "Buy selected goods.", self)
-        Sell_button = Basic_button("Sell", "Sell selected goods.", self)
+        Buy_button = Basic_button("Buy", "Buy selected goods.", self)  # 구입 버튼
+        Sell_button = Basic_button(
+            "Sell", "Sell selected goods.", self)  # 판매 버튼
+        # 각각의 버튼에 기능 연결
         Buy_button.clicked.connect(self.buy_item)
         Sell_button.clicked.connect(self.sell_item)
 
-        self.numCount = QLineEdit(self)
-        self.numCount.setPlaceholderText("Insert quantity. (int)")
-        place_in_layout(self.item_info, (self.item_name,
+        self.numCount = QLineEdit(self)  # 개수 입력하는 부분
+        self.numCount.setPlaceholderText("Insert quantity(Natural)")  # 힌트 메시지
+        place_in_layout(self.item_deal, (self.item_name,
                                          self.item_price, Buy_button, self.numCount, Sell_button), "wing_b")
 
         News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
-        Next_day_button = Push_button("Sleep", "Next day", self)  # '다음 날' 버튼
+        Refresh_button=Basic_button("Refresh", "Refresh this window.", self) # 새로고침
+        Refresh_button.clicked.connect(self.refresh)
+        Next_day_button = Basic_button("Sleep", "Next day", self)  # '다음 날' 버튼
         Next_day_button.clicked.connect(self.next_day)
         End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
@@ -216,13 +212,13 @@ class Main_wind(Wind):
         place_in_layout(top_box, (self.Info_text, Bank_button, Storage_button))
 
         mid_box = QHBoxLayout()  # 중간
-        place_in_layout(mid_box, (self.Products, self.item_info))
+        place_in_layout(mid_box, (self.Products, self.item_deal))
 
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
-            bottom_box, (News_button, Next_day_button, End_button), "wing_b")
+            bottom_box, (Refresh_button, News_button, Next_day_button, End_button), "wing_b")
 
-        vbox = QVBoxLayout()
+        vbox = QVBoxLayout()  # 전체 레이아웃
         place_in_layout(vbox, (top_box, mid_box, bottom_box), arrange="spread")
 
         self.setLayout(vbox)
@@ -263,7 +259,7 @@ class Main_wind(Wind):
         try:
             self.num = self.numCount.text()
             self.num = int(self.num)
-            if self.num<=0:
+            if self.num <= 0:
                 return
         except ValueError:
             return
@@ -275,7 +271,7 @@ class Main_wind(Wind):
                 return
             if ans:
                 try:
-                    if self.num<=0:
+                    if self.num <= 0:
                         return
                     buy(self.current_item_name, getclass(
                         self.current_item_name), self.num)
@@ -292,7 +288,7 @@ class Main_wind(Wind):
         try:
             self.num = self.numCount.text()
             self.num = int(self.num)
-            if self.num<=0:
+            if self.num <= 0:
                 return
         except ValueError:
             return
@@ -324,6 +320,10 @@ class Main_wind(Wind):
         else:
             pass
 
+    def refresh(self):
+        self.Info_text.setText("Your Money: {}\nDay: {}".format(
+            money.money, Day))
+        self.update()
 
 class Intro_wind(Wind):
     """
@@ -373,34 +373,60 @@ class List_wind(Wind):
         super().setup()
 
 
-class Bank_Wind(List_wind):
+class Bank_Wind(Wind):
     """
     버튼으로 메뉴를 만들어둔 창입니다. List_wind를 상속합니다.
     """
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        _vbox = QVBoxLayout()
-        _hbox_1 = QHBoxLayout()
-        self.buttons = QVBoxLayout()
-        _hbox_2 = QHBoxLayout()
+        self.vbox = QVBoxLayout()
+        self.hbox_1 = QHBoxLayout()
+        self.hbox_2 = QHBoxLayout()
+        self.hbox_3 = QHBoxLayout()
+        self.hbox_4 = QHBoxLayout()
 
-        self.button1 = Push_button("Save", "Save", self)
-        self.button2 = Push_button("Loan", "Loan", self)
-        self.button3 = Push_button("????", "????", self)
-        place_in_layout(self.buttons, (self.button1,
-                                       self.button2, self.button3))
+        place_in_layout(self.hbox_1, (Text("asdf", self), Text("qwer", self)))
 
-        self.List = QListWidget()
-        _hbox_1.addWidget(self.List)
-        _hbox_1.addLayout(self.buttons)
+        self.save_button = Basic_button("Save", "Save", self)  # 저축 버튼
+        self.loan_button = Basic_button("Loan", "Loan", self)  # 대출 버튼
+        self.loan_button.clicked.connect(self.get_loan)
+        place_in_layout(self.hbox_2, (self.save_button, self.loan_button))
 
-        place_in_layout(
-            _hbox_2, (Close_button("Close", "Close this window.", self),), "center")
-        _vbox.addLayout(_hbox_1)
-        _vbox.addLayout(_hbox_2)
+        self.money_amount = QLineEdit()
+        self.money_amount.setPlaceholderText("type money...")
+        place_in_layout(self.hbox_3, (self.money_amount,), "center")
 
-        self.setLayout(_vbox)
+        place_in_layout(self.hbox_4, (Close_button(
+            "Close", "Close bank.", self),), "center")
+
+        self.vbox.addStretch(1)
+        self.vbox.addLayout(self.hbox_1)
+        self.vbox.addLayout(self.hbox_2)
+        self.vbox.addLayout(self.hbox_3)
+        self.vbox.addStretch(1)
+        self.vbox.addLayout(self.hbox_4)
+        self.setLayout(self.vbox)
+
+    def save_money(self):
+        pass
+
+    def get_loan(self):
+        try:
+            self.loan_amount = int(self.money_amount.text())
+        except ValueError:
+            return
+        else:
+            if self.loan_amount <= 0:
+                return
+            else:
+                money.make_loan(self.loan_amount)
+                self.strong_close(QCloseEvent)
+
+    def setup(self):
+        self.setWindowTitle(self.name)
+        self.setFixedSize(500, 300)
+        self.show()
 
 
 class News_wind(List_wind):
@@ -484,7 +510,7 @@ class Link_button(Push_button):
         """
         상위 클래스로부터 오버라이드합니다.
         :parameter link_class: 띄울 창의 클래스입니다.
-        :parameter link_name: 띄울 창의 정보입니다. (이름)
+        :parameter link_name: 띄울 창의 이름입니다.
         """
         self.linkage_info = (link_class, link_name)  # 띄울 창의 정보를 튜플로 만들기
         super().__init__(name, tooltip, window)  # 상위 클래스의 생성자 호출
