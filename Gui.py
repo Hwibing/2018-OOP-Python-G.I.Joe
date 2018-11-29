@@ -2,7 +2,7 @@ import sys
 from abc import abstractmethod
 
 from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtGui import QCloseEvent
+from PyQt5.QtGui import QCloseEvent, QIcon, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
                              QLineEdit, QListWidget, QMainWindow, QMessageBox,
                              QPushButton, QVBoxLayout, QWidget)
@@ -179,17 +179,20 @@ class Main_wind(Wind):
         self.item_deal = QVBoxLayout()  # 물품 정보 및 매매
         self.item_name = Text("Select an item", self)  # 초기 텍스트1
         self.item_price = Text("from left.", self)  # 초기 텍스트2
-        Buy_button = Basic_button("Buy", "Buy selected goods.", self)  # 구입 버튼
-        Sell_button = Basic_button(
+        self.ProductImageLabel = QLabel(self)
+
+        self.Buy_button = Basic_button(
+            "Buy", "Buy selected goods.", self)  # 구입 버튼
+        self.Sell_button = Basic_button(
             "Sell", "Sell selected goods.", self)  # 판매 버튼
         # 각각의 버튼에 기능 연결
-        Buy_button.clicked.connect(self.buy_item)
-        Sell_button.clicked.connect(self.sell_item)
+        self.Buy_button.clicked.connect(self.buy_item)
+        self.Sell_button.clicked.connect(self.sell_item)
 
         self.numCount = QLineEdit(self)  # 개수 입력하는 부분
         self.numCount.setPlaceholderText("Insert quantity(Natural)")  # 힌트 메시지
         place_in_layout(self.item_deal, (self.item_name,
-                                         self.item_price, Buy_button, self.numCount, Sell_button), "wing_b")
+                                         self.item_price, self.ProductImageLabel, self.Buy_button, self.numCount, self.Sell_button))
 
         News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
@@ -239,14 +242,24 @@ class Main_wind(Wind):
             self.Products.addItem(name+"\t"+str(price))
 
     def selectionChanged_event(self):
+        """
+        리스트(물건 목록)에서 선택한 아이템이 바뀌었을 때 호출됩니다.
+        하는 일: 텍스트 바꾸기, 이미지 바꾸기, 현 아이템 바꾸기
+        """
         k = str(self.Products.currentItem().text())
         if "-" in k:
             return
         k = k.split("\t")
-        self.current_item_name = str(k[0].strip("\t"))
-        self.current_item_price = str(int(k[1].strip("\t").replace("\t", "")))
-        self.item_name.setText(self.current_item_name)
-        self.item_price.setText(self.current_item_price)
+
+        self.current_item_name = str(k[0].strip("\t")) # 아이템 이름
+        self.current_item_price = str(int(k[1].strip("\t").replace("\t", ""))) # 아이템 가격
+        self.item_name.setText(self.current_item_name) # 이름을 띄우고
+        self.item_price.setText(self.current_item_price) # 가격도 띄우고
+
+        self.item_class=getclass(self.current_item_name).type # 물건의 클래스를 받아
+        self.Image = QPixmap("images/{}.png".format(self.item_class)) # 사진을 따온 뒤
+        self.ProductImageLabel.setPixmap(self.Image) # 사진을 바꿔준다
+
         self.update()
 
     def buy_item(self):
