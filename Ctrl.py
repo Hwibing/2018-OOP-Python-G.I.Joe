@@ -65,5 +65,3 @@ def init():
 
     return tuple(cls)
 
-readnews()
-
