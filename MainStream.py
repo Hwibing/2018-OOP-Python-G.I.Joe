@@ -124,16 +124,26 @@ def sleep():
             News_List.append(randnews[0])
             manufactured.update(randnews[1], list(manufactured.productList.keys()))
 
+    # UPDATE INFO PRICES
+    for [rate, products] in Next_Update:
+        cls = getclass(products[0])
+        cls.update(rate, products)
+
 
 def getinfo():
     if random.randint(1,10) >= 2:
         newinfo = pick_news(info_specific, 1)
+        newinfo = newinfo[0]
         name = pick_random(allproduct)
-        Next_Update.append([newinfo[1], name[0]])
+        Next_Update.append([newinfo[1], name])
         return newinfo[0].replace('(?)', name[0])
     else:
         newinfo = pick_news(info_global, 1)
-        Next_Update.append([newinfo[1], list(agriculture.productList.keys())+list(livestock.productList.keys())+list(luxury.productList.keys())+list(manufactured.productList.keys()))
+        newinfo = newinfo[0]
+        Next_Update.append([newinfo[1], list(agriculture.productList.keys())])
+        Next_Update.append([newinfo[1], list(livestock.productList.keys())])
+        Next_Update.append([newinfo[1], list(luxury.productList.keys())])
+        Next_Update.append([newinfo[1], list(manufactured.productList.keys())])
         return newinfo[0]
 
 
@@ -150,4 +160,3 @@ if __name__=="__main__":
     sleep()
     status()
     '''
-    print(pick_news())

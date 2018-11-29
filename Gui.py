@@ -515,7 +515,7 @@ class Predict_wind(List_wind):
         self.Prediction_list = QListWidget()
         self.get_info_button = Basic_button(
             "Get Info", "Purchace prediction of tomorrow", self)
-        self.get_info_button.clicked.connect(함수명)
+        self.get_info_button.clicked.connect(self.addinfo)
         self.hbox_1 = QHBoxLayout()
         self.hbox_2 = QHBoxLayout()
         self.vbox = QVBoxLayout()
@@ -534,6 +534,10 @@ class Predict_wind(List_wind):
         self.y_loc = 160
         self.width = 570
         self.height = 360
+
+    def addinfo(self):
+        self.Prediction_list.addItem(getinfo())
+
 
 
 class Storage_wind(List_wind):
