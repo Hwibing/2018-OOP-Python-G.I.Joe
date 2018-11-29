@@ -325,6 +325,8 @@ class Main_wind(Wind):
             self.Info_text.setText(
                 "Your Money: {}\nDay: {}".format(money.money, Day))  # 잔고
             self.refresh()
+            if money.money<0:
+                QMessageBox().about(self, "Title", "Message")
         else:  # 아녀
             pass  # 그럼 나중에 뵈요!
 
@@ -531,14 +533,12 @@ class Storage_wind(List_wind):
     """
 
     def design(self):
-        # status()
         # 상위 클래스로부터 오버라이드합니다.
         super().design()  # List_Wind의 design 호출
         self.List.addItem('이름:\t수량:\t유통기한:')
         self.List.addItem('-'*40)
         for (name, data) in list(storage.warehouse.items()):
             if not isinstance(getclass(name), ExpireProduct):
-                # print(name, data)
                 self.List.addItem(name + '\t' + str(data))
         for (name, datelist) in list(storage.warehouse_expire.items()):
             for [number, date] in datelist:
