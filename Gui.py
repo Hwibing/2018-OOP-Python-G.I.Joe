@@ -9,8 +9,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
 
 from MainStream import *
 
-
-opened_window_list = dict()  # 열려 있는 창들을 모아 놓은 딕셔너리
+opened_window_list = dict()  # 열려 있는 창들을 모아 놓은 딕셔너리(이름이 key, 객체가 value)
 
 
 def place_in_layout(layout, details, arrange="spread"):
@@ -45,13 +44,17 @@ def place_in_layout(layout, details, arrange="spread"):
             try:
                 layout.addWidget(details[l])
             except Exception:
-                layout.addLayout(details[i])
-        layout.addStretch(1)
-        if is_odd and "b" in arrange:
+                layout.addLayout(details[l])
+            finally:
+                layout.addStretch(1)
+        elif is_odd and "b" in arrange:
+            layout.addStretch(1)
             try:
                 layout.addWidget(details[l])
             except Exception:
                 layout.addLayout(details[l])
+        else:
+            layout.addStretch(1)
         for i in range(l):
             try:
                 layout.addWidget(details[i+l+(1 if is_odd else 0)])
@@ -92,8 +95,8 @@ def YN_question(window, question_name, question_str):
     :return: bool타입의 대답(True: Yes, False: No)
     """
     ans = QMessageBox.question(window, question_name, question_str,
-                               QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-    return (ans == QMessageBox.Yes)
+                               QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)  # 메시지박스로 대답 얻고
+    return (ans == QMessageBox.Yes)  # 대답이 Yes인지를 비교하여 리턴
 
 
 class Wind(QWidget):
@@ -112,7 +115,7 @@ class Wind(QWidget):
         opened_window_list[name] = self
         super().__init__()  # 상위 클래스의 생성자 호출
         self.name = name  # 창의 이름 정하기
-        self.origin=origin # 원점 확인
+        self.origin = origin  # 원점 확인
         self.strong = False  # 되묻지 않고 닫을지에 대한 여부
         self.design()  # 디자인
         self.setup()  # 셋업
@@ -124,26 +127,26 @@ class Wind(QWidget):
         창을 디자인합니다. 
         하는 일: 레이아웃, 버튼/텍스트 띄우기, 크기 결정
         """
-        self.x_loc = 100
-        self.y_loc = 100
-        self.width = 800
-        self.height = 600
+        self.x_loc = 100  # 창의 x축 위치(오른쪽으로)
+        self.y_loc = 100  # 창의 y축 위치(아래로)
+        self.width = 800  # 창의 너비
+        self.height = 600  # 창의 높이
 
     def setup(self):
         """
         창을 세팅하고 띄웁니다.
         하는 일: 창의 제목 설정, 창 보이기, 창 위치/크기 설정
         """
-        self.setWindowTitle(self.name)  # 창의 제목 지정
-        self.move(self.x_loc, self.y_loc)  # 창의 위치
-        self.setFixedSize(self.width, self.height)  # 창의 크기
-        self.show()  # 보이기
+        self.setWindowTitle(self.name)  # 창의 제목 설정
+        self.move(self.x_loc, self.y_loc)  # 창의 위치 설정
+        self.setFixedSize(self.width, self.height)  # 창의 크기 설정
+        self.show()  # 창 보이기
 
-    def closeEvent(self, QCloseEvent):  # 창 닫기 이벤트(X자 누르거나 .close() 호출 시)
+    def closeEvent(self, QCloseEvent):  # 창 닫기 이벤트(X자 누르거나 .close() 호출 시 발생)
         if self.strong:  # 만약 되묻지 않기로 했다면?
             QCloseEvent.accept()  # 그냥 CloseEvent 수용
         else:  # 되묻기
-            # 메시지박스로 물어보기(Y/N), 그 결과를 ans에 저장
+            # 물어보기(Y/N), 그 결과를 ans에 저장
             self.ans = YN_question(
                 self, "Confirm", "Do you want to close this window?")
             if self.ans:
@@ -158,8 +161,9 @@ class Wind(QWidget):
     def refresh(self):
         """
         새로고침입니다. refresh가 호출되면 창의 정보를 다시 불러옵니다. 
+        기본적으로 .update지만, 앞에 무언가를 넣을 수도 있습니다.
         """
-        self.update()
+        self.update() # 업데이트
 
 
 class Main_wind(Wind):
@@ -206,15 +210,17 @@ class Main_wind(Wind):
         self.News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
         self.Predict_button = Link_button(
-            "Predict", "Show predictions.", self, Predict_wind, "Predict", self)  # 뉴스 버튼
+            "Predict", "Show predictions.", self, Predict_wind, "Predict", self)  # 예측 버튼
 
-        self.Next_day_button = Basic_button("Sleep", "Next day", self)  # '다음 날' 버튼
+        self.Next_day_button = Basic_button(
+            "Sleep", "Next day", self)  # '다음 날' 버튼
         self.Next_day_button.clicked.connect(self.next_day)
         self.End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
 
         top_box = QHBoxLayout()  # 상부
-        place_in_layout(top_box, (self.Info_text, self.Bank_button, self.Storage_button))
+        place_in_layout(
+            top_box, (self.Info_text, self.Bank_button, self.Storage_button))
 
         mid_box = QHBoxLayout()  # 중간
         place_in_layout(mid_box, (self.Products, self.item_deal))
@@ -326,9 +332,9 @@ class Main_wind(Wind):
             self.Info_text.setText(
                 "Your Money: {}\nDay: {}".format(money.money, Day))  # 텍스트 재설정
             self.refresh()  # 다시 창 띄우기
-            if money.money < 0: # 돈이 0보다 적으면
-                QMessageBox().about(self, "Bankrupt", "You are bankrupt!") # 파산 알림
-                self.End_button.click() # 게임 종료
+            if money.money < 0:  # 돈이 0보다 적으면
+                QMessageBox().about(self, "Bankrupt", "You are bankrupt!")  # 파산 알림
+                self.End_button.click()  # 게임 종료
             self.window_will_be_closed = opened_window_list.items()
             for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
                 if not isinstance(window_object, Main_wind):
@@ -357,41 +363,26 @@ class Intro_wind(Wind):
         # 상위 클래스로부터 오버라이드합니다.
         self._start_btn = Moveto_button(
             "Start", "Start game.", self, Main_wind, "Main")  # 게임 시작 버튼
-        self._start_hbox = QHBoxLayout()
-        place_in_layout(self._start_hbox, (self._start_btn,), "center")
-        self._quit_btn = Quit_button("Quit", "Quit game.", self)  # 종료 버튼
-        self._quit_hbox = QHBoxLayout()
-        place_in_layout(self._quit_hbox, (self._quit_btn,), "center")
+        self._start_hbox = QHBoxLayout() # 게임 시작 버튼 배치 레이아웃(수평)
+        place_in_layout(self._start_hbox, (self._start_btn,), "center") # 배치(함수 이용)
 
-        self._vmid_box = QVBoxLayout()
+        self._quit_btn = Quit_button("Quit", "Quit game.", self)  # 게임 종료 버튼
+        self._quit_hbox = QHBoxLayout() # 게임 종료 버튼 배치 레이아웃(수평)
+        place_in_layout(self._quit_hbox, (self._quit_btn,), "center") # 배치(함수 이용) 
+
+        self._vmid_box = QVBoxLayout() # 두 레이아웃을 수직으로 놓는 레이아웃
         place_in_layout(self._vmid_box, (self._start_hbox,
-                                         self._quit_hbox))  # 버튼 수직 레이아웃
+                                         self._quit_hbox))  # 두 버튼의 레이아웃을 레이아웃에 담음
 
-        self.setLayout(self._vmid_box)  # 배치
+        self.setLayout(self._vmid_box)  # 창의 레이아웃을 이걸로 설정
 
-        # 창의 위치, 크기
         self.x_loc = 300
         self.y_loc = 300
         self.width = 200
         self.height = 150
 
 
-class Popup_wind(Wind):
-    """
-    팝업으로 뜨는 창들입니다. 원래 창에 대한 정보를 가지고 있습니다.
-    끌 때 꼭꼭!!! origin을 refresh하도록!!
-    """
-
-    def __init__(self, name, origin):
-        """
-        상위 클래스로부터 오버라이드합니다.
-        :parameter origin: 원래 창입니다. 
-        """
-        self.origin = origin
-        super().__init__(name)
-
-
-class Bank_Wind(Popup_wind):
+class Bank_Wind(Wind):
     """
     은행 업무를 맡는 창입니다. List_wind를 상속합니다.
     """
@@ -420,14 +411,9 @@ class Bank_Wind(Popup_wind):
         place_in_layout(self.hbox_3, (Close_button(
             "Close", "Close bank.", self),), "center")
 
-        self.vbox.addStretch(1)
-        self.vbox.addLayout(self.hbox_1)
-        self.vbox.addLayout(self.hbox_2)
-        self.vbox.addStretch(1)
-        self.vbox.addLayout(self.hbox_3)
+        place_in_layout(self.vbox, (self.hbox_1, self.hbox_2, self.hbox_3), "wing_f")
         self.setLayout(self.vbox)
 
-        # 창의 크기, 위치
         self.x_loc = 225
         self.y_loc = 250
         self.width = 500
@@ -446,7 +432,7 @@ class Bank_Wind(Popup_wind):
                 money.invest(self.save_amount)  # 저축을 하고
                 self.origin.refresh()  # 원래 창을 새로고침
 
-    # 대출받기 함수
+    # 대출 받기 함수, 저축과 크게 안 다름
     def get_loan(self):
         try:
             self.loan_amount = int(self.money_amount.text())
@@ -459,6 +445,7 @@ class Bank_Wind(Popup_wind):
                 money.make_loan(self.loan_amount)
                 self.origin.refresh()
 
+    # 대출 갚기 함수, 역시 크게 안 다름
     def pay_for_loan(self):
         try:
             self.pay_amount = int(self.money_amount.text())
@@ -488,7 +475,6 @@ class List_wind(Wind):
         self._vbox.addLayout(self._hbox)  # 수직 레이아웃에 수평 레이아웃 추가
         self.setLayout(self._vbox)  # 수직 레이아웃 배치
 
-        # 창의 위치, 크기
         self.x_loc = 100
         self.y_loc = 100
         self.width = 400
@@ -508,9 +494,9 @@ class News_wind(List_wind):
         self.width = 600
 
 
-class Predict_wind(Popup_wind):
+class Predict_wind(Wind):
     """
-    정보를 예측해주는 창입니다. Popup_wind를 상속합니다.
+    정보를 예측해주는 창입니다. Wind를 상속합니다.
     """
 
     def design(self):
@@ -532,7 +518,6 @@ class Predict_wind(Popup_wind):
         place_in_layout(self.vbox, (self.hbox_1, self.hbox_2))
         self.setLayout(self.vbox)
 
-        # 창의 위치, 크기
         self.x_loc = 300
         self.y_loc = 240
         self.width = 600
@@ -545,22 +530,37 @@ class Predict_wind(Popup_wind):
         self.origin.refresh()
 
 
-class Storage_wind(List_wind):
+class Storage_wind(Wind):
     """
-    창고를 띄우는 창입니다. List_wind를 상속합니다.
+    창고를 띄우는 창입니다. Wind를 상속합니다.
     """
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        super().design()  # List_Wind의 design 호출
+        self.List=QListWidget() # 창고 품목 리스트
         self.List.addItem('이름:\t수량:\t유통기한:')
         self.List.addItem('-'*40)
+        # 아래는 창고에 무엇이 들어있는지를 보여주는 부분
         for (name, data) in list(storage.warehouse.items()):
             if not isinstance(getclass(name), ExpireProduct):
                 self.List.addItem(name + '\t' + str(data))
         for (name, datelist) in list(storage.warehouse_expire.items()):
             for [number, date] in datelist:
                 self.List.addItem(name + '\t' + str(number) + '\t' + str(date))
+
+        # 수직 레이아웃, 수평 레이아웃
+        self._hbox=QHBoxLayout()
+        self._vbox=QVBoxLayout()
+        self.up_button = Basic_button("Upgrade", "Upgrade storage", self)
+        place_in_layout(self._hbox, (self.up_button, Close_button(
+            "Close", "Close this window.", self)), "center")
+        place_in_layout(self._vbox, (self.List, self._hbox), "normal")
+        self.setLayout(self._vbox)
+
+        self.x_loc=100
+        self.y_loc=100
+        self.width=400
+        self.height=400
 
 
 class Push_button(QPushButton):
@@ -573,6 +573,7 @@ class Push_button(QPushButton):
         생성자입니다. __init__이 끝날 때 utility_set을 호출합니다.
         :parameter name: 버튼의 이름(내용)입니다.
         :parameter tooltip: 버튼의 툴팁입니다. (마우스 올리면 나오는 내용)
+        :parameter window: 이 버튼이 포함된 창입니다.
         """
         super().__init__(name, window)  # 상위 클래스의 생성자 호출
         self.design(tooltip)  # 디자인하기
@@ -581,7 +582,7 @@ class Push_button(QPushButton):
     def design(self, tooltip):
         """
         버튼을 디자인합니다.
-        하는 일: 버튼 툴팁 설정, 위치/크기 조정
+        하는 일: 버튼 툴팁 설정, 위치 조정
         :parameter tooltip: 버튼 툴팁(마우스 올리면 나타나는 거)입니다.
         """
         self.setToolTip(tooltip)  # 툴팁 설정
@@ -633,11 +634,8 @@ class Link_button(Push_button):
         """
         새 창을 여는 메소드입니다.
         """
-        if issubclass(self.linkage_info[0], Popup_wind):  # 만약 창 클래스가 팝업이라면?
-            self.link = self.linkage_info[0](
-                self.linkage_info[1], self.linkage_info[2])  # 원점 정보 추가
-        else:  # 아니면
-            self.link = self.linkage_info[0](self.linkage_info[1])  # 그냥 호출
+        self.link = self.linkage_info[0](
+            self.linkage_info[1], self.linkage_info[2])  # 원점 정보 추가
 
 
 class Moveto_button(Link_button):
