@@ -10,6 +10,9 @@ from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
 from MainStream import *
 
 
+opened_window_list = dict()  # 열려 있는 창들을 모아 놓은 딕셔너리
+
+
 def place_in_layout(layout, details, arrange="spread"):
     """
     레이아웃과 담을 것들을 받아 배치합니다. (Stretch 이용)
@@ -105,6 +108,7 @@ class Wind(QWidget):
         띄울 창의 이름을 결정하며, 끝날 때 setup을 호출합니다.
         :parameter name: 창의 이름입니다.
         """
+        opened_window_list[name] = self
         super().__init__()  # 상위 클래스의 생성자 호출
         self.name = name  # 창의 이름 정하기
         self.strong = False  # 되묻지 않고 닫을지에 대한 여부
@@ -145,11 +149,14 @@ class Wind(QWidget):
             else:
                 QCloseEvent.ignore()  # CloseEvent 거절
 
-    def strong_close(self, QCloseEvent):  # 강하게 닫기(물어봄 X)
+    def strong_close(self, QCloseEvent=None):  # 강하게 닫기(물어봄 X)
         self.strong = True  # 안 되묻기로 한 뒤
         self.close()  # 닫는다(그냥 종료)
 
     def refresh(self):
+        """
+        새로고침입니다. refresh가 호출되면 창의 정보를 다시 불러옵니다. 
+        """
         self.update()
 
 
@@ -262,36 +269,30 @@ class Main_wind(Wind):
             "images/{}.png".format(self.item_class))  # 사진을 따온 뒤
         self.ProductImageLabel.setPixmap(self.Image)  # 사진을 바꿔준다
 
-        self.update()
+        self.update()  # 새로고침
 
     def buy_item(self):
         try:
-            self.num = self.numCount.text()
-            self.num = int(self.num)
-            if self.num <= 0:
+            self.num = self.numCount.text()  # 입력한 텍스트를 받아와
+            self.num = int(self.num)  # 정수화하는데
+            if self.num <= 0:  # 0보다 작으면 리턴
                 return
-        except ValueError:
-            return
+        except ValueError:  # 유효하지 않아도
+            return  # 리턴
         else:
             try:
                 ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
-                    self.num*int(self.current_item_price)))
-            except AttributeError:
-                return
-            if ans:
-                try:
-                    if self.num <= 0:
-                        return
-                    buy(self.current_item_name, getclass(
-                        self.current_item_name), self.num)
-                except AttributeError:
-                    pass
-                else:
-                    self.Info_text.setText("Your Money: {}\nDay: {}".format(
-                        money.money, Day))  # 잔고
-                    self.update()
-            else:
-                pass
+                    self.num*int(self.current_item_price)))  # ㄹㅇ 살거임?
+            except AttributeError:  # 선택을 안했다면(current 생성 X)
+                return  # 리턴
+            if ans:  # 넹
+                buy(self.current_item_name, getclass(
+                    self.current_item_name), self.num)  # 그럼 사세요
+                self.Info_text.setText("Your Money: {}\nDay: {}".format(
+                    money.money, Day))  # 텍스트 업데이트
+                self.update()  # 새로고침
+            else:  # 아녀
+                pass  # 지나가세요
 
     def sell_item(self):
         try:
@@ -302,20 +303,16 @@ class Main_wind(Wind):
         except ValueError:
             return
         else:
-            try:
-                ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
-                    self.num*int(self.current_item_price)))
-            except AttributeError:
-                pass
+            ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
+                self.num*int(self.current_item_price)))
+            if ans:
+                sell(self.current_item_name, getclass(
+                    self.current_item_name), self.num)
+                self.Info_text.setText("Your Money: {}\nDay: {}".format(
+                    money.money, Day))  # 잔고
+                self.update()
             else:
-                if ans:
-                    sell(self.current_item_name, getclass(
-                        self.current_item_name), self.num)
-                    self.Info_text.setText("Your Money: {}\nDay: {}".format(
-                        money.money, Day))  # 잔고
-                    self.update()
-                else:
-                    pass
+                pass
 
     def next_day(self):
         ans = YN_question(self, "Sleep confirm",
@@ -327,18 +324,25 @@ class Main_wind(Wind):
             self.Info_text.setText(
                 "Your Money: {}\nDay: {}".format(money.money, Day))  # 텍스트 재설정
             self.refresh()  # 다시 창 띄우기
-            self.News_button.click()  # 뉴스 띄우기
             if money.money < 0:
                 QMessageBox().about(self, "Bankrupt", "You are bankrupt!")
                 Quit_button.click()
+            self.window_will_be_closed=opened_window_list.items()
+            for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
+                if not isinstance(window_object,Main_wind):
+                    window_object.strong_close()  # 닫는당
+            opened_window_list.clear()  # 딕셔너리를 비우고
+            opened_window_list[self.name] = self  # 자신을 넣는다
+            self.News_button.click()  # 뉴스 띄우기
         else:  # 아녀
             pass  # 그럼 나중에 뵈요!
 
     def refresh(self):
+        # 상위 클래스로부터 오버라이드합니다.
         self.Info_text.setText("Your Money: {}\nDay: {}".format(
-            money.money, Day))
-        self.showProducts()
-        super().refresh()
+            money.money, Day))  # 텍스트 다시 세팅
+        self.showProducts()  # 사진 다시 띄우기, 리스트 다시 그거.
+        super().refresh()  # 상위 클래스의 refresh 불러옴
 
 
 class Intro_wind(Wind):
@@ -349,9 +353,6 @@ class Intro_wind(Wind):
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        self.wiimage = QLabel(self)
-        self.wiimage.setPixmap(QPixmap("images/intro.png"))
-
         self._start_btn = Moveto_button(
             "Start", "Start game.", self, Main_wind, "Main")  # 게임 시작 버튼
         self._start_hbox = QHBoxLayout()
@@ -513,26 +514,26 @@ class Predict_wind(Popup_wind):
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         self.Prediction_list = QListWidget()
+        self.Prediction_list.setFixedSize(540, 270)
         self.get_info_button = Basic_button(
             "Get Info", "Purchace prediction of tomorrow", self)
         self.get_info_button.clicked.connect(self.addinfo)
+
         self.hbox_1 = QHBoxLayout()
         self.hbox_2 = QHBoxLayout()
         self.vbox = QVBoxLayout()
 
         place_in_layout(
-            self.hbox_1, (self.Prediction_list, self.get_info_button),)
-        self.Prediction_list.setFixedSize(360, 240)
-        place_in_layout(self.hbox_2, (Close_button(
-            "Close", "Close this window", self), ))
+            self.hbox_1, (self.Prediction_list,),)
+        place_in_layout(self.hbox_2, (self.get_info_button, Close_button(
+            "Close", "Close this window", self)))
         place_in_layout(self.vbox, (self.hbox_1, self.hbox_2))
-
         self.setLayout(self.vbox)
 
         # 창의 위치, 크기
-        self.x_loc = 160
-        self.y_loc = 160
-        self.width = 570
+        self.x_loc = 300
+        self.y_loc = 240
+        self.width = 600
         self.height = 360
 
     def addinfo(self):
@@ -540,11 +541,6 @@ class Predict_wind(Popup_wind):
             money.money -= Info_Cost
             self.Prediction_list.addItem(getinfo())
         self.origin.refresh()
-
-        # REFRESH 요망
-        # 방법을 모름ㅠㅠ
-        # 돈 까이는데 슬립 누르기 전까지 업데이트가 안됌
-
 
 
 class Storage_wind(List_wind):
