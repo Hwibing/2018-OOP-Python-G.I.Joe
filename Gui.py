@@ -197,7 +197,7 @@ class Main_wind(Wind):
         self.News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
         self.Predict_button = Link_button(
-            "Predict", "Show predictions.", self, Predict_wind, "Predict")  # 뉴스 버튼
+            "Predict", "Show predictions.", self, Predict_wind, "Predict", self)  # 뉴스 버튼
 
         Next_day_button = Basic_button("Sleep", "Next day", self)  # '다음 날' 버튼
         Next_day_button.clicked.connect(self.next_day)
@@ -330,7 +330,7 @@ class Main_wind(Wind):
             self.News_button.click()  # 뉴스 띄우기
             if money.money < 0:
                 QMessageBox().about(self, "Bankrupt", "You are bankrupt!")
-                self.strong_close(QCloseEvent)
+                Quit_button.click()
         else:  # 아녀
             pass  # 그럼 나중에 뵈요!
 
@@ -505,9 +505,9 @@ class News_wind(List_wind):
         self.width = 600
 
 
-class Predict_wind(List_wind):
+class Predict_wind(Popup_wind):
     """
-    정보를 예측해주는 창입니다. News_wind를 상속합니다.
+    정보를 예측해주는 창입니다. Popup_wind를 상속합니다.
     """
 
     def design(self):
@@ -539,6 +539,7 @@ class Predict_wind(List_wind):
         if money.ismoneyleft(Info_Cost):
             money.money -= Info_Cost
             self.Prediction_list.addItem(getinfo())
+        self.origin.refresh()
 
         # REFRESH 요망
         # 방법을 모름ㅠㅠ
