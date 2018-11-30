@@ -23,7 +23,7 @@ def place_in_layout(layout, details, arrange="spread"):
     :Exception: 담을 내용 오류/유효하지 않은 배치 방식
     """
     arrange = arrange.lower()  # 소문자화(비교를 위해)
-    if arrange not in ("spread", "center", "front", "back", "wing_f", "wing_b", "dispersion"):  # 배치 방식이 다음 중 없으면?
+    if arrange not in ("spread", "center", "front", "back", "wing_f", "wing_b", "dispersion", "normal"):  # 배치 방식이 다음 중 없으면?
         raise Exception("Invalid arrangement.")  # 예외 발생
 
     """
@@ -102,15 +102,17 @@ class Wind(QWidget):
     Wind 클래스를 만들면 창이 띄워집니다.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, origin=None):
         """
         생성자입니다. 
         띄울 창의 이름을 결정하며, 끝날 때 setup을 호출합니다.
         :parameter name: 창의 이름입니다.
+        :parameter origin: 본 창을 띄운 창입니다. 
         """
         opened_window_list[name] = self
         super().__init__()  # 상위 클래스의 생성자 호출
         self.name = name  # 창의 이름 정하기
+        self.origin=origin # 원점 확인
         self.strong = False  # 되묻지 않고 닫을지에 대한 여부
         self.design()  # 디자인
         self.setup()  # 셋업
@@ -178,9 +180,9 @@ class Main_wind(Wind):
 
         self.Info_text = Text("Your Money: {}\nDay: {}".format(
             money.money, Day), self)  # 잔고
-        Bank_button = Link_button(
+        self.Bank_button = Link_button(
             "Bank", "Bank", self, Bank_Wind, "Bank", self)  # 은행
-        Storage_button = Link_button(
+        self.Storage_button = Link_button(
             "Storage", "Storage", self, Storage_wind, "Storage")  # 창고용량
 
         self.item_deal = QVBoxLayout()  # 물품 정보 및 매매
@@ -206,20 +208,20 @@ class Main_wind(Wind):
         self.Predict_button = Link_button(
             "Predict", "Show predictions.", self, Predict_wind, "Predict", self)  # 뉴스 버튼
 
-        Next_day_button = Basic_button("Sleep", "Next day", self)  # '다음 날' 버튼
-        Next_day_button.clicked.connect(self.next_day)
-        End_button = Quit_button(
+        self.Next_day_button = Basic_button("Sleep", "Next day", self)  # '다음 날' 버튼
+        self.Next_day_button.clicked.connect(self.next_day)
+        self.End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
 
         top_box = QHBoxLayout()  # 상부
-        place_in_layout(top_box, (self.Info_text, Bank_button, Storage_button))
+        place_in_layout(top_box, (self.Info_text, self.Bank_button, self.Storage_button))
 
         mid_box = QHBoxLayout()  # 중간
         place_in_layout(mid_box, (self.Products, self.item_deal))
 
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
-            bottom_box, (self.News_button, self.Predict_button, Next_day_button, End_button), "wing_b")
+            bottom_box, (self.News_button, self.Predict_button, self.Next_day_button, self.End_button), "wing_b")
 
         vbox = QVBoxLayout()  # 전체 레이아웃
         place_in_layout(vbox, (top_box, mid_box, bottom_box), arrange="spread")
@@ -317,16 +319,16 @@ class Main_wind(Wind):
     def next_day(self):
         ans = YN_question(self, "Sleep confirm",
                           "Sleep and move on next day.")  # "주무시게요?"
-        if ans:  # 넹
+        if ans:  # 자겠다고 확인
             global Day
             Day += 1  # 하루 더하기
             sleep()  # 잠자기
             self.Info_text.setText(
                 "Your Money: {}\nDay: {}".format(money.money, Day))  # 텍스트 재설정
             self.refresh()  # 다시 창 띄우기
-            if money.money < 0:
-                QMessageBox().about(self, "Bankrupt", "You are bankrupt!")
-                Quit_button.click()
+            if money.money < 0: # 돈이 0보다 적으면
+                QMessageBox().about(self, "Bankrupt", "You are bankrupt!") # 파산 알림
+                self.End_button.click() # 게임 종료
             self.window_will_be_closed = opened_window_list.items()
             for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
                 if not isinstance(window_object, Main_wind):
@@ -334,7 +336,7 @@ class Main_wind(Wind):
             opened_window_list.clear()  # 딕셔너리를 비우고
             opened_window_list[self.name] = self  # 자신을 넣는다
             self.News_button.click()  # 뉴스 띄우기
-        else:  # 아녀
+        else:  # 자지 않겠다고 함
             pass  # 그럼 나중에 뵈요!
 
     def refresh(self):
