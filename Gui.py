@@ -411,7 +411,7 @@ class Bank_Wind(Wind):
         place_in_layout(self.hbox_3, (Close_button(
             "Close", "Close bank.", self),), "center")
 
-        place_in_layout(self.vbox, (self.hbox_1, self.hbox_2, self.hbox_3), "wing_f")
+        place_in_layout(self.vbox, (self.hbox_1, self.hbox_2, self.hbox_3), "dispersion")
         self.setLayout(self.vbox)
 
         self.x_loc = 225
