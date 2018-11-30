@@ -163,7 +163,7 @@ class Storage:
         return True
 
     def nextday(self, decay=1):
-        if self.freezer: decay = 1
+        if self.freezer: decay = 0.5
         for name in list(self.warehouse_expire.keys()):
             for idx in range(len(self.warehouse_expire[name])): # size of list
                 if self.warehouse_expire[name] == []:
