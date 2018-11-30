@@ -327,9 +327,9 @@ class Main_wind(Wind):
             if money.money < 0:
                 QMessageBox().about(self, "Bankrupt", "You are bankrupt!")
                 Quit_button.click()
-            self.window_will_be_closed=opened_window_list.items()
+            self.window_will_be_closed = opened_window_list.items()
             for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
-                if not isinstance(window_object,Main_wind):
+                if not isinstance(window_object, Main_wind):
                     window_object.strong_close()  # 닫는당
             opened_window_list.clear()  # 딕셔너리를 비우고
             opened_window_list[self.name] = self  # 자신을 넣는다
