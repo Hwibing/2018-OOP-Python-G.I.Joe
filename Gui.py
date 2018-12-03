@@ -12,13 +12,12 @@ from MainStream import *
 opened_window_list = dict()  # 열려 있는 창들을 모아 놓은 딕셔너리(이름이 key, 객체가 value)
 
 
-def place_in_layout(layout=(QHBoxLayout, QVBoxLayout), details=tuple, arrange="spread"):
+def place_in_layout(layout: (QHBoxLayout, QVBoxLayout), details: tuple, arrange="spread"):
     """
     레이아웃과 담을 것들을 받아 배치합니다. (Stretch 이용)
-    :parameter layout: 레이아웃입니다.
-    :parameter details: 레이아웃에 담을 것들의 iterable 객체입니다.
+    :parameter layout: 레이아웃입니다. (QHBoxLayout 또는 QVBoxLayout)
+    :parameter details: 레이아웃에 담을 것들의 튜플 객체입니다.
     :parameter arrange: 배치 방식입니다. 
-    :return: None
     :Exception: 담을 내용 오류/유효하지 않은 배치 방식
     """
     arrange = arrange.lower()  # 소문자화(비교를 위해)
@@ -86,12 +85,12 @@ def place_in_layout(layout=(QHBoxLayout, QVBoxLayout), details=tuple, arrange="s
     return
 
 
-def YN_question(window, question_name=str, question_str=str):
+def YN_question(window, question_name: str, question_str: str):
     """
     QMessagebox로 예/아니오를 물어봅니다.
     :parameter window: 어디 창에서 질문을 띄울 건지
-    :parameter question_name: 질문 창 이름
-    :parameter question_str: 질문 내용
+    :parameter question_name: 질문 창 이름(문자열)
+    :parameter question_str: 질문 내용(문자열)
     :return: bool타입의 대답(True: Yes, False: No)
     """
     ans = QMessageBox.question(window, question_name, question_str,
@@ -106,6 +105,23 @@ def gen_items_in_list(list_widget: QListWidget):
     """
     for i in range(list_widget.count()):
         yield list_widget.item(i)
+
+
+def only_positive_int(parameter):
+    """
+    parameter를 양의 정수로 바꿀 수 있다면 바꿔서 반환합니다.
+    그럴 수 없다면 값을 반환하지 않습니다. 
+    :parameter parameter: int화시킬 객체입니다.
+    :return 1: 양의 정수를 반환합니다.
+    :return 2: None
+    """
+    try:
+        parameter=int(parameter)
+    except ValueError:
+        return
+    else:
+        if parameter>0:
+            return parameter
 
 
 class Wind(QWidget):
@@ -289,14 +305,9 @@ class Main_wind(Wind):
         self.update()  # 새로고침
 
     def buy_item(self):
-        try:
-            self.num = self.numCount.text()  # 입력한 텍스트를 받아와
-            self.num = int(self.num)  # 정수화하는데
-            if self.num <= 0:  # 0보다 작으면 리턴
-                return
-        except ValueError:  # 유효하지 않아도
-            return  # 리턴
-        else:
+        self.num=self.numCount.text()
+        self.num=only_positive_int(self.num)
+        if self.num:
             try:
                 ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
                     self.num*int(self.current_item_price)))  # ㄹㅇ 살거임?
@@ -312,16 +323,14 @@ class Main_wind(Wind):
                 pass  # 지나가세요
 
     def sell_item(self):
-        try:
-            self.num = self.numCount.text()
-            self.num = int(self.num)
-            if self.num <= 0:
-                return
-        except ValueError:
-            return
-        else:
-            ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
-                self.num*int(self.current_item_price)))
+        self.num = self.numCount.text()
+        self.num = only_positive_int(self.num)
+        if self.num:
+            try:
+                ans = YN_question(self, "Confirm", "Are you sure to sell?\nTotal Price: %d Tau" % (
+                    self.num*int(self.current_item_price)))  # ㄹㅇ 살거임?
+            except AttributeError:  # 선택을 안했다면(current 생성 X)
+                return  # 리턴
             if ans:
                 sell(self.current_item_name, getclass(
                     self.current_item_name), self.num)
@@ -333,7 +342,7 @@ class Main_wind(Wind):
 
     def next_day(self):
         ans = YN_question(self, "Sleep confirm",
-                          "Sleep and move on next day.")  # "주무시게요?"
+                          "Sleep and move on next day.")  # 잘 거냐고 다시 물어봄
         if ans:  # 자겠다고 확인
             global Day
             Day += 1  # 하루 더하기
@@ -448,42 +457,24 @@ class Bank_Wind(Wind):
 
     # 저축하기 함수
     def save_money(self):
-        try:
-            self.save_amount = int(self.money_amount.text())  # 저축 금액
-        except ValueError:  # 입력값이 이상하면
-            return  # 돌려보낸다
-        else:
-            if self.save_amount <= 0:  # 양수가 아니어도
-                return  # 돌려보낸다
-            else:  # 문제 없는 경우
-                money.invest(self.save_amount)  # 저축을 하고
-                self.origin.refresh()  # 원래 창을 새로고침
+        self.save_amount = only_positive_int(self.money_amount.text())  # 저축 금액
+        if self.save_amount:
+            money.invest(self.save_amount)  # 저축을 하고
+            self.origin.refresh()  # 원래 창을 새로고침
 
     # 대출 받기 함수, 저축과 크게 안 다름
     def get_loan(self):
-        try:
-            self.loan_amount = int(self.money_amount.text())
-        except ValueError:
-            return
-        else:
-            if self.loan_amount <= 0:
-                return
-            else:
-                money.make_loan(self.loan_amount)
-                self.origin.refresh()
+        self.loan_amount = only_positive_int(self.money_amount.text())
+        if self.loan_amount:
+            money.make_loan(self.loan_amount)
+            self.origin.refresh()
 
     # 대출 갚기 함수, 역시 크게 안 다름
     def pay_for_loan(self):
-        try:
-            self.pay_amount = int(self.money_amount.text())
-        except ValueError:
-            return
-        else:
-            if self.pay_amount <= 0:
-                return
-            else:
-                money.payoff_loan(self.pay_amount)
-                self.origin.refresh()
+        self.pay_amount = only_positive_int(self.money_amount.text())
+        if self.pay_amount:
+            money.payoff_loan(self.pay_amount)
+            self.origin.refresh()
 
 
 class List_wind(Wind):
