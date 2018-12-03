@@ -12,7 +12,7 @@ from MainStream import *
 opened_window_list = dict()  # 열려 있는 창들을 모아 놓은 딕셔너리(이름이 key, 객체가 value)
 
 
-def place_in_layout(layout, details, arrange="spread"):
+def place_in_layout(layout=(QHBoxLayout, QVBoxLayout), details=tuple, arrange="spread"):
     """
     레이아웃과 담을 것들을 받아 배치합니다. (Stretch 이용)
     :parameter layout: 레이아웃입니다.
@@ -86,7 +86,7 @@ def place_in_layout(layout, details, arrange="spread"):
     return
 
 
-def YN_question(window, question_name, question_str):
+def YN_question(window, question_name=str, question_str=str):
     """
     QMessagebox로 예/아니오를 물어봅니다.
     :parameter window: 어디 창에서 질문을 띄울 건지
@@ -97,6 +97,15 @@ def YN_question(window, question_name, question_str):
     ans = QMessageBox.question(window, question_name, question_str,
                                QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)  # 메시지박스로 대답 얻고
     return (ans == QMessageBox.Yes)  # 대답이 Yes인지를 비교하여 리턴
+
+
+def gen_items_in_list(list_widget: QListWidget):
+    """
+    list_widget 안의 모든 원소를 순서대로 반환하는 제너레이터입니다.
+    :parameter list_widget: 아이템을 순서대로 보고 싶은 QListWidget 객체입니다. 
+    """
+    for i in range(list_widget.count()):
+        yield list_widget.item(i)
 
 
 class Wind(QWidget):
@@ -163,7 +172,7 @@ class Wind(QWidget):
         새로고침입니다. refresh가 호출되면 창의 정보를 다시 불러옵니다. 
         기본적으로 .update지만, 앞에 무언가를 넣을 수도 있습니다.
         """
-        self.update() # 업데이트
+        self.update()  # 업데이트
 
 
 class Main_wind(Wind):
@@ -267,10 +276,10 @@ class Main_wind(Wind):
         k = k.split("\t")
 
         self.current_item_name = str(k[0].strip("\t"))  # 아이템 이름
-        self.current_item_price = str(
-            int(k[1].strip("\t").replace("\t", "")))  # 아이템 가격
+        self.current_item_price = int(
+            k[1].strip("\t").replace("\t", ""))  # 아이템 가격
         self.item_name.setText(self.current_item_name)  # 이름을 띄우고
-        self.item_price.setText(self.current_item_price)  # 가격도 띄우고
+        self.item_price.setText(str(self.current_item_price))  # 가격도 띄우고
 
         self.item_class = getclass(self.current_item_name).type  # 물건의 클래스를 받아
         self.Image = QPixmap(
@@ -331,6 +340,7 @@ class Main_wind(Wind):
             sleep()  # 잠자기
             self.Info_text.setText(
                 "Your Money: {}\nDay: {}".format(money.money, Day))  # 텍스트 재설정
+
             self.refresh()  # 다시 창 띄우기
             if money.money < 0:  # 돈이 0보다 적으면
                 QMessageBox().about(self, "Bankrupt", "You are bankrupt!")  # 파산 알림
@@ -350,6 +360,20 @@ class Main_wind(Wind):
         self.Info_text.setText("Your Money: {}\nDay: {}".format(
             money.money, Day))  # 텍스트 다시 세팅
         self.showProducts()  # 사진 다시 띄우기, 리스트 다시 그거.
+        # 자고 일어나면, 클릭된 물건의 값을 업데이트...
+        try:
+            for i in gen_items_in_list(self.Products):  # 품목 리스트에서
+                k = i.text()
+                if self.current_item_name in k:  # 선택된 물건의 이름을 찾아
+                    self.current_item_price = int(
+                        k.split("\t")[1].strip("\t"))  # 가격을 구한 뒤
+                    self.item_price.setText(
+                        str(self.current_item_price))  # 텍스트 업데이트
+                    break
+        except AttributeError as e:  # 아직 물건이 지정되지 않아, 그런 객체변수가 없다면
+            print(e)
+            pass  # 흘려보낸다
+
         super().refresh()  # 상위 클래스의 refresh 불러옴
 
 
@@ -363,14 +387,16 @@ class Intro_wind(Wind):
         # 상위 클래스로부터 오버라이드합니다.
         self._start_btn = Moveto_button(
             "Start", "Start game.", self, Main_wind, "Main")  # 게임 시작 버튼
-        self._start_hbox = QHBoxLayout() # 게임 시작 버튼 배치 레이아웃(수평)
-        place_in_layout(self._start_hbox, (self._start_btn,), "center") # 배치(함수 이용)
+        self._start_hbox = QHBoxLayout()  # 게임 시작 버튼 배치 레이아웃(수평)
+        place_in_layout(self._start_hbox, (self._start_btn,),
+                        "center")  # 배치(함수 이용)
 
         self._quit_btn = Quit_button("Quit", "Quit game.", self)  # 게임 종료 버튼
-        self._quit_hbox = QHBoxLayout() # 게임 종료 버튼 배치 레이아웃(수평)
-        place_in_layout(self._quit_hbox, (self._quit_btn,), "center") # 배치(함수 이용) 
+        self._quit_hbox = QHBoxLayout()  # 게임 종료 버튼 배치 레이아웃(수평)
+        place_in_layout(self._quit_hbox, (self._quit_btn,),
+                        "center")  # 배치(함수 이용)
 
-        self._vmid_box = QVBoxLayout() # 두 레이아웃을 수직으로 놓는 레이아웃
+        self._vmid_box = QVBoxLayout()  # 두 레이아웃을 수직으로 놓는 레이아웃
         place_in_layout(self._vmid_box, (self._start_hbox,
                                          self._quit_hbox))  # 두 버튼의 레이아웃을 레이아웃에 담음
 
@@ -411,7 +437,8 @@ class Bank_Wind(Wind):
         place_in_layout(self.hbox_3, (Close_button(
             "Close", "Close bank.", self),), "center")
 
-        place_in_layout(self.vbox, (self.hbox_1, self.hbox_2, self.hbox_3), "dispersion")
+        place_in_layout(self.vbox, (self.hbox_1, self.hbox_2,
+                                    self.hbox_3), "dispersion")
         self.setLayout(self.vbox)
 
         self.x_loc = 225
@@ -537,7 +564,7 @@ class Storage_wind(Wind):
 
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
-        self.List=QListWidget() # 창고 품목 리스트
+        self.List = QListWidget()  # 창고 품목 리스트
         self.List.addItem('이름:\t수량:\t유통기한:')
         self.List.addItem('-'*40)
         # 아래는 창고에 무엇이 들어있는지를 보여주는 부분
@@ -549,18 +576,18 @@ class Storage_wind(Wind):
                 self.List.addItem(name + '\t' + str(number) + '\t' + str(date))
 
         # 수직 레이아웃, 수평 레이아웃
-        self._hbox=QHBoxLayout()
-        self._vbox=QVBoxLayout()
+        self._hbox = QHBoxLayout()
+        self._vbox = QVBoxLayout()
         self.up_button = Basic_button("Upgrade", "Upgrade storage", self)
         place_in_layout(self._hbox, (self.up_button, Close_button(
             "Close", "Close this window.", self)), "center")
         place_in_layout(self._vbox, (self.List, self._hbox), "normal")
         self.setLayout(self._vbox)
 
-        self.x_loc=100
-        self.y_loc=100
-        self.width=400
-        self.height=400
+        self.x_loc = 100
+        self.y_loc = 100
+        self.width = 400
+        self.height = 400
 
 
 class Push_button(QPushButton):
