@@ -411,16 +411,20 @@ class Main_wind(Wind):
         self.Info_text.setText(
             "Your Money: {}\nDay: {}".format(money.money, Day))  # 텍스트 재설정
 
-        self.refresh()  # 다시 창 띄우기
-        if money.money < 0:  # 돈이 0보다 적으면
-            QMessageBox().about(self, "Bankrupt", "You are bankrupt!")  # 파산 알림
-            self.End_button.click()  # 게임 종료
         self.window_will_be_closed = opened_window_list.items()
         for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
             if not isinstance(window_object, Main_wind):
                 window_object.strong_close()  # 닫는당
         opened_window_list.clear()  # 딕셔너리를 비우고
         opened_window_list[self.name] = self  # 자신을 넣는다
+
+        self.refresh()  # 다시 창 띄우기
+        if money.money < 0:  # 돈이 0보다 적으면
+            QMessageBox().about(self, "Bankrupt", "You are bankrupt!")  # 파산 알림
+            self.restart_button = Moveto_button(
+                "Restart", "Restart game.", self, Intro_wind, "Restart")  # 보이지 않는 버튼
+            self.restart_button.click()  # 게임 재시작
+            raise NotImplementedError # 변수 초기화
         self.News_button.click()  # 뉴스 띄우기
 
     def refresh(self):
