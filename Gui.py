@@ -229,14 +229,28 @@ class Main_wind(Wind):
             "Buy", "Buy selected goods.", self)  # 구입 버튼
         self.Sell_button = Basic_button(
             "Sell", "Sell selected goods.", self)  # 판매 버튼
+        self.Buy_max = Basic_button(
+            "Max", "Buy max amount with your money.", self)  # 최댓값
+        self.Sell_all = Basic_button(
+            "All", "Sell all selected item in your storage.", self)  # 전부 팔기
         # 각각의 버튼에 기능 연결
         self.Buy_button.clicked.connect(self.buy_item)
         self.Sell_button.clicked.connect(self.sell_item)
+        self.Buy_max.clicked.connect(self.max_buy)
+        self.Sell_all.clicked.connect(self.all_sell)
+
+        self.Buy_layer = QHBoxLayout()  # 구매, 최대 버튼
+        self.Sell_layer = QHBoxLayout()  # 판매, 전체 버튼
+        place_in_layout(
+            self.Buy_layer, (self.Buy_max, self.Buy_button), "normal")
+        place_in_layout(self.Sell_layer,
+                        (self.Sell_all, self.Sell_button), "normal")
 
         self.numCount = QLineEdit(self)  # 개수 입력하는 부분
         self.numCount.setPlaceholderText("Insert quantity(Natural)")  # 힌트 메시지
         place_in_layout(self.item_deal, (self.item_name,
-                                         self.item_price, self.ProductImageLabel, self.Buy_button, self.numCount, self.Sell_button))
+                                         self.item_price, self.ProductImageLabel,
+                                         self.Buy_layer, self.numCount, self.Sell_layer)) # 물품 처리 영역
 
         self.News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
@@ -329,6 +343,7 @@ class Main_wind(Wind):
                 ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
                     self.num*int(self.current_item_price)))  # ㄹㅇ 살거임?
             except AttributeError:  # 선택을 안했다면(current 생성 X)
+                QMessageBox.about(self,"Alert","Please select an item.") # 알림
                 return  # 리턴
             if ans:  # 넹
                 self.result = buy(self.current_item_name, getclass(
@@ -354,6 +369,7 @@ class Main_wind(Wind):
                 ans = YN_question(self, "Confirm", "Are you sure to sell?\nTotal Price: %d Tau" % (
                     self.num*int(self.current_item_price)))  # ㄹㅇ 팔거임?
             except AttributeError:  # 선택을 안했다면(current 생성 X)
+                QMessageBox.about(self,"Alert","Please select an item.") # 알림
                 return  # 리턴
             if ans:
                 self.result = sell(self.current_item_name, getclass(
@@ -365,6 +381,20 @@ class Main_wind(Wind):
                     QMessageBox().about(self, "Error", "You cannot.\nCheck your storage.")
             else:
                 pass
+
+    def max_buy(self):
+        # 금액 내에서 최대로 구입 가능한 수량을 입력해줍니다.
+        try:
+            self.numCount.setText(str(money.money//self.current_item_price)) # 정수 나눗셈
+        except AttributeError:
+            QMessageBox.about(self,"Alert","Please select an item.") # 알림
+
+    def all_sell(self):
+        # 창고에 있는 물건의 개수를 입력해줍니다.
+        try:
+            pass
+        except AttributeError:
+            QMessageBox.about(self,"Alert","Please select an item.") # 알림
 
     def next_day(self):
         """
@@ -405,7 +435,7 @@ class Main_wind(Wind):
                     self.item_price.setText(
                         str(self.current_item_price))  # 텍스트 업데이트
                     break
-        except AttributeError as e:  # 아직 물건이 지정되지 않아, 그런 객체변수가 없다면
+        except AttributeError:  # 아직 물건이 지정되지 않아, 그런 객체변수가 없다면
             pass  # 흘려보낸다
 
         super().refresh()  # 상위 클래스의 refresh 불러옴
