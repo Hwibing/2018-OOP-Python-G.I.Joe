@@ -340,7 +340,7 @@ class Main_wind(Wind):
                     money.money, Day))  # 잔고
                 self.update()
                 if not self.result:  # 만약 판매에 실패하면?
-                    QMessageBox().about(self,"Error","You cannot.\nCheck your storage.")
+                    QMessageBox().about(self, "Error", "You cannot.\nCheck your storage.")
             else:
                 pass
 
@@ -462,8 +462,11 @@ class Bank_Wind(Wind):
     def save_money(self):
         self.save_amount = only_positive_int(self.money_amount.text())  # 저축 금액
         if self.save_amount:
-            money.invest(self.save_amount)  # 저축을 하고
+            self.result = money.invest(self.save_amount)  # 저축을 하고
             self.origin.refresh()  # 원래 창을 새로고침
+            if not self.result:  # 저축이 안되면
+                QMessageBox.about(
+                    self, "Error", "You cannot.\nCheck your money.")  # 할 수 없다고 표시
 
     # 대출 받기 함수, 저축과 크게 안 다름
     def get_loan(self):
@@ -476,8 +479,11 @@ class Bank_Wind(Wind):
     def pay_for_loan(self):
         self.pay_amount = only_positive_int(self.money_amount.text())
         if self.pay_amount:
-            money.payoff_loan(self.pay_amount)
+            self.result = money.payoff_loan(self.pay_amount)
             self.origin.refresh()
+            if not self.result:
+                QMessageBox.about(
+                    self, "Error", "You cannot.\nCheck your money.")
 
 
 class List_wind(Wind):
