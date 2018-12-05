@@ -124,6 +124,7 @@ def only_positive_int(parameter):
             return parameter
 
 
+# 누가 클래스 상속 이따구로 짰냐 아 나구나
 class Wind(QWidget):
     """
     창 클래스입니다. QWidget을 상속합니다.
@@ -429,8 +430,9 @@ class Bank_Wind(Wind):
         # 상위 클래스로부터 오버라이드합니다.
         self.vbox = QVBoxLayout()  # 수직 레이아웃(hbox들 담을 예정)
         self.hbox_1 = QHBoxLayout()  # 위에서 1번째: 버튼 모음
-        self.hbox_2 = QHBoxLayout()  # 위에서 2번째: 숫자 입력하기
-        self.hbox_3 = QHBoxLayout()  # 위에서 3번째: 닫기
+        self.hbox_2 = QHBoxLayout()  # 위에서 2번째: 적금액, 대출액
+        self.hbox_3 = QHBoxLayout()  # 위에서 3번째: 숫자 입력하기
+        self.hbox_4 = QHBoxLayout()  # 위에서 4번째: 닫기
 
         self.save_button = Basic_button(
             "Installment", "Instalment saving account. Cannot be closed.", self)  # 저축 버튼
@@ -443,14 +445,18 @@ class Bank_Wind(Wind):
         place_in_layout(self.hbox_1, (self.save_button,
                                       self.loan_button, self.pay_button))
 
-        self.money_amount = QLineEdit()  # 돈 입력하는 곳
-        self.money_amount.setPlaceholderText("type money...")  # 텍스트 힌트
-        place_in_layout(self.hbox_2, (self.money_amount,), "center")
-        place_in_layout(self.hbox_3, (Close_button(
+        self.now_invest = Text("Account: "+str(money.bank), self)  # 현재 적금액
+        self.now_loan = Text("Loan: "+str(money.debt), self)  # 현재 대출액
+        place_in_layout(self.hbox_2, (self.now_invest, self.now_loan))
+
+        self.money_count = QLineEdit()  # 돈 입력하는 곳
+        self.money_count.setPlaceholderText("type money...")  # 텍스트 힌트
+        place_in_layout(self.hbox_3, (self.money_count,), "center")
+        place_in_layout(self.hbox_4, (Close_button(
             "Close", "Close bank.", self),), "center")
 
-        place_in_layout(self.vbox, (self.hbox_1, self.hbox_2,
-                                    self.hbox_3), "dispersion")
+        place_in_layout(self.vbox, (self.hbox_1, self.hbox_2, self.hbox_3,
+                                    self.hbox_4), "dispersion")
         self.setLayout(self.vbox)
 
         self.x_loc = 225
@@ -460,30 +466,39 @@ class Bank_Wind(Wind):
 
     # 저축하기 함수
     def save_money(self):
-        self.save_amount = only_positive_int(self.money_amount.text())  # 저축 금액
+        self.save_amount = only_positive_int(self.money_count.text())  # 저축 금액
         if self.save_amount:
             self.result = money.invest(self.save_amount)  # 저축을 하고
             self.origin.refresh()  # 원래 창을 새로고침
             if not self.result:  # 저축이 안되면
                 QMessageBox.about(
                     self, "Error", "You cannot.\nCheck your money.")  # 할 수 없다고 표시
+        self.refresh()  # 창 새로고침
 
     # 대출 받기 함수, 저축과 크게 안 다름
     def get_loan(self):
-        self.loan_amount = only_positive_int(self.money_amount.text())
+        self.loan_amount = only_positive_int(self.money_count.text())
         if self.loan_amount:
             money.make_loan(self.loan_amount)
             self.origin.refresh()
+        self.refresh()
 
     # 대출 갚기 함수, 역시 크게 안 다름
     def pay_for_loan(self):
-        self.pay_amount = only_positive_int(self.money_amount.text())
+        self.pay_amount = only_positive_int(self.money_count.text())
         if self.pay_amount:
             self.result = money.payoff_loan(self.pay_amount)
             self.origin.refresh()
             if not self.result:
                 QMessageBox.about(
                     self, "Error", "You cannot.\nCheck your money.")
+        self.refresh()
+
+    def refresh(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        self.now_invest.setText("Account: "+str(money.bank))  # 현재 적금액 텍스트 업데이트
+        self.now_loan.setText("Loan: "+str(money.debt))  # 현재 대출액 텍스트 업데이트
+        super().refresh()
 
 
 class List_wind(Wind):
@@ -689,6 +704,7 @@ class Close_button(Push_button):
     def utility_set(self, window):
         # 상위 클래스로부터 오버라이드합니다.
         self.clicked.connect(window.strong_close)  # 호출하는 window를 닫습니다. (강하게)
+        self.setShortcut("Esc") # 단축키 설정: Esc
 
 
 class Quit_button(Close_button):
