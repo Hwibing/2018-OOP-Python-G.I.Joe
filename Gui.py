@@ -124,7 +124,7 @@ def only_positive_int(parameter):
             return parameter
 
 
-# 누가 클래스 상속 이따구로 짰냐 아 나구나
+# 누가 클래스 상속구조 이따구로 짰냐 아 나구나
 class Wind(QWidget):
     """
     창 클래스입니다. QWidget을 상속합니다.
@@ -168,7 +168,12 @@ class Wind(QWidget):
         self.setFixedSize(self.width, self.height)  # 창의 크기 설정
         self.show()  # 창 보이기
 
-    def closeEvent(self, QCloseEvent):  # 창 닫기 이벤트(X자 누르거나 .close() 호출 시 발생)
+    def closeEvent(self, QCloseEvent):
+        """
+        창 닫기 이벤트입니다. X 버튼을 누르거나 .close()를 호출할 때 발생합니다.
+        사용자에게 정말 닫을 거냐고 되묻습니다.
+        강하게 닫을 경우 (strong=true) 되묻지 않고 바로 꺼집니다.
+        """
         if self.strong:  # 만약 되묻지 않기로 했다면?
             QCloseEvent.accept()  # 그냥 CloseEvent 수용
         else:  # 되묻기
@@ -187,7 +192,7 @@ class Wind(QWidget):
     def refresh(self):
         """
         새로고침입니다. refresh가 호출되면 창의 정보를 다시 불러옵니다. 
-        기본적으로 .update지만, 앞에 무언가를 넣을 수도 있습니다.
+        기본적으로 .update지만, 오버라이드 시 앞에 무언가를 넣을 수도 있습니다.
         """
         self.update()  # 업데이트
 
@@ -241,6 +246,7 @@ class Main_wind(Wind):
         self.Next_day_button = Basic_button(
             "Sleep", "Next day", self)  # '다음 날' 버튼
         self.Next_day_button.clicked.connect(self.next_day)
+        self.Next_day_button.setShortcut("Ctrl+S")
         self.End_button = Quit_button(
             "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
 
@@ -266,6 +272,11 @@ class Main_wind(Wind):
         self.setLayout(vbox)
 
     def showProducts(self):
+        """
+        Products - QListWidget에 물건들을 넣습니다.
+        처음에 비운 뒤, 아이템을 순서대로 박아줍니다.
+        구분선이 존재합니다.
+        """
         self.Products.clear()
         self.Products.addItem("물품-----요금(τ)----유통기한(일)")
         self.Products.addItem("----------[농산물]-----------")
@@ -306,6 +317,11 @@ class Main_wind(Wind):
         self.update()  # 새로고침
 
     def buy_item(self):
+        """
+        아이템을 구매할 때 호출되는 메소드입니다. (buy button 클릭됨)
+        self.num이 유효한 값인지 확인하고, 선택한 아이템이 있는지도 확인합니다.
+        결정 직전에 되묻습니다. 취소할 수 있습니다.
+        """
         self.num = self.numCount.text()
         self.num = only_positive_int(self.num)
         if self.num:
@@ -326,6 +342,11 @@ class Main_wind(Wind):
                 pass  # 지나가세요
 
     def sell_item(self):
+        """
+        아이템을 판매할 때 호출되는 메소드입니다. (sell button 클릭됨)
+        self.num이 유효한 값인지 확인하고, 선택한 아이템이 있는지도 확인합니다.
+        결정 직전에 되묻습니다. 취소할 수 있습니다.
+        """
         self.num = self.numCount.text()
         self.num = only_positive_int(self.num)
         if self.num:
@@ -346,28 +367,28 @@ class Main_wind(Wind):
                 pass
 
     def next_day(self):
-        ans = YN_question(self, "Sleep confirm",
-                          "Sleep and move on next day.")  # 잘 거냐고 다시 물어봄
-        if ans:  # 자겠다고 확인
-            global Day
-            Day += 1  # 하루 더하기
-            sleep()  # 잠자기
-            self.Info_text.setText(
-                "Your Money: {}\nDay: {}".format(money.money, Day))  # 텍스트 재설정
+        """
+        다음 날로 넘어갑니다. Day를 증가시키고, storage의 유통기한을 1씩 없앱니다.
+        파산을 감지합니다. (돈<0)
+        Main Window를 제외한 모든 창을 닫고, 새로 뉴스를 띄웁니다.
+        """
+        global Day
+        Day += 1  # 하루 더하기
+        sleep()  # 잠자기
+        self.Info_text.setText(
+            "Your Money: {}\nDay: {}".format(money.money, Day))  # 텍스트 재설정
 
-            self.refresh()  # 다시 창 띄우기
-            if money.money < 0:  # 돈이 0보다 적으면
-                QMessageBox().about(self, "Bankrupt", "You are bankrupt!")  # 파산 알림
-                self.End_button.click()  # 게임 종료
-            self.window_will_be_closed = opened_window_list.items()
-            for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
-                if not isinstance(window_object, Main_wind):
-                    window_object.strong_close()  # 닫는당
-            opened_window_list.clear()  # 딕셔너리를 비우고
-            opened_window_list[self.name] = self  # 자신을 넣는다
-            self.News_button.click()  # 뉴스 띄우기
-        else:  # 자지 않겠다고 함
-            pass  # 그럼 나중에 뵈요!
+        self.refresh()  # 다시 창 띄우기
+        if money.money < 0:  # 돈이 0보다 적으면
+            QMessageBox().about(self, "Bankrupt", "You are bankrupt!")  # 파산 알림
+            self.End_button.click()  # 게임 종료
+        self.window_will_be_closed = opened_window_list.items()
+        for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
+            if not isinstance(window_object, Main_wind):
+                window_object.strong_close()  # 닫는당
+        opened_window_list.clear()  # 딕셔너리를 비우고
+        opened_window_list[self.name] = self  # 자신을 넣는다
+        self.News_button.click()  # 뉴스 띄우기
 
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
@@ -466,6 +487,11 @@ class Bank_Wind(Wind):
 
     # 저축하기 함수
     def save_money(self):
+        """
+        돈을 저축하는 함수입니다. (save button 클릭 시 호출)
+        money_count의 값을 읽어 돈을 넣습니다.
+        저축을 하고 창을 새로고침하여 텍스트를 업데이트합니다.
+        """
         self.save_amount = only_positive_int(self.money_count.text())  # 저축 금액
         if self.save_amount:
             self.result = money.invest(self.save_amount)  # 저축을 하고
@@ -704,7 +730,7 @@ class Close_button(Push_button):
     def utility_set(self, window):
         # 상위 클래스로부터 오버라이드합니다.
         self.clicked.connect(window.strong_close)  # 호출하는 window를 닫습니다. (강하게)
-        self.setShortcut("Esc") # 단축키 설정: Esc
+        self.setShortcut("Esc")  # 단축키 설정: Esc
 
 
 class Quit_button(Close_button):
