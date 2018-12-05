@@ -250,7 +250,7 @@ class Main_wind(Wind):
         self.numCount.setPlaceholderText("Insert quantity(Natural)")  # 힌트 메시지
         place_in_layout(self.item_deal, (self.item_name,
                                          self.item_price, self.ProductImageLabel,
-                                         self.Buy_layer, self.numCount, self.Sell_layer)) # 물품 처리 영역
+                                         self.Buy_layer, self.numCount, self.Sell_layer))  # 물품 처리 영역
 
         self.News_button = Link_button(
             "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
@@ -343,7 +343,8 @@ class Main_wind(Wind):
                 ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
                     self.num*int(self.current_item_price)))  # ㄹㅇ 살거임?
             except AttributeError:  # 선택을 안했다면(current 생성 X)
-                QMessageBox.about(self,"Alert","Please select an item.") # 알림
+                QMessageBox.about(
+                    self, "Alert", "Please select an item.")  # 알림
                 return  # 리턴
             if ans:  # 넹
                 self.result = buy(self.current_item_name, getclass(
@@ -369,7 +370,8 @@ class Main_wind(Wind):
                 ans = YN_question(self, "Confirm", "Are you sure to sell?\nTotal Price: %d Tau" % (
                     self.num*int(self.current_item_price)))  # ㄹㅇ 팔거임?
             except AttributeError:  # 선택을 안했다면(current 생성 X)
-                QMessageBox.about(self,"Alert","Please select an item.") # 알림
+                QMessageBox.about(
+                    self, "Alert", "Please select an item.")  # 알림
                 return  # 리턴
             if ans:
                 self.result = sell(self.current_item_name, getclass(
@@ -385,16 +387,17 @@ class Main_wind(Wind):
     def max_buy(self):
         # 금액 내에서 최대로 구입 가능한 수량을 입력해줍니다.
         try:
-            self.numCount.setText(str(money.money//self.current_item_price)) # 정수 나눗셈
+            self.numCount.setText(
+                str(money.money//self.current_item_price))  # 정수 나눗셈
         except AttributeError:
-            QMessageBox.about(self,"Alert","Please select an item.") # 알림
+            QMessageBox.about(self, "Alert", "Please select an item.")  # 알림
 
     def all_sell(self):
         # 창고에 있는 물건의 개수를 입력해줍니다.
         try:
             pass
         except AttributeError:
-            QMessageBox.about(self,"Alert","Please select an item.") # 알림
+            QMessageBox.about(self, "Alert", "Please select an item.")  # 알림
 
     def next_day(self):
         """
