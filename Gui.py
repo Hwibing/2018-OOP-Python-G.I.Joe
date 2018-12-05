@@ -116,11 +116,11 @@ def only_positive_int(parameter):
     :return 2: None
     """
     try:
-        parameter=int(parameter)
+        parameter = int(parameter)
     except ValueError:
         return
     else:
-        if parameter>0:
+        if parameter > 0:
             return parameter
 
 
@@ -305,8 +305,8 @@ class Main_wind(Wind):
         self.update()  # 새로고침
 
     def buy_item(self):
-        self.num=self.numCount.text()
-        self.num=only_positive_int(self.num)
+        self.num = self.numCount.text()
+        self.num = only_positive_int(self.num)
         if self.num:
             try:
                 ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
@@ -314,11 +314,13 @@ class Main_wind(Wind):
             except AttributeError:  # 선택을 안했다면(current 생성 X)
                 return  # 리턴
             if ans:  # 넹
-                buy(self.current_item_name, getclass(
+                self.result = buy(self.current_item_name, getclass(
                     self.current_item_name), self.num)  # 그럼 사세요
                 self.Info_text.setText("Your Money: {}\nDay: {}".format(
                     money.money, Day))  # 텍스트 업데이트
                 self.update()  # 새로고침
+                if not self.result:  # 만약 구매에 실패하면?
+                    QMessageBox().about(self, "Error", "You cannot.\nCheck your storage or money.")
             else:  # 아녀
                 pass  # 지나가세요
 
@@ -328,15 +330,17 @@ class Main_wind(Wind):
         if self.num:
             try:
                 ans = YN_question(self, "Confirm", "Are you sure to sell?\nTotal Price: %d Tau" % (
-                    self.num*int(self.current_item_price)))  # ㄹㅇ 살거임?
+                    self.num*int(self.current_item_price)))  # ㄹㅇ 팔거임?
             except AttributeError:  # 선택을 안했다면(current 생성 X)
                 return  # 리턴
             if ans:
-                sell(self.current_item_name, getclass(
+                self.result = sell(self.current_item_name, getclass(
                     self.current_item_name), self.num)
                 self.Info_text.setText("Your Money: {}\nDay: {}".format(
                     money.money, Day))  # 잔고
                 self.update()
+                if not self.result:  # 만약 판매에 실패하면?
+                    QMessageBox().about(self,"Error","You cannot.\nCheck your storage.")
             else:
                 pass
 
@@ -380,7 +384,6 @@ class Main_wind(Wind):
                         str(self.current_item_price))  # 텍스트 업데이트
                     break
         except AttributeError as e:  # 아직 물건이 지정되지 않아, 그런 객체변수가 없다면
-            print(e)
             pass  # 흘려보낸다
 
         super().refresh()  # 상위 클래스의 refresh 불러옴
