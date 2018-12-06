@@ -424,7 +424,7 @@ class Main_wind(Wind):
             self.restart_button = Moveto_button(
                 "Restart", "Restart game.", self, Intro_wind, "Restart")  # 보이지 않는 버튼
             self.restart_button.click()  # 게임 재시작
-            raise NotImplementedError # 변수 초기화
+            raise NotImplementedError  # 변수 초기화
         self.News_button.click()  # 뉴스 띄우기
 
     def refresh(self):
@@ -798,7 +798,6 @@ class Text(QLabel):
         # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
         self.setFixedSize(self.sizeHint())  # 크기 설정
         self.show()
-
 
 
 app = QApplication(sys.argv)  # application 객체 생성하기 위해 시스템 인수 넘김
