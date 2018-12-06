@@ -296,7 +296,7 @@ class Main_wind(Wind):
         place_in_layout(mid_box, (self.Products, self.item_deal))
 
         low_box = QHBoxLayout()  # 중하부, 각 이미지를 클릭하면 줄어들도록
-        self.agr_btn = QLabel()
+        """self.agr_btn = QLabel()
         self.agr_btn.setPixmap(self.agr_image)
         self.liv_btn = QLabel()
         self.liv_btn.setPixmap(self.liv_image)
@@ -306,7 +306,7 @@ class Main_wind(Wind):
         self.lux_btn.setPixmap(self.lux_image)
         low_box.addStretch(1)
         place_in_layout(low_box, (self.agr_btn, self.liv_btn,
-                                  self.man_btn, self.lux_btn), "normal")
+                                  self.man_btn, self.lux_btn), "normal")"""
         low_box.addStretch(3)
 
         bottom_box = QHBoxLayout()  # 하부
