@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 import sys
 
 from PyQt5.QtCore import QCoreApplication
@@ -123,7 +124,23 @@ def only_positive_int(parameter):
             return parameter
 
 
+def alert_message(origin, alert_name, alert_detail):
+    """
+    경고 창을 띄웁니다. 닫기 전엔 다른 걸 할 수 없습니다.
+    :parameter origin: 이 경고창이 어디서 띄워지는지
+    :parameter alert_name: 경고 창의 제목
+    :parameter alert_detail: 경고 창 내용
+    """
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Critical)
+    msg.setWindowTitle(alert_name)
+    msg.setText(alert_detail)
+    msg.setStandardButtons(QMessageBox.Ok)
+    msg.exec_()
+
 # 누가 클래스 상속구조 이따구로 짰냐 아 나구나
+
+
 class Wind(QWidget):
     """
     창 클래스입니다. QWidget을 상속합니다.
@@ -200,14 +217,14 @@ class Main_wind(Wind):
     게임 플레이의 중추입니다.
     Main window에서 모든 부가 창으로 이동할 수 있습니다.
     """
-    
+
     def __init__(self, name, origin=None):
-        self.agr_image = QPixmap("images/agriculture.png") # 농산물 이미지
-        self.liv_image = QPixmap("images/livestock.png") # 축/수산물 이미지
-        self.man_image = QPixmap("images/manufactured.png") # 공산품 이미지
-        self.lux_image = QPixmap("images/luxury.png") # 사치재 이미지
-        super().__init__(name,origin)
-    
+        self.agr_image = QPixmap("images/agriculture.png")  # 농산물 이미지
+        self.liv_image = QPixmap("images/livestock.png")  # 축/수산물 이미지
+        self.man_image = QPixmap("images/manufactured.png")  # 공산품 이미지
+        self.lux_image = QPixmap("images/luxury.png")  # 사치재 이미지
+        super().__init__(name, origin)
+
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         self.Products = QListWidget()  # 물품 목록
@@ -466,12 +483,12 @@ class Intro_wind(Wind):
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         self._start_btn = Moveto_button(
-            "Start", "Start game.", self, Main_wind, "Main")  # 게임 시작 버튼
+            "시작하기", "게임을 시작합니다", self, Main_wind, "Main")  # 게임 시작 버튼
         self._start_hbox = QHBoxLayout()  # 게임 시작 버튼 배치 레이아웃(수평)
         place_in_layout(self._start_hbox, (self._start_btn,),
                         "center")  # 배치(함수 이용)
 
-        self._quit_btn = Quit_button("Quit", "Quit game.", self)  # 게임 종료 버튼
+        self._quit_btn = Quit_button("종료하기", "게임을 종료합니다.", self)  # 게임 종료 버튼
         self._quit_hbox = QHBoxLayout()  # 게임 종료 버튼 배치 레이아웃(수평)
         place_in_layout(self._quit_hbox, (self._quit_btn,),
                         "center")  # 배치(함수 이용)
@@ -502,25 +519,26 @@ class Bank_Wind(Wind):
         self.hbox_4 = QHBoxLayout()  # 위에서 4번째: 닫기
 
         self.save_button = Basic_button(
-            "Installment", "Instalment saving account. Cannot be closed.", self)  # 저축 버튼
+            "적금", "적금 계좌에 입금합니다. 다시 꺼낼 수 없습니다.", self)  # 저축 버튼
         self.save_button.clicked.connect(self.save_money)  # 버튼-기능 연결(저축)
-        self.loan_button = Basic_button("Loan", "Loan", self)  # 대출 버튼
+        self.loan_button = Basic_button(
+            "대출", "대출을 받습니다. 이자에 조심하세요!", self)  # 대출 버튼
         self.loan_button.clicked.connect(self.get_loan)  # 버튼-기능 연결(대출)
         self.pay_button = Basic_button(
-            "Payoff", "Loan payoff", self)  # 대출 갚기 버튼
+            "상환", "대출금을 갚습니다.", self)  # 대출 갚기 버튼
         self.pay_button.clicked.connect(self.pay_for_loan)  # 버튼-기능 연결(갚기)
         place_in_layout(self.hbox_1, (self.save_button,
                                       self.loan_button, self.pay_button))
 
-        self.now_invest = Text("Account: "+str(money.bank), self)  # 현재 적금액
-        self.now_loan = Text("Loan: "+str(money.debt), self)  # 현재 대출액
+        self.now_invest = Text("적금액: "+str(money.bank), self)  # 현재 적금액
+        self.now_loan = Text("대출금: "+str(money.debt), self)  # 현재 대출액
         place_in_layout(self.hbox_2, (self.now_invest, self.now_loan))
 
         self.money_count = QLineEdit()  # 돈 입력하는 곳
-        self.money_count.setPlaceholderText("type money...")  # 텍스트 힌트
+        self.money_count.setPlaceholderText("돈을 입력하세요...")  # 텍스트 힌트
         place_in_layout(self.hbox_3, (self.money_count,), "center")
         place_in_layout(self.hbox_4, (Close_button(
-            "Close", "Close bank.", self),), "center")
+            "닫기", "은행에서 나갑니다.", self),), "center")
 
         place_in_layout(self.vbox, (self.hbox_1, self.hbox_2, self.hbox_3,
                                     self.hbox_4), "dispersion")
@@ -543,8 +561,7 @@ class Bank_Wind(Wind):
             self.result = money.invest(self.save_amount)  # 저축을 하고
             self.origin.refresh()  # 원래 창을 새로고침
             if not self.result:  # 저축이 안되면
-                QMessageBox.about(
-                    self, "Error", "You cannot.\nCheck your money.")  # 할 수 없다고 표시
+                alert_message(self, "Error", "그럴 수 없습니다.\n돈을 확인하세요.")
         self.refresh()  # 창 새로고침
 
     # 대출 받기 함수, 저축과 크게 안 다름
@@ -562,14 +579,13 @@ class Bank_Wind(Wind):
             self.result = money.payoff_loan(self.pay_amount)
             self.origin.refresh()
             if not self.result:
-                QMessageBox.about(
-                    self, "Error", "You cannot.\nCheck your money.")
+                alert_message(self, "Error", "그럴 수 없습니다.\n돈을 확인하세요.")
         self.refresh()
 
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
-        self.now_invest.setText("Account: "+str(money.bank))  # 현재 적금액 텍스트 업데이트
-        self.now_loan.setText("Loan: "+str(money.debt))  # 현재 대출액 텍스트 업데이트
+        self.now_invest.setText("적금액: "+str(money.bank))  # 현재 적금액 텍스트 업데이트
+        self.now_loan.setText("대출금: "+str(money.debt))  # 현재 대출액 텍스트 업데이트
         super().refresh()
 
 
