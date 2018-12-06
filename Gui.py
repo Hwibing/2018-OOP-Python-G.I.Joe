@@ -384,22 +384,23 @@ class Main_wind(Wind):
         """
         self.num = self.numCount.text()
         self.num = only_positive_int(self.num)
-        if self.num:
+        if self.num:  # 유효한 값일 경우
             try:
-                ans = YN_question(self, "Confirm", "Are you sure to buy?\nTotal Price: %d Tau" % (
+                ans = YN_question(self, "Confirm", "정말 사시겠어요?\n총 가격: %d Tau" % (
                     self.num*int(self.current_item_price)))  # ㄹㅇ 살거임?
             except AttributeError:  # 선택을 안했다면(current 생성 X)
-                QMessageBox.about(
-                    self, "Alert", "Please select an item.")  # 알림
+                alert_message(self, "Error", "품목을 선택해주세요.")
                 return  # 리턴
             if ans:  # 넹
                 self.result = buy(self.current_item_name, getclass(
                     self.current_item_name), self.num)  # 그럼 사세요
                 self.refresh()
                 if not self.result:  # 만약 구매에 실패하면?
-                    QMessageBox().about(self, "Error", "You cannot.\nCheck your storage or money.")
+                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n돈을 확인해주세요.")
             else:  # 아녀
                 pass  # 지나가세요
+        else:
+            alert_message(self, "Error", "유효하지 않은 값입니다.")
 
     def sell_item(self):
         """
@@ -411,20 +412,22 @@ class Main_wind(Wind):
         self.num = only_positive_int(self.num)
         if self.num:
             try:
-                ans = YN_question(self, "Confirm", "Are you sure to sell?\nTotal Price: %d Tau" % (
+                ans = YN_question(self, "Confirm", "정말 파시겠어요?\n총 가격: %d Tau" % (
                     self.num*int(self.current_item_price)))  # ㄹㅇ 팔거임?
             except AttributeError:  # 선택을 안했다면(current 생성 X)
                 QMessageBox.about(
-                    self, "Alert", "Please select an item.")  # 알림
+                    self, "Alert", "품목을 선택해주세요.")  # 알림
                 return  # 리턴
             if ans:
                 self.result = sell(self.current_item_name, getclass(
                     self.current_item_name), self.num)
                 self.refresh()
                 if not self.result:  # 만약 판매에 실패하면?
-                    QMessageBox().about(self, "Error", "You cannot.\nCheck your storage.")
+                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n창고를 확인해주세요.")
             else:
                 pass
+        else:
+            alert_message(self, "Error", "유효하지 않은 값입니다.")
 
     def max_buy(self):
         # 금액 내에서 최대로 구입 가능한 수량을 입력해줍니다.
@@ -528,9 +531,9 @@ class Bank_Wind(Wind):
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         self.vbox = QVBoxLayout()  # 수직 레이아웃(hbox들 담을 예정)
-        self.hbox_1 = QHBoxLayout()  # 위에서 1번째: 버튼 모음
-        self.hbox_2 = QHBoxLayout()  # 위에서 2번째: 적금액, 대출액
-        self.hbox_3 = QHBoxLayout()  # 위에서 3번째: 숫자 입력하기
+        self.hbox_1 = QHBoxLayout()  # 위에서 1번째: 적금액, 대출액
+        self.hbox_2 = QHBoxLayout()  # 위에서 2번째: 숫자 입력하기
+        self.hbox_3 = QHBoxLayout()  # 위에서 3번째: 버튼 모음
         self.hbox_4 = QHBoxLayout()  # 위에서 4번째: 닫기
 
         self.save_button = Basic_button(
@@ -542,16 +545,16 @@ class Bank_Wind(Wind):
         self.pay_button = Basic_button(
             "상환", "대출금을 갚습니다.", self)  # 대출 갚기 버튼
         self.pay_button.clicked.connect(self.pay_for_loan)  # 버튼-기능 연결(갚기)
-        place_in_layout(self.hbox_1, (self.save_button,
+        place_in_layout(self.hbox_3, (self.save_button,
                                       self.loan_button, self.pay_button))
 
         self.now_invest = Text("적금액: "+str(money.bank), self)  # 현재 적금액
         self.now_loan = Text("대출금: "+str(money.debt), self)  # 현재 대출액
-        place_in_layout(self.hbox_2, (self.now_invest, self.now_loan))
+        place_in_layout(self.hbox_1, (self.now_invest, self.now_loan))
 
         self.money_count = QLineEdit()  # 돈 입력하는 곳
         self.money_count.setPlaceholderText("돈을 입력하세요...")  # 텍스트 힌트
-        place_in_layout(self.hbox_3, (self.money_count,), "center")
+        place_in_layout(self.hbox_2, (self.money_count,), "center")
         place_in_layout(self.hbox_4, (Close_button(
             "닫기", "은행에서 나갑니다.", self),), "center")
 
@@ -616,7 +619,7 @@ class List_wind(Wind):
         self._vbox.addWidget(self.List)  # 수직 레이아웃에 리스트 추가
         self._hbox = QHBoxLayout()  # 수평 레이아웃
         place_in_layout(
-            self._hbox, (Close_button("Close", "Close this window.", self),), "center")  # 수평 레이아웃에 닫기 버튼 추가
+            self._hbox, (Close_button("닫기", "이 창을 닫습니다.", self),), "center")  # 수평 레이아웃에 닫기 버튼 추가
         self._vbox.addLayout(self._hbox)  # 수직 레이아웃에 수평 레이아웃 추가
         self.setLayout(self._vbox)  # 수직 레이아웃 배치
 
@@ -642,6 +645,7 @@ class News_wind(List_wind):
 class Predict_wind(Wind):
     """
     정보를 예측해주는 창입니다. Wind를 상속합니다.
+    아니 이거 뭔가 List_wind 상속하면 되는데 ㅠㅠ
     """
 
     def design(self):
@@ -649,7 +653,7 @@ class Predict_wind(Wind):
         self.Prediction_list = QListWidget()
         self.Prediction_list.setFixedSize(540, 270)
         self.get_info_button = Basic_button(
-            "Get Info", "Purchace prediction of tomorrow", self)
+            "정보 얻기", "돈을 지불하고 내일 무슨 일이 일어날지 알아봅니다", self)
         self.get_info_button.clicked.connect(self.addinfo)
 
         self.hbox_1 = QHBoxLayout()
@@ -659,7 +663,7 @@ class Predict_wind(Wind):
         place_in_layout(
             self.hbox_1, (self.Prediction_list,),)
         place_in_layout(self.hbox_2, (self.get_info_button, Close_button(
-            "Close", "Close this window", self)))
+            "닫기", "이 창을 닫습니다.", self)))
         place_in_layout(self.vbox, (self.hbox_1, self.hbox_2))
         self.setLayout(self.vbox)
 
@@ -696,9 +700,9 @@ class Storage_wind(Wind):
         # 수직 레이아웃, 수평 레이아웃
         self._hbox = QHBoxLayout()
         self._vbox = QVBoxLayout()
-        self.up_button = Basic_button("Upgrade", "Upgrade storage", self)
+        self.up_button = Basic_button("업그레이드", "더 좋은 창고로 이전합니다. 용량이 늘어나고, 보관 기간이 길어집니다.", self)
         place_in_layout(self._hbox, (self.up_button, Close_button(
-            "Close", "Close this window.", self)), "center")
+            "닫기", "창고에서 나갑니다.", self)), "center")
         place_in_layout(self._vbox, (self.List, self._hbox), "normal")
         self.setLayout(self._vbox)
 
@@ -721,7 +725,7 @@ class Push_button(QPushButton):
         :parameter window: 이 버튼이 포함된 창입니다.
         """
         super().__init__(name, window)  # 상위 클래스의 생성자 호출
-        self.setFont(QFont("제주고딕")) # 폰트 설정
+        self.setFont(QFont("제주고딕"))  # 폰트 설정
         self.design(tooltip)  # 디자인하기
         self.utility_set(window)  # 기능 설정
 
@@ -832,7 +836,7 @@ class Text(QLabel):
         :parameter window: 텍스트를 띄울 창
         """
         super().__init__(text, window)  # 상위 클래스의 생성자 호출
-        self.setFont(QFont("제주고딕")) # 폰트 설정
+        self.setFont(QFont("제주고딕"))  # 폰트 설정
 
     def setup(self):
         # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
