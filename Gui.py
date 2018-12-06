@@ -1,8 +1,7 @@
 import sys
-from abc import abstractmethod
 
 from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtGui import QCloseEvent, QIcon, QPixmap
+from PyQt5.QtGui import QCloseEvent, QIcon, QPixmap, QFont
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
                              QLineEdit, QListWidget, QMainWindow, QMessageBox,
                              QPushButton, QVBoxLayout, QWidget)
@@ -146,8 +145,6 @@ class Wind(QWidget):
         self.design()  # 디자인
         self.setup()  # 셋업
 
-    # 디자인 메소드는 반드시 오버라이드해야 합니다. (추상 메소드)
-    @abstractmethod
     def design(self):
         """
         창을 디자인합니다. 
@@ -203,7 +200,14 @@ class Main_wind(Wind):
     게임 플레이의 중추입니다.
     Main window에서 모든 부가 창으로 이동할 수 있습니다.
     """
-
+    
+    def __init__(self, name, origin=None):
+        self.agr_image = QPixmap("images/agriculture.png") # 농산물 이미지
+        self.liv_image = QPixmap("images/livestock.png") # 축/수산물 이미지
+        self.man_image = QPixmap("images/manufactured.png") # 공산품 이미지
+        self.lux_image = QPixmap("images/luxury.png") # 사치재 이미지
+        super().__init__(name,origin)
+    
     def design(self):
         # 상위 클래스로부터 오버라이드합니다.
         self.Products = QListWidget()  # 물품 목록
@@ -213,7 +217,7 @@ class Main_wind(Wind):
         self.Products.itemSelectionChanged.connect(
             self.selectionChanged_event)  # 선택 아이템이 바뀌었을 때
 
-        self.Info_text = Text("Day: {}\nYour Money: {}\nStorage: {}/{}".format(
+        self.Info_text = Text("{}번째 날\n남은 돈: {}\n창고 용량: {}/{}".format(
             Day, money.money, storage.quantity, storage.maxsize), self)  # 정보 텍스트
         self.Bank_button = Link_button(
             "Bank", "Bank", self, Bank_Wind, "Bank", self)  # 은행
@@ -271,18 +275,22 @@ class Main_wind(Wind):
         mid_box = QHBoxLayout()  # 중간
         place_in_layout(mid_box, (self.Products, self.item_deal))
 
+        low_box = QHBoxLayout()  # 중하부
+
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
             bottom_box, (self.News_button, self.Predict_button, self.Next_day_button, self.End_button), "wing_b")
 
         vbox = QVBoxLayout()  # 전체 레이아웃
-        place_in_layout(vbox, (top_box, mid_box, bottom_box), arrange="spread")
+        vbox.addStretch(1)
+        place_in_layout(vbox, (top_box, mid_box, low_box,
+                               bottom_box), arrange="dispersion")
 
         # 창의 위치, 크기
-        self.x_loc = 150
-        self.y_loc = 150
-        self.width = 800
-        self.height = 600
+        self.x_loc = 60
+        self.y_loc = 45
+        self.width = 1200
+        self.height = 900
         self.setLayout(vbox)
 
     def showProducts(self):
@@ -323,10 +331,16 @@ class Main_wind(Wind):
         self.item_name.setText(self.current_item_name)  # 이름을 띄우고
         self.item_price.setText(str(self.current_item_price))  # 가격도 띄우고
 
-        self.item_class = getclass(self.current_item_name).type  # 물건의 클래스를 받아
-        self.Image = QPixmap(
-            "images/{}.png".format(self.item_class))  # 사진을 따온 뒤
-        self.ProductImageLabel.setPixmap(self.Image)  # 사진을 바꿔준다
+        self.item_class = getclass(
+            self.current_item_name).type  # 물건의 클래스 이름을 받아 적절한 이미지 배치
+        if self.item_class == "agriculture":
+            self.ProductImageLabel.setPixmap(self.agr_image)
+        elif self.item_class == "livestock":
+            self.ProductImageLabel.setPixmap(self.liv_image)
+        elif self.item_class == "manufactured":
+            self.ProductImageLabel.setPixmap(self.man_image)
+        elif self.item_class == "luxury":
+            self.ProductImageLabel.setPixmap(self.lux_image)
 
         self.update()  # 새로고침
 
@@ -423,10 +437,10 @@ class Main_wind(Wind):
 
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
-        self.Info_text.setText("Day: {}\nYour Money: {}\nStorage: {}/{}".format(
+        self.Info_text.setText("{}번째 날\n남은 돈: {}\n창고 용량: {}/{}".format(
             Day, money.money, storage.quantity, storage.maxsize))  # 텍스트 재설정
         self.showProducts()  # 사진 다시 띄우기, 리스트 다시 출력.
-        
+
         # 클릭되어 있는 물건의 값을 업데이트...
         try:
             for i in gen_items_in_list(self.Products):  # 품목 리스트에서
@@ -688,8 +702,6 @@ class Push_button(QPushButton):
         self.setToolTip(tooltip)  # 툴팁 설정
         self.setFixedSize(self.sizeHint())  # 글씨에 따라 버튼 크기 조정
 
-    # utility_set은 반드시 오버라이드해야 함
-    @abstractmethod
     def utility_set(self, window):
         pass
 
@@ -788,6 +800,7 @@ class Text(QLabel):
         :parameter window: 텍스트를 띄울 창
         """
         super().__init__(text, window)  # 상위 클래스의 생성자 호출
+        self.setFont(QFont(""))
 
     def setup(self):
         # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
