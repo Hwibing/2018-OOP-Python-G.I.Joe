@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+# 사용 폰트: 제주고딕
 import sys
 
 from PyQt5.QtCore import QCoreApplication
@@ -30,7 +31,7 @@ def place_in_layout(layout: (QHBoxLayout, QVBoxLayout), details: tuple, arrange=
     front: 앞으로 쏠림 / back: 뒤로 쏠림
     wing_f, wing_b: 양쪽으로 갈라짐, 홀수 개 위젯일 때 가운데 것을 f는 앞에, b는 뒤에 붙임
     """
-    # 이하는 크게 신경쓰지 않아도 됨(배치 방법에 따라 위젯 적절히 나열하기)
+    # 이하는 크게 신경쓰지 않아도 됨(배치 방법에 따라 위젯 적절히 나열하기
     if "wing" in arrange:
         l = len(details)//2
         is_odd = (len(details) % 2 == 1)
@@ -230,30 +231,32 @@ class Main_wind(Wind):
         self.Products = QListWidget()  # 물품 목록
         self.showProducts()  # 물품 리스트 출력
 
-        self.Products.setFixedSize(500, 400)  # 크기 고정
+        self.Products.setFixedSize(600, 450)  # 크기 고정
+        # self.Products.setFont(QFont("ㅁㄴㅇㄹ")) # 폰트 설정
         self.Products.itemSelectionChanged.connect(
             self.selectionChanged_event)  # 선택 아이템이 바뀌었을 때
 
         self.Info_text = Text("{}번째 날\n남은 돈: {}\n창고 용량: {}/{}".format(
             Day, money.money, storage.quantity, storage.maxsize), self)  # 정보 텍스트
+        self.Info_text.setFont(QFont("제주고딕", 10))
         self.Bank_button = Link_button(
-            "Bank", "Bank", self, Bank_Wind, "Bank", self)  # 은행
+            "은행", "은행 창을 엽니다.", self, Bank_Wind, "Bank", self)  # 은행
         self.Storage_button = Link_button(
-            "Storage", "Storage", self, Storage_wind, "Storage")  # 창고용량
+            "창고", "창고 목록을 봅니다", self, Storage_wind, "Storage")  # 창고용량
 
         self.item_deal = QVBoxLayout()  # 물품 정보 및 매매
-        self.item_name = Text("Select an item", self)  # 초기 텍스트1
-        self.item_price = Text("from left.", self)  # 초기 텍스트2
+        self.item_name = Text("왼쪽의 물건 목록에서", self)  # 초기 텍스트1
+        self.item_price = Text("거래하려는 것을 선택하세요.", self)  # 초기 텍스트2
         self.ProductImageLabel = QLabel(self)
 
         self.Buy_button = Basic_button(
-            "Buy", "Buy selected goods.", self)  # 구입 버튼
+            "구매", "선택한 물건을 수량만큼 구입합니다.", self)  # 구입 버튼
         self.Sell_button = Basic_button(
-            "Sell", "Sell selected goods.", self)  # 판매 버튼
+            "판매", "선택한 물건을 수량만큼 판매합니다.", self)  # 판매 버튼
         self.Buy_max = Basic_button(
-            "Max", "Buy max amount with your money.", self)  # 최댓값
+            "최댓값", "현재 돈으로 살 수 있는 만큼 수량을 지정합니다.", self)  # 최댓값
         self.Sell_all = Basic_button(
-            "All", "Sell all selected item in your storage.", self)  # 전부 팔기
+            "보유량", "선택한 물건이 창고에 있는 개수 만큼 수량을 지정합니다..", self)  # 전부 팔기
         # 각각의 버튼에 기능 연결
         self.Buy_button.clicked.connect(self.buy_item)
         self.Sell_button.clicked.connect(self.sell_item)
@@ -268,22 +271,22 @@ class Main_wind(Wind):
                         (self.Sell_all, self.Sell_button), "normal")
 
         self.numCount = QLineEdit(self)  # 개수 입력하는 부분
-        self.numCount.setPlaceholderText("Insert quantity(Natural)")  # 힌트 메시지
+        self.numCount.setPlaceholderText("개수를 입력하세요...")  # 힌트 메시지
         place_in_layout(self.item_deal, (self.item_name,
                                          self.item_price, self.ProductImageLabel,
                                          self.Buy_layer, self.numCount, self.Sell_layer))  # 물품 처리 영역
 
         self.News_button = Link_button(
-            "News", "Show recent news.", self, News_wind, "News")  # 뉴스 버튼
+            "뉴스", "오늘의 뉴스 목록입니다.", self, News_wind, "News")  # 뉴스 버튼
         self.Predict_button = Link_button(
-            "Predict", "Show predictions.", self, Predict_wind, "Predict", self)  # 예측 버튼
+            "예측", "내일의 예측을 보러 갑니다.", self, Predict_wind, "Predict", self)  # 예측 버튼
 
         self.Next_day_button = Basic_button(
-            "Sleep", "Next day", self)  # '다음 날' 버튼
+            "잠자기", "다음 날로 넘어갑니다", self)  # '다음 날' 버튼
         self.Next_day_button.clicked.connect(self.next_day)
         self.Next_day_button.setShortcut("Ctrl+S")
         self.End_button = Quit_button(
-            "Quit", "Changes will not be saved.", self)  # '끝내기' 버튼
+            "종료", "저장되지 않습니다.", self)  # '끝내기' 버튼
 
         top_box = QHBoxLayout()  # 상부
         place_in_layout(
@@ -293,6 +296,18 @@ class Main_wind(Wind):
         place_in_layout(mid_box, (self.Products, self.item_deal))
 
         low_box = QHBoxLayout()  # 중하부
+        self.agr_btn = QLabel()
+        self.agr_btn.setPixmap(self.agr_image)
+        self.liv_btn = QLabel()
+        self.liv_btn.setPixmap(self.liv_image)
+        self.man_btn = QLabel()
+        self.man_btn.setPixmap(self.man_image)
+        self.lux_btn = QLabel()
+        self.lux_btn.setPixmap(self.lux_image)
+        low_box.addStretch(1)
+        place_in_layout(low_box, (self.agr_btn, self.liv_btn,
+                                  self.man_btn, self.lux_btn), "normal")
+        low_box.addStretch(3)
 
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
@@ -346,7 +361,7 @@ class Main_wind(Wind):
         self.current_item_price = int(
             k[1].strip("\t").replace("\t", ""))  # 아이템 가격
         self.item_name.setText(self.current_item_name)  # 이름을 띄우고
-        self.item_price.setText(str(self.current_item_price))  # 가격도 띄우고
+        self.item_price.setText(str(self.current_item_price)+" Tau")  # 가격도 띄우고
 
         self.item_class = getclass(
             self.current_item_name).type  # 물건의 클래스 이름을 받아 적절한 이미지 배치
@@ -706,6 +721,7 @@ class Push_button(QPushButton):
         :parameter window: 이 버튼이 포함된 창입니다.
         """
         super().__init__(name, window)  # 상위 클래스의 생성자 호출
+        self.setFont(QFont("제주고딕")) # 폰트 설정
         self.design(tooltip)  # 디자인하기
         self.utility_set(window)  # 기능 설정
 
@@ -816,7 +832,7 @@ class Text(QLabel):
         :parameter window: 텍스트를 띄울 창
         """
         super().__init__(text, window)  # 상위 클래스의 생성자 호출
-        # self.setFont(QFont(""))
+        self.setFont(QFont("제주고딕")) # 폰트 설정
 
     def setup(self):
         # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
