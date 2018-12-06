@@ -213,8 +213,8 @@ class Main_wind(Wind):
         self.Products.itemSelectionChanged.connect(
             self.selectionChanged_event)  # 선택 아이템이 바뀌었을 때
 
-        self.Info_text = Text("Your Money: {}\nDay: {}".format(
-            money.money, Day), self)  # 잔고
+        self.Info_text = Text("Day: {}\nYour Money: {}\nStorage: {}/{}".format(
+            Day, money.money, storage.quantity, storage.maxsize), self)  # 정보 텍스트
         self.Bank_button = Link_button(
             "Bank", "Bank", self, Bank_Wind, "Bank", self)  # 은행
         self.Storage_button = Link_button(
@@ -349,9 +349,7 @@ class Main_wind(Wind):
             if ans:  # 넹
                 self.result = buy(self.current_item_name, getclass(
                     self.current_item_name), self.num)  # 그럼 사세요
-                self.Info_text.setText("Your Money: {}\nDay: {}".format(
-                    money.money, Day))  # 텍스트 업데이트
-                self.update()  # 새로고침
+                self.refresh()
                 if not self.result:  # 만약 구매에 실패하면?
                     QMessageBox().about(self, "Error", "You cannot.\nCheck your storage or money.")
             else:  # 아녀
@@ -376,9 +374,7 @@ class Main_wind(Wind):
             if ans:
                 self.result = sell(self.current_item_name, getclass(
                     self.current_item_name), self.num)
-                self.Info_text.setText("Your Money: {}\nDay: {}".format(
-                    money.money, Day))  # 잔고
-                self.update()
+                self.refresh()
                 if not self.result:  # 만약 판매에 실패하면?
                     QMessageBox().about(self, "Error", "You cannot.\nCheck your storage.")
             else:
@@ -408,8 +404,6 @@ class Main_wind(Wind):
         global Day
         Day += 1  # 하루 더하기
         sleep()  # 잠자기
-        self.Info_text.setText(
-            "Your Money: {}\nDay: {}".format(money.money, Day))  # 텍스트 재설정
 
         self.window_will_be_closed = opened_window_list.items()
         for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
@@ -429,10 +423,11 @@ class Main_wind(Wind):
 
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
-        self.Info_text.setText("Your Money: {}\nDay: {}".format(
-            money.money, Day))  # 텍스트 다시 세팅
-        self.showProducts()  # 사진 다시 띄우기, 리스트 다시 그거.
-        # 자고 일어나면, 클릭된 물건의 값을 업데이트...
+        self.Info_text.setText("Day: {}\nYour Money: {}\nStorage: {}/{}".format(
+            Day, money.money, storage.quantity, storage.maxsize))  # 텍스트 재설정
+        self.showProducts()  # 사진 다시 띄우기, 리스트 다시 출력.
+        
+        # 클릭되어 있는 물건의 값을 업데이트...
         try:
             for i in gen_items_in_list(self.Products):  # 품목 리스트에서
                 k = i.text()
