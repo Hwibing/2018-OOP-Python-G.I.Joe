@@ -132,12 +132,12 @@ def alert_message(origin, alert_name, alert_detail):
     :parameter alert_name: 경고 창의 제목
     :parameter alert_detail: 경고 창 내용
     """
-    msg = QMessageBox()
-    msg.setIcon(QMessageBox.Critical)
-    msg.setWindowTitle(alert_name)
-    msg.setText(alert_detail)
-    msg.setStandardButtons(QMessageBox.Ok)
-    msg.exec_()
+    msg = QMessageBox()  # 메시지 객체 생성
+    msg.setIcon(QMessageBox.Critical)  # 아이콘: 빨간 X자
+    msg.setWindowTitle(alert_name)  # 창 이름
+    msg.setText(alert_detail)  # 창 내용
+    msg.setStandardButtons(QMessageBox.Ok)  # 버튼 1개 추가: ok 버튼
+    msg.exec_()  # 실행하기(이거 끄기 전에 못 끔)
 
 # 누가 클래스 상속구조 이따구로 짰냐 아 나구나
 
@@ -161,17 +161,22 @@ class Wind(QWidget):
         self.origin = origin  # 원점 확인
         self.strong = False  # 되묻지 않고 닫을지에 대한 여부
         self.design()  # 디자인
+        self.btnClickConnect()  # 버튼 기능 연결
         self.setup()  # 셋업
 
     def design(self):
         """
-        창을 디자인합니다. 
+        창을 디자인합니다. 반드시 오버라이드해야 합니다.
         하는 일: 레이아웃, 버튼/텍스트 띄우기, 크기 결정
         """
-        self.x_loc = 100  # 창의 x축 위치(오른쪽으로)
-        self.y_loc = 100  # 창의 y축 위치(아래로)
-        self.width = 800  # 창의 너비
-        self.height = 600  # 창의 높이
+        raise Exception("Abstract Method")
+
+    def btnClickConnect(self):
+        """
+        버튼 클릭과 함수를 연결해줍니다. 반드시 오버라이드해야 합니다.
+        하는 일: 버튼과 함수를 연결짓기
+        """
+        raise Exception("Abstract Method")
 
     def setup(self):
         """
@@ -224,6 +229,7 @@ class Main_wind(Wind):
         self.liv_image = QPixmap("images/livestock.png")  # 축/수산물 이미지
         self.man_image = QPixmap("images/manufactured.png")  # 공산품 이미지
         self.lux_image = QPixmap("images/luxury.png")  # 사치재 이미지
+        self.opened = {"agr": True, "liv": True, "man": True, "lux": True}
         super().__init__(name, origin)
 
     def design(self):
@@ -257,11 +263,6 @@ class Main_wind(Wind):
             "최댓값", "현재 돈으로 살 수 있는 만큼 수량을 지정합니다.", self)  # 최댓값
         self.Sell_all = Basic_button(
             "보유량", "선택한 물건이 창고에 있는 개수 만큼 수량을 지정합니다..", self)  # 전부 팔기
-        # 각각의 버튼에 기능 연결
-        self.Buy_button.clicked.connect(self.buy_item)
-        self.Sell_button.clicked.connect(self.sell_item)
-        self.Buy_max.clicked.connect(self.max_buy)
-        self.Sell_all.clicked.connect(self.all_sell)
 
         self.Buy_layer = QHBoxLayout()  # 구매, 최대 버튼
         self.Sell_layer = QHBoxLayout()  # 판매, 전체 버튼
@@ -283,7 +284,6 @@ class Main_wind(Wind):
 
         self.Next_day_button = Basic_button(
             "잠자기", "다음 날로 넘어갑니다", self)  # '다음 날' 버튼
-        self.Next_day_button.clicked.connect(self.next_day)
         self.Next_day_button.setShortcut("Ctrl+S")
         self.End_button = Quit_button(
             "종료", "저장되지 않습니다.", self)  # '끝내기' 버튼
@@ -295,7 +295,7 @@ class Main_wind(Wind):
         mid_box = QHBoxLayout()  # 중간
         place_in_layout(mid_box, (self.Products, self.item_deal))
 
-        low_box = QHBoxLayout()  # 중하부
+        low_box = QHBoxLayout()  # 중하부, 각 이미지를 클릭하면 줄어들도록
         self.agr_btn = QLabel()
         self.agr_btn.setPixmap(self.agr_image)
         self.liv_btn = QLabel()
@@ -325,6 +325,14 @@ class Main_wind(Wind):
         self.height = 900
         self.setLayout(vbox)
 
+    def btnClickConnect(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        self.Buy_button.clicked.connect(self.buy_item)
+        self.Sell_button.clicked.connect(self.sell_item)
+        self.Buy_max.clicked.connect(self.max_buy)
+        self.Sell_all.clicked.connect(self.all_sell)
+        self.Next_day_button.clicked.connect(self.next_day)
+
     def showProducts(self):
         """
         Products - QListWidget에 물건들을 넣습니다.
@@ -333,19 +341,23 @@ class Main_wind(Wind):
         """
         self.Products.clear()
         self.Products.addItem("물품-----요금(τ)----유통기한(일)")
-        self.Products.addItem("----------[농산물]-----------")
-        for (name, [price, date]) in list(agriculture.productList.items()):
-            self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
-        self.Products.addItem("----------[축/수산물]-----------")
-        for (name, [price, date]) in list(livestock.productList.items()):
-            self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
+        if self.opened["agr"]:
+            self.Products.addItem("----------[농산물]-----------")
+            for (name, [price, date]) in list(agriculture.productList.items()):
+                self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
+        if self.opened["liv"]:
+            self.Products.addItem("----------[축/수산물]-----------")
+            for (name, [price, date]) in list(livestock.productList.items()):
+                self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
 
-        self.Products.addItem("----------[공산품]-----------")
-        for (name, price) in list(manufactured.productList.items()):
-            self.Products.addItem(name+"\t"+str(price))
-        self.Products.addItem("----------[사치품]-----------")
-        for (name, price) in list(luxury.productList.items()):
-            self.Products.addItem(name+"\t"+str(price))
+        if self.opened["man"]:
+            self.Products.addItem("----------[공산품]-----------")
+            for (name, price) in list(manufactured.productList.items()):
+                self.Products.addItem(name+"\t"+str(price))
+        if self.opened["lux"]:
+            self.Products.addItem("----------[사치품]-----------")
+            for (name, price) in list(luxury.productList.items()):
+                self.Products.addItem(name+"\t"+str(price))
 
     def selectionChanged_event(self):
         """
@@ -522,6 +534,10 @@ class Intro_wind(Wind):
         self.width = 200
         self.height = 150
 
+    def btnClickConnect(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        pass
+
 
 class Bank_Wind(Wind):
     """
@@ -538,13 +554,10 @@ class Bank_Wind(Wind):
 
         self.save_button = Basic_button(
             "적금", "적금 계좌에 입금합니다. 다시 꺼낼 수 없습니다.", self)  # 저축 버튼
-        self.save_button.clicked.connect(self.save_money)  # 버튼-기능 연결(저축)
         self.loan_button = Basic_button(
             "대출", "대출을 받습니다. 이자에 조심하세요!", self)  # 대출 버튼
-        self.loan_button.clicked.connect(self.get_loan)  # 버튼-기능 연결(대출)
         self.pay_button = Basic_button(
             "상환", "대출금을 갚습니다.", self)  # 대출 갚기 버튼
-        self.pay_button.clicked.connect(self.pay_for_loan)  # 버튼-기능 연결(갚기)
         place_in_layout(self.hbox_3, (self.save_button,
                                       self.loan_button, self.pay_button))
 
@@ -566,6 +579,12 @@ class Bank_Wind(Wind):
         self.y_loc = 250
         self.width = 500
         self.height = 200
+
+    def btnClickConnect(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        self.save_button.clicked.connect(self.save_money)
+        self.loan_button.clicked.connect(self.get_loan)
+        self.pay_button.clicked.connect(self.pay_for_loan)
 
     # 저축하기 함수
     def save_money(self):
@@ -628,6 +647,10 @@ class List_wind(Wind):
         self.width = 400
         self.height = 300
 
+    def btnClickConnect(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        pass
+
 
 class News_wind(List_wind):
     """
@@ -654,7 +677,6 @@ class Predict_wind(Wind):
         self.Prediction_list.setFixedSize(540, 270)
         self.get_info_button = Basic_button(
             "정보 얻기", "돈을 지불하고 내일 무슨 일이 일어날지 알아봅니다", self)
-        self.get_info_button.clicked.connect(self.addinfo)
 
         self.hbox_1 = QHBoxLayout()
         self.hbox_2 = QHBoxLayout()
@@ -671,6 +693,10 @@ class Predict_wind(Wind):
         self.y_loc = 240
         self.width = 600
         self.height = 360
+
+    def btnClickConnect(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        self.get_info_button.clicked.connect(self.addinfo)
 
     def addinfo(self):
         if money.ismoneyleft(Info_Cost):
@@ -700,7 +726,8 @@ class Storage_wind(Wind):
         # 수직 레이아웃, 수평 레이아웃
         self._hbox = QHBoxLayout()
         self._vbox = QVBoxLayout()
-        self.up_button = Basic_button("업그레이드", "더 좋은 창고로 이전합니다. 용량이 늘어나고, 보관 기간이 길어집니다.", self)
+        self.up_button = Basic_button(
+            "업그레이드", "더 좋은 창고로 이전합니다. 용량이 늘어나고, 보관 기간이 길어집니다.", self)
         place_in_layout(self._hbox, (self.up_button, Close_button(
             "닫기", "창고에서 나갑니다.", self)), "center")
         place_in_layout(self._vbox, (self.List, self._hbox), "normal")
@@ -710,6 +737,10 @@ class Storage_wind(Wind):
         self.y_loc = 100
         self.width = 400
         self.height = 400
+
+    def btnClickConnect(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        pass
 
 
 class Push_button(QPushButton):
