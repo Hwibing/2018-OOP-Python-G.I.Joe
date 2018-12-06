@@ -800,7 +800,7 @@ class Text(QLabel):
         :parameter window: 텍스트를 띄울 창
         """
         super().__init__(text, window)  # 상위 클래스의 생성자 호출
-        self.setFont(QFont(""))
+        # self.setFont(QFont(""))
 
     def setup(self):
         # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
