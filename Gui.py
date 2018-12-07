@@ -6,7 +6,7 @@ from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QCloseEvent, QIcon, QPixmap, QFont
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
                              QLineEdit, QListWidget, QMainWindow, QMessageBox,
-                             QPushButton, QVBoxLayout, QWidget)
+                             QPushButton, QVBoxLayout, QWidget, QCheckBox)
 
 from MainStream import *
 
@@ -295,19 +295,16 @@ class Main_wind(Wind):
         mid_box = QHBoxLayout()  # 중간
         place_in_layout(mid_box, (self.Products, self.item_deal))
 
-        low_box = QHBoxLayout()  # 중하부, 각 이미지를 클릭하면 줄어들도록
-        """self.agr_btn = QLabel()
-        self.agr_btn.setPixmap(self.agr_image)
-        self.liv_btn = QLabel()
-        self.liv_btn.setPixmap(self.liv_image)
-        self.man_btn = QLabel()
-        self.man_btn.setPixmap(self.man_image)
-        self.lux_btn = QLabel()
-        self.lux_btn.setPixmap(self.lux_image)
-        low_box.addStretch(1)
-        place_in_layout(low_box, (self.agr_btn, self.liv_btn,
-                                  self.man_btn, self.lux_btn), "normal")"""
-        low_box.addStretch(3)
+        low_box = QHBoxLayout()  # 중하부, 각 품목을 클릭하면 줄어들도록
+        # 4개의 체크박스(보기/접기 용도)
+        self.agr_chkbox = QCheckBox("Agriculture", self)
+        self.liv_chkbox = QCheckBox("Livestock", self)
+        self.man_chkbox = QCheckBox("Manufactured", self)
+        self.lux_chkbox = QCheckBox("Luxury", self)
+        self.checkboxes=(self.agr_chkbox, self.liv_chkbox, self.man_chkbox,self.lux_chkbox)
+        for i in self.checkboxes: i.toggle() # 시작은 켜져 있는 상태로
+        place_in_layout(low_box, (self.agr_chkbox, self.liv_chkbox,
+                                  self.man_chkbox, self.lux_chkbox), "center")
 
         bottom_box = QHBoxLayout()  # 하부
         place_in_layout(
@@ -332,6 +329,7 @@ class Main_wind(Wind):
         self.Buy_max.clicked.connect(self.max_buy)
         self.Sell_all.clicked.connect(self.all_sell)
         self.Next_day_button.clicked.connect(self.next_day)
+        for i in self.checkboxes: i.stateChanged.connect(self.hide_n_show(i))
 
     def showProducts(self):
         """
@@ -349,7 +347,6 @@ class Main_wind(Wind):
             self.Products.addItem("----------[축/수산물]-----------")
             for (name, [price, date]) in list(livestock.productList.items()):
                 self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
-
         if self.opened["man"]:
             self.Products.addItem("----------[공산품]-----------")
             for (name, price) in list(manufactured.productList.items()):
@@ -364,10 +361,14 @@ class Main_wind(Wind):
         리스트(물건 목록)에서 선택한 아이템이 바뀌었을 때 호출됩니다.
         하는 일: 텍스트 바꾸기, 이미지 바꾸기, 현 아이템 바꾸기
         """
-        k = str(self.Products.currentItem().text())
-        if "-" in k:
+        try:
+            k = str(self.Products.currentItem().text())
+        except AttributeError:
             return
-        k = k.split("\t")
+        else:
+            if "-" in k:
+                return
+            k = k.split("\t")
 
         self.current_item_name = str(k[0].strip("\t"))  # 아이템 이름
         self.current_item_price = int(
@@ -387,6 +388,13 @@ class Main_wind(Wind):
             self.ProductImageLabel.setPixmap(self.lux_image)
 
         self.update()  # 새로고침
+
+    def hide_n_show(self, changedCheck): # Closure를 이용한 clicked.connect(매개변수 함수)
+        def folder(): # inner function
+            k=changedCheck.text()[:3].lower() # 첫 3글자 소문자
+            self.opened[k]=not self.opened[k] # 상태 반전
+            self.refresh() # 새로고침
+        return folder
 
     def buy_item(self):
         """
