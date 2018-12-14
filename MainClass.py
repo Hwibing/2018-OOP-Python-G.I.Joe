@@ -43,7 +43,9 @@ class Finance:
             return False
 
     def buy_warehouse(self, storageprice):
+
         if self.ismoneyleft(storageprice):
+            self.money -= storageprice
             self.rent = False
             return True
         else:
