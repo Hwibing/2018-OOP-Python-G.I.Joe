@@ -771,7 +771,9 @@ class Storage_wind(Wind):
         self._hbox = QHBoxLayout()
         self._vbox = QVBoxLayout()
         self.up_button = Basic_button(
-            "업그레이드", "더 좋은 창고로 이전합니다. 용량이 늘어나고, 보관 기간이 길어집니다.", self)
+            "창고 구매" if money.rent else "업그레이드",
+            "더 좋은 창고로 이전합니다. 용량이 늘어나고, 보관 기간이 길어집니다.", self)
+
         place_in_layout(self._hbox, (self.up_button, Close_button(
             "닫기", "창고에서 나갑니다.", self)), "center")
         place_in_layout(self._vbox, (self.List, self._hbox), "normal")
@@ -784,7 +786,20 @@ class Storage_wind(Wind):
 
     def btnClickConnect(self):
         # 상위 클래스로부터 오버라이드합니다.
-        pass
+        self.up_button.clicked.connect(self.storage_upgrade)  # 창고 업그레이드 버튼
+
+    def storage_upgrade(self):
+        """
+        창고를 업그레이드해주는 함수입니다.
+        이 함수가 한 번이라도 호출되었다면 버튼이 '업그레이드'라, 아니면 '창고 구매'라고 뜹니다.
+        """
+        money.buy_warehouse(0) # 창고 구매
+        self.refresh() # 새로고침
+
+    def refresh(self):
+        # 상위 클래스로부터 오버라이드합니다.
+        self.up_button.setText("업그레이드") # 버튼 텍스트 바꿔주기
+        super().refresh()
 
 
 class Push_button(QPushButton):
