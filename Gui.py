@@ -2,8 +2,8 @@
 # 사용 폰트: 제주고딕
 import sys
 
-from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtGui import QCloseEvent, QIcon, QPixmap, QFont
+from PyQt5.QtCore import QCoreApplication, Qt
+from PyQt5.QtGui import QCloseEvent, QIcon, QPixmap, QFont, QColor
 from PyQt5.QtWidgets import (QAction, QApplication, QHBoxLayout, QLabel,
                              QLineEdit, QListWidget, QMainWindow, QMessageBox,
                              QPushButton, QVBoxLayout, QWidget, QCheckBox)
@@ -97,6 +97,26 @@ def YN_question(window, question_name: str, question_str: str):
     ans = QMessageBox.question(window, question_name, question_str,
                                QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)  # 메시지박스로 대답 얻고
     return (ans == QMessageBox.Yes)  # 대답이 Yes인지를 비교하여 리턴
+
+
+def set_background_color(changing_object, color):
+    """
+    changing_object의 배경색을 바꾸어줍니다!
+    :parameter changing_object: 배경색이 존재하는 pyqt 객체
+    :parameter color: 배경색을 어떤 색으로 바꿀지
+    :return: 제대로 되면 True, 아니면 False
+    아래 코드는 신경쓰지 않는걸로! (dict 쓰려니 메모리가...눈물...)
+    """
+    p=changing_object.palette()
+    if color=="red": p.setColor(changing_object.backgroundRole(), Qt.red)
+    elif color=="blue": p.setColor(changing_object.backgroundRole(), Qt.blue)
+    elif color=="green": p.setColor(changing_object.backgroundRole(), Qt.green)
+    elif color=="black": p.setColor(changing_object.backgroundRole(), Qt.black)
+    elif color=="white": p.setColor(changing_object.backgroundRole(), Qt.white)
+    elif color=="gray": p.setColor(changing_object.backgroundRole(), Qt.gray)
+    else: return False
+    changing_object.setPalette(p)
+    return True
 
 
 def gen_items_in_list(list_widget: QListWidget):
@@ -225,10 +245,10 @@ class Main_wind(Wind):
     """
 
     def __init__(self, name, origin=None):
-        self.agr_image = QPixmap("images/agriculture.png")  # 농산물 이미지
-        self.liv_image = QPixmap("images/livestock.png")  # 축/수산물 이미지
-        self.man_image = QPixmap("images/manufactured.png")  # 공산품 이미지
-        self.lux_image = QPixmap("images/luxury.png")  # 사치재 이미지
+        self.agr_pixmap = QPixmap("images/agriculture.png")  # 농산물 이미지
+        self.liv_pixmap = QPixmap("images/livestock.png")  # 축/수산물 이미지
+        self.man_pixmap = QPixmap("images/manufactured.png")  # 공산품 이미지
+        self.lux_pixmap = QPixmap("images/luxury.png")  # 사치재 이미지
         self.opened = {"agr": True, "liv": True, "man": True, "lux": True}
         super().__init__(name, origin)
 
@@ -297,12 +317,14 @@ class Main_wind(Wind):
 
         low_box = QHBoxLayout()  # 중하부, 각 품목을 클릭하면 줄어들도록
         # 4개의 체크박스(보기/접기 용도)
-        self.agr_chkbox = QCheckBox("Agriculture", self)
-        self.liv_chkbox = QCheckBox("Livestock", self)
-        self.man_chkbox = QCheckBox("Manufactured", self)
-        self.lux_chkbox = QCheckBox("Luxury", self)
-        self.checkboxes=(self.agr_chkbox, self.liv_chkbox, self.man_chkbox,self.lux_chkbox)
-        for i in self.checkboxes: i.toggle() # 시작은 켜져 있는 상태로
+        self.agr_chkbox = QCheckBox("agriculture", self)
+        self.liv_chkbox = QCheckBox("livestock", self)
+        self.man_chkbox = QCheckBox("manufactured", self)
+        self.lux_chkbox = QCheckBox("luxury", self)
+        self.checkboxes = (self.agr_chkbox, self.liv_chkbox,
+                           self.man_chkbox, self.lux_chkbox)
+        for i in self.checkboxes:
+            i.toggle()  # 시작은 켜져 있는 상태로
         place_in_layout(low_box, (self.agr_chkbox, self.liv_chkbox,
                                   self.man_chkbox, self.lux_chkbox), "center")
 
@@ -329,7 +351,8 @@ class Main_wind(Wind):
         self.Buy_max.clicked.connect(self.max_buy)
         self.Sell_all.clicked.connect(self.all_sell)
         self.Next_day_button.clicked.connect(self.next_day)
-        for i in self.checkboxes: i.stateChanged.connect(self.hide_n_show(i))
+        for i in self.checkboxes:
+            i.stateChanged.connect(self.hide_n_show(i))
 
     def showProducts(self):
         """
@@ -379,21 +402,21 @@ class Main_wind(Wind):
         self.item_class = getclass(
             self.current_item_name).type  # 물건의 클래스 이름을 받아 적절한 이미지 배치
         if self.item_class == "agriculture":
-            self.ProductImageLabel.setPixmap(self.agr_image)
+            self.ProductImageLabel.setPixmap(self.agr_pixmap)
         elif self.item_class == "livestock":
-            self.ProductImageLabel.setPixmap(self.liv_image)
+            self.ProductImageLabel.setPixmap(self.liv_pixmap)
         elif self.item_class == "manufactured":
-            self.ProductImageLabel.setPixmap(self.man_image)
+            self.ProductImageLabel.setPixmap(self.man_pixmap)
         elif self.item_class == "luxury":
-            self.ProductImageLabel.setPixmap(self.lux_image)
+            self.ProductImageLabel.setPixmap(self.lux_pixmap)
 
         self.update()  # 새로고침
 
-    def hide_n_show(self, changedCheck): # Closure를 이용한 clicked.connect(매개변수 함수)
-        def folder(): # inner function
-            k=changedCheck.text()[:3].lower() # 첫 3글자 소문자
-            self.opened[k]=not self.opened[k] # 상태 반전
-            self.refresh() # 새로고침
+    def hide_n_show(self, changedCheck):  # Closure를 이용한 clicked.connect(매개변수 함수)
+        def folder():  # inner function
+            k = changedCheck.text()[:3].lower()  # 첫 3글자 소문자
+            self.opened[k] = not self.opened[k]  # 상태 반전
+            self.refresh()  # 새로고침
         return folder
 
     def buy_item(self):
@@ -876,6 +899,7 @@ class Text(QLabel):
         """
         super().__init__(text, window)  # 상위 클래스의 생성자 호출
         self.setFont(QFont("제주고딕"))  # 폰트 설정
+
 
     def setup(self):
         # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
