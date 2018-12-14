@@ -347,8 +347,8 @@ class Main_wind(Wind):
         # 창의 위치, 크기
         self.x_loc = 60
         self.y_loc = 45
-        self.width = 1200
-        self.height = 900
+        self.width = 1280
+        self.height = 720
         self.setLayout(vbox)
 
     def btnClickConnect(self):
