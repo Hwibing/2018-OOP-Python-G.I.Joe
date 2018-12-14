@@ -25,12 +25,12 @@ class Finance:
 
     # 돈을 빚보다 많이 갚았을 경우 별도의 처리 필요
     def payoff_loan(self, money):
-        if self.ismoneyleft(money):
+        if self.debt >= money and self.ismoneyleft(money):
             self.debt -= money
             self.money -= money
             return True
         else:
-            print('Not Enough Money')
+            # print('Not Enough Money')
             return False
 
     def invest(self, money):
@@ -39,7 +39,7 @@ class Finance:
             self.bank += money
             return True
         else:
-            print('Not Enough Money')
+            # print('Not Enough Money')
             return False
 
     def buy_warehouse(self):
