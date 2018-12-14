@@ -138,8 +138,6 @@ class Storage:
                 print('Error: NOT ENOUGH ITEMS')
                 return False
 
-        print(self.warehouse_expire)
-
         if name in self.warehouse_expire:
 
             while True:

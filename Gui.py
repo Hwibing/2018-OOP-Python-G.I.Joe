@@ -107,14 +107,21 @@ def set_background_color(changing_object, color):
     :return: 제대로 되면 True, 아니면 False
     아래 코드는 신경쓰지 않는걸로! (dict 쓰려니 메모리가...눈물...)
     """
-    p=changing_object.palette()
-    if color=="red": p.setColor(changing_object.backgroundRole(), Qt.red)
-    elif color=="blue": p.setColor(changing_object.backgroundRole(), Qt.blue)
-    elif color=="green": p.setColor(changing_object.backgroundRole(), Qt.green)
-    elif color=="black": p.setColor(changing_object.backgroundRole(), Qt.black)
-    elif color=="white": p.setColor(changing_object.backgroundRole(), Qt.white)
-    elif color=="gray": p.setColor(changing_object.backgroundRole(), Qt.gray)
-    else: return False
+    p = changing_object.palette()
+    if color == "red":
+        p.setColor(changing_object.backgroundRole(), Qt.red)
+    elif color == "blue":
+        p.setColor(changing_object.backgroundRole(), Qt.blue)
+    elif color == "green":
+        p.setColor(changing_object.backgroundRole(), Qt.green)
+    elif color == "black":
+        p.setColor(changing_object.backgroundRole(), Qt.black)
+    elif color == "white":
+        p.setColor(changing_object.backgroundRole(), Qt.white)
+    elif color == "gray":
+        p.setColor(changing_object.backgroundRole(), Qt.gray)
+    else:
+        return False
     changing_object.setPalette(p)
     return True
 
@@ -439,7 +446,7 @@ class Main_wind(Wind):
                     self.current_item_name), self.num)  # 그럼 사세요
                 self.refresh()
                 if not self.result:  # 만약 구매에 실패하면?
-                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n돈을 확인해주세요.")
+                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n돈 혹은 창고를 확인해주세요.")
             else:  # 아녀
                 pass  # 지나가세요
         else:
@@ -478,14 +485,14 @@ class Main_wind(Wind):
             self.numCount.setText(
                 str(money.money//self.current_item_price))  # 정수 나눗셈
         except AttributeError:
-            QMessageBox.about(self, "Alert", "Please select an item.")  # 알림
+            alert_message(self, "Error", "아이템을 선택해주세요.")
 
     def all_sell(self):
         # 창고에 있는 물건의 개수를 입력해줍니다.
         try:
             pass
         except AttributeError:
-            QMessageBox.about(self, "Alert", "Please select an item.")  # 알림
+            alert_message(self, "Error", "아이템을 선택해주세요.")
 
     def next_day(self):
         """
@@ -629,7 +636,9 @@ class Bank_Wind(Wind):
             self.result = money.invest(self.save_amount)  # 저축을 하고
             self.origin.refresh()  # 원래 창을 새로고침
             if not self.result:  # 저축이 안되면
-                alert_message(self, "Error", "그럴 수 없습니다.\n돈을 확인하세요.")
+                alert_message(self, "Error", "그럴 수 없습니다.\n돈을 확인해주세요.")
+        else:
+            alert_message(self, "Error", "유효하지 않은 값입니다.")
         self.refresh()  # 창 새로고침
 
     # 대출 받기 함수, 저축과 크게 안 다름
@@ -638,6 +647,8 @@ class Bank_Wind(Wind):
         if self.loan_amount:
             money.make_loan(self.loan_amount)
             self.origin.refresh()
+        else:
+            alert_message(self, "Error", "유효하지 않은 값입니다.")
         self.refresh()
 
     # 대출 갚기 함수, 역시 크게 안 다름
@@ -647,7 +658,9 @@ class Bank_Wind(Wind):
             self.result = money.payoff_loan(self.pay_amount)
             self.origin.refresh()
             if not self.result:
-                alert_message(self, "Error", "그럴 수 없습니다.\n돈을 확인하세요.")
+                alert_message(self, "Error", "그럴 수 없습니다.\n돈을 확인해주세요.")
+        else:
+            alert_message(self, "Error", "유효하지 않은 값입니다.")
         self.refresh()
 
     def refresh(self):
@@ -899,7 +912,6 @@ class Text(QLabel):
         """
         super().__init__(text, window)  # 상위 클래스의 생성자 호출
         self.setFont(QFont("제주고딕"))  # 폰트 설정
-
 
     def setup(self):
         # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
