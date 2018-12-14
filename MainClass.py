@@ -42,8 +42,12 @@ class Finance:
             # print('Not Enough Money')
             return False
 
-    def buy_warehouse(self):
-        self.rent = False
+    def buy_warehouse(self, storageprice):
+        if self.ismoneyleft(storageprice):
+            self.rent = False
+            return True
+        else:
+            return False
 
     def buy(self, name, cls, number):
         if isinstance(cls, ExpireProduct):
