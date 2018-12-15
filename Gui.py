@@ -413,7 +413,7 @@ class Main_wind(Wind):
         self.item_pixmap = QPixmap(
             "images/Raw File/{}/{}.png".format(self.item_class, self.current_item_name))  # 픽스맵 불러오기
         self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
-        self.update()  # 새로고침
+        self.refresh()  # 새로고침
 
     def hide_n_show(self, changedCheck):  # Closure를 이용한 clicked.connect(매개변수 함수)
         def folder():  # inner function
@@ -425,13 +425,13 @@ class Main_wind(Wind):
 
             self.item_pixmap = QPixmap("images/{}.png".format(k))  # 픽스맵 불러오기
             self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
+            self.refresh()  # 새로고침
 
             try:
                 del self.current_item_name
                 del self.current_item_price
             except AttributeError:
                 pass
-            self.refresh()  # 새로고침
         return folder
 
     def buy_item(self):
