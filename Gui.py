@@ -404,7 +404,6 @@ class Main_wind(Wind):
 
         # 물건의 클래스 이름을 받아 적절한 이미지 배치
         self.item_class = getclass(self.current_item_name).type
-        print("images/Raw File/{}/{}.png".format(self.item_class, self.current_item_name))
         self.item_pixmap = QPixmap(
             "images/Raw File/{}/{}.png".format(self.item_class, self.current_item_name))  # 픽스맵 불러오기
         self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
