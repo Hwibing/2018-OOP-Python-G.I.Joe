@@ -129,6 +129,12 @@ def sleep():
     for [rate, products] in Next_Update:
         cls = getclass(products[0])
         cls.update(rate, products)
+    
+    # Random Bad Event
+    thief_event=(random.randint(1,100)<=1)
+    if thief_event:
+        money.money=0
+    return (thief_event,)
 
 
 def getinfo():

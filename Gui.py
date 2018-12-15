@@ -269,7 +269,7 @@ class Main_wind(Wind):
         self.Products.itemSelectionChanged.connect(
             self.selectionChanged_event)  # 선택 아이템이 바뀌었을 때
 
-        self.Info_text = Text("{}번째 날\n남은 돈: {}\n창고 용량: {}/{}".format(
+        self.Info_text = Text("{}번째 주\n남은 돈: {}\n창고 용량: {}/{}".format(
             Day, money.money, storage.quantity, storage.maxsize), self)  # 정보 텍스트
         self.Info_text.setFont(QFont("제주고딕", 10))
         self.Bank_button = Link_button(
@@ -502,7 +502,7 @@ class Main_wind(Wind):
         """
         global Day
         Day += 1  # 하루 더하기
-        sleep()  # 잠자기
+        bad_event_result=sleep()  # 잠자기
 
         self.window_will_be_closed = opened_window_list.items()
         for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
@@ -519,6 +519,9 @@ class Main_wind(Wind):
             self.restart_button.click()  # 게임 재시작
             raise NotImplementedError  # 변수 초기화
         self.News_button.click()  # 뉴스 띄우기
+
+        if bad_event_result==(True,):
+            alert_message(self, "Thief", "도둑이 당신의 금고를 털었습니다!\n보유 재산이 0원이 됩니다.")
 
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
