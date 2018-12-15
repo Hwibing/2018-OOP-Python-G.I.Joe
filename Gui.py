@@ -275,7 +275,7 @@ class Main_wind(Wind):
         self.Bank_button = Link_button(
             "은행", "은행 창을 엽니다.", self, Bank_Wind, "Bank", self)  # 은행
         self.Storage_button = Link_button(
-            "창고", "창고 목록을 봅니다", self, Storage_wind, "Storage")  # 창고용량
+            "창고", "창고 목록을 봅니다", self, Storage_wind, "Storage", self)  # 창고용량
 
         self.item_deal = QVBoxLayout()  # 물품 정보 및 매매
         self.item_name = Text("왼쪽의 물건 목록에서", self)  # 초기 텍스트1
@@ -396,7 +396,7 @@ class Main_wind(Wind):
         except AttributeError:
             return
         else:
-            if "-" in k:
+            if "-" in k or "τ" in k:
                 return
             k = k.split("\t")
 
@@ -794,6 +794,7 @@ class Storage_wind(Wind):
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
         self.up_button.setText("업그레이드") # 버튼 텍스트 바꿔주기
+        self.origin.refresh()
         super().refresh()
 
 
