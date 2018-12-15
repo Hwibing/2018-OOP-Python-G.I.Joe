@@ -252,10 +252,6 @@ class Main_wind(Wind):
     """
 
     def __init__(self, name, origin=None):
-        self.agr_pixmap = QPixmap("images/agriculture.png")  # 농산물 이미지
-        self.liv_pixmap = QPixmap("images/livestock.png")  # 축/수산물 이미지
-        self.man_pixmap = QPixmap("images/manufactured.png")  # 공산품 이미지
-        self.lux_pixmap = QPixmap("images/luxury.png")  # 사치재 이미지
         self.opened = {"agr": True, "liv": True, "man": True, "lux": True}
         super().__init__(name, origin)
 
@@ -406,17 +402,11 @@ class Main_wind(Wind):
         self.item_name.setText(self.current_item_name)  # 이름을 띄우고
         self.item_price.setText(str(self.current_item_price)+" Tau")  # 가격도 띄우고
 
-        self.item_class = getclass(
-            self.current_item_name).type  # 물건의 클래스 이름을 받아 적절한 이미지 배치
-        if self.item_class == "agriculture":
-            self.ProductImageLabel.setPixmap(self.agr_pixmap)
-        elif self.item_class == "livestock":
-            self.ProductImageLabel.setPixmap(self.liv_pixmap)
-        elif self.item_class == "manufactured":
-            self.ProductImageLabel.setPixmap(self.man_pixmap)
-        elif self.item_class == "luxury":
-            self.ProductImageLabel.setPixmap(self.lux_pixmap)
-
+        # 물건의 클래스 이름을 받아 적절한 이미지 배치
+        self.item_class = getclass(self.current_item_name).type
+        self.item_pixmap = QPixmap(
+            "images/Raw Files/{}/{}.png".format(self.item_class, self.current_item_name))  # 픽스맵 불러오기
+        self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
         self.update()  # 새로고침
 
     def hide_n_show(self, changedCheck):  # Closure를 이용한 clicked.connect(매개변수 함수)
@@ -502,7 +492,7 @@ class Main_wind(Wind):
         """
         global Day
         Day += 1  # 하루 더하기
-        bad_event_result=sleep()  # 잠자기
+        bad_event_result = sleep()  # 잠자기
 
         self.window_will_be_closed = opened_window_list.items()
         for (window_name, window_object) in self.window_will_be_closed:  # 지금까지 열려 있는 창 닫기(main 제외)
@@ -520,23 +510,14 @@ class Main_wind(Wind):
             raise NotImplementedError  # 변수 초기화
         self.News_button.click()  # 뉴스 띄우기
 
-        if bad_event_result==(True,):
+        if bad_event_result == (True,):
             alert_message(self, "Thief", "도둑이 당신의 금고를 털었습니다!\n보유 재산이 0원이 됩니다.")
 
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
-        self.Info_text.setText("{}번째 날\n남은 돈: {}\n창고 용량: {}/{}".format(
+        self.Info_text.setText("{}번째 주\n남은 돈: {}\n창고 용량: {}/{}".format(
             Day, money.money, storage.quantity, storage.maxsize))  # 텍스트 재설정
         self.showProducts()  # 사진 다시 띄우기, 리스트 다시 출력.
-
-        self.item_name.setText("왼쪽의 물건 목록에서")  # 텍스트 초기화 1
-        self.item_price.setText("거래하려는 것을 선택하세요.")  # 텍스트 초기화 2
-        try:
-            del self.current_item_name # 변수 삭제
-            del self.current_item_price # 변수 삭제
-        except AttributeError: # 그런 변수 없어요
-            pass # 네
-        
         super().refresh()  # 상위 클래스의 refresh 불러옴
 
 
@@ -791,12 +772,12 @@ class Storage_wind(Wind):
         창고를 업그레이드해주는 함수입니다.
         이 함수가 한 번이라도 호출되었다면 버튼이 '업그레이드'라, 아니면 '창고 구매'라고 뜹니다.
         """
-        money.buy_warehouse(0) # 창고 구매
-        self.refresh() # 새로고침
+        money.buy_warehouse(0)  # 창고 구매
+        self.refresh()  # 새로고침
 
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
-        self.up_button.setText("업그레이드") # 버튼 텍스트 바꿔주기
+        self.up_button.setText("업그레이드")  # 버튼 텍스트 바꿔주기
         self.origin.refresh()
         super().refresh()
 
