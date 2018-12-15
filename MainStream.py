@@ -93,7 +93,7 @@ def sleep():
         cls.update(rate, name)
         News_List.append(news.replace('(?)', name[0]))
 
-    if random.randint(1, 10) >= 1:  # 10% 확률로 disaster event 발생
+    if random.randint(1, 10) <= 1:  # 10% 확률로 disaster event 발생
         disastertypes = list(news_disaster.keys())
         random.shuffle(disastertypes)
         news_type = disastertypes[0]
