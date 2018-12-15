@@ -368,7 +368,7 @@ class Main_wind(Wind):
         구분선이 존재합니다.
         """
         self.Products.clear()
-        self.Products.addItem("물품-----요금(τ)----유통기한(일)")
+        self.Products.addItem("물품\t요금(τ)\t유통기한(일)")
         if self.opened["agr"]:
             self.Products.addItem("----------[농산물]-----------")
             for (name, [price, date]) in list(agriculture.productList.items()):
@@ -526,19 +526,14 @@ class Main_wind(Wind):
             Day, money.money, storage.quantity, storage.maxsize))  # 텍스트 재설정
         self.showProducts()  # 사진 다시 띄우기, 리스트 다시 출력.
 
-        # 클릭되어 있는 물건의 값을 업데이트...
+        self.item_name.setText("왼쪽의 물건 목록에서")  # 텍스트 초기화 1
+        self.item_price.setText("거래하려는 것을 선택하세요.")  # 텍스트 초기화 2
         try:
-            for i in gen_items_in_list(self.Products):  # 품목 리스트에서
-                k = i.text()
-                if self.current_item_name in k:  # 선택된 물건의 이름을 찾아
-                    self.current_item_price = int(
-                        k.split("\t")[1].strip("\t"))  # 가격을 구한 뒤
-                    self.item_price.setText(
-                        str(self.current_item_price))  # 텍스트 업데이트
-                    break
-        except AttributeError:  # 아직 물건이 지정되지 않아, 그런 객체변수가 없다면
-            pass  # 흘려보낸다
-
+            del self.current_item_name # 변수 삭제
+            del self.current_item_price # 변수 삭제
+        except AttributeError: # 그런 변수 없어요
+            pass # 네
+        
         super().refresh()  # 상위 클래스의 refresh 불러옴
 
 
