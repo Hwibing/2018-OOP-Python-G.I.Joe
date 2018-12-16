@@ -503,9 +503,12 @@ class Main_wind(Wind):
     def all_sell(self):
         # 창고에 있는 물건의 개수를 입력해줍니다.
         try:
-            pass
+            # 창고에서 아이템의 개수를 받아 전달
+            self.numCount.setText(str(storage.warehouse[self.current_item_name]))
         except AttributeError:
             alert_message(self, "Error", "아이템을 선택해주세요.")
+        except KeyError:
+            alert_message(self, "Error", "창고에 없는 물건입니다.")
 
     def next_day(self):
         """
@@ -541,15 +544,17 @@ class Main_wind(Wind):
         # 상위 클래스로부터 오버라이드합니다.
         self.Info_text.setText("{}번째 주\n남은 돈: {}\n창고 용량: {}/{}".format(
             Day, money.money, storage.quantity, storage.maxsize))  # 텍스트 재설정
-        
+
         # 자고 일어나도 클릭은 유지 + 표시된 가격은 업데이트
-        for i in gen_items_in_list(self.Products): # 품목을 하나씩 살펴보며
+        for i in gen_items_in_list(self.Products):  # 품목을 하나씩 살펴보며
             try:
-                if(self.current_item_name in i.text()): # 선택되어 있는 항목과 일치하면(이름 들어있음)
-                    self.current_item_price=int(i.text().split("\t")[1].strip("\t")) # 아이템 가격 업데이트
-                    self.item_price.setText(str(self.current_item_price)) # 텍스트 재설정
+                if(self.current_item_name in i.text()):  # 선택되어 있는 항목과 일치하면(이름 들어있음)
+                    self.current_item_price = int(
+                        i.text().split("\t")[1].strip("\t"))  # 아이템 가격 업데이트
+                    self.item_price.setText(
+                        str(self.current_item_price))  # 텍스트 재설정
                     break
-            except AttributeError: # 만약 아이템이 클릭되어 있지 않았다면
+            except AttributeError:  # 만약 아이템이 클릭되어 있지 않았다면
                 break
 
         self.showProducts()  # 사진 다시 띄우기, 리스트 다시 출력.
