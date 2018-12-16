@@ -483,7 +483,7 @@ class Main_wind(Wind):
                     self.current_item_name), self.num)  # 그럼 사세요
                 self.refresh()
                 if not self.result:  # 만약 구매에 실패하면?
-                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n돈 혹은 창고 용량을 확인해주세요.")
+                    alert_message(self, "Error", "그럴 수 없습니다.\n돈 혹은 창고 용량을 확인해주세요.")
             else:  # 아녀
                 pass  # 지나가세요
         else:
@@ -502,15 +502,14 @@ class Main_wind(Wind):
                 ans = YN_question(self, "Confirm", "정말 파시겠어요?\n총 가격: %d Tau" % (
                     self.num*int(self.current_item_price)))  # ㄹㅇ 팔거임?
             except AttributeError:  # 선택을 안했다면(current 생성 X)
-                QMessageBox.about(
-                    self, "Alert", "품목을 선택해주세요.")  # 알림
+                alert_message(self, "Error", "품목을 선택해주세요.")  # 알림
                 return  # 리턴
             if ans:
                 self.result = sell(self.current_item_name, getclass(
                     self.current_item_name), self.num)
                 self.refresh()
                 if not self.result:  # 만약 판매에 실패하면?
-                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n창고를 확인해주세요.")
+                    alert_message(self, "Error", "그럴 수 없습니다.\n창고를 확인해주세요.")
             else:
                 pass
         else:
