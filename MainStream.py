@@ -5,7 +5,7 @@ import random
 
 # Initialize Game
 def gamerestart():
-    global allproduct, news_normal, news_disaster, info_global, info_specific, Next_Update, News_List, Day, money, storage, Info_Cost
+    global agriculture, livestock, luxury, manufactured, allproduct, news_normal, news_disaster, info_global, info_specific, Next_Update, News_List, Day, money, storage, Info_Cost
     (agriculture, livestock, luxury, manufactured) = init()
     allproduct = [agriculture, livestock, luxury, manufactured]
     (news_normal, news_disaster) = readnews()

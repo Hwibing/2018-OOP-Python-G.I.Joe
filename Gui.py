@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-# 사용 폰트: 나눔명조
+# 사용 폰트: 제주고딕
 import sys
 
 from PyQt5.QtCore import QCoreApplication, Qt
@@ -268,11 +268,11 @@ class Main_wind(Wind):
         self.showProducts()  # 물품 리스트 출력
 
         self.Products.setFixedSize(600, 450)  # 크기 고정
-        self.Products.setFont(QFont("나눔명조", 10)) # 폰트 설정
+        # self.Products.setFont(QFont("ㅁㄴㅇㄹ")) # 폰트 설정
 
         self.Info_text = Text("{}번째 주\n남은 돈: {}\n창고 용량: {}/{}".format(
             Day, money.money, storage.quantity, storage.maxsize), self)  # 정보 텍스트
-        self.Info_text.setFont(QFont("나눔명조", 10))
+        self.Info_text.setFont(QFont("제주고딕", 10))
         self.Bank_button = Link_button(
             "은행", "은행 창을 엽니다.", self, Bank_Wind, "Bank", self)  # 은행
         self.Storage_button = Link_button(
@@ -351,7 +351,6 @@ class Main_wind(Wind):
         self.width = 1280
         self.height = 720
         self.setLayout(vbox)
-        self.setStyleSheet("background-color: #B5DB93;")
 
     def btnClickConnect(self):
         # 상위 클래스로부터 오버라이드합니다.
@@ -838,7 +837,7 @@ class Push_button(QPushButton):
         :parameter window: 이 버튼이 포함된 창입니다.
         """
         super().__init__(name, window)  # 상위 클래스의 생성자 호출
-        self.setFont(QFont("나눔명조"))  # 폰트 설정
+        self.setFont(QFont("제주고딕"))  # 폰트 설정
         self.design(tooltip)  # 디자인하기
         self.utility_set(window)  # 기능 설정
 
@@ -949,7 +948,7 @@ class Text(QLabel):
         :parameter window: 텍스트를 띄울 창
         """
         super().__init__(text, window)  # 상위 클래스의 생성자 호출
-        self.setFont(QFont("나눔명조"))  # 폰트 설정
+        self.setFont(QFont("제주고딕"))  # 폰트 설정
 
     def setup(self):
         # 텍스트를 세팅하고 띄웁니다. 크기는 글자에 맞추어 고정됩니다.
