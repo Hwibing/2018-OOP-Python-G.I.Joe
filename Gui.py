@@ -252,7 +252,13 @@ class Main_wind(Wind):
     """
 
     def __init__(self, name, origin=None):
-        self.opened = {"agr": True, "liv": True, "man": True, "lux": True}
+        self.opened = {"agriculture": True, "livestock": True,
+                       "manufactured": True, "luxury": True}  # 보기/접기 상태
+        # 한/영/한 번역 딕셔너리
+        self.cls_en_kr = {
+            "agriculture": "농산물", "livestock": "축/수산물", "manufactured": "공산품", "luxury": "사치재"}
+        self.cls_kr_en = {"농산물": "agriculture", "축/수산물": "livestock",
+                          "공산품": "manufactured", "사치재": "luxury"}
         super().__init__(name, origin)
 
     def design(self):
@@ -320,10 +326,10 @@ class Main_wind(Wind):
 
         low_box = QHBoxLayout()  # 중하부, 각 품목을 클릭하면 줄어들도록
         # 4개의 체크박스(보기/접기 용도)
-        self.agr_chkbox = QCheckBox("agriculture", self)
-        self.liv_chkbox = QCheckBox("livestock", self)
-        self.man_chkbox = QCheckBox("manufactured", self)
-        self.lux_chkbox = QCheckBox("luxury", self)
+        self.agr_chkbox = QCheckBox("농산물", self)
+        self.liv_chkbox = QCheckBox("축/수산물", self)
+        self.man_chkbox = QCheckBox("공산품", self)
+        self.lux_chkbox = QCheckBox("사치재", self)
         self.checkboxes = (self.agr_chkbox, self.liv_chkbox,
                            self.man_chkbox, self.lux_chkbox)
         for i in self.checkboxes:
@@ -365,20 +371,20 @@ class Main_wind(Wind):
         """
         self.Products.clear()
         self.Products.addItem("물품\t요금(τ)\t유통기한(일)")
-        if self.opened["agr"]:
+        if self.opened["agriculture"]:
             self.Products.addItem("----------[농산물]-----------")
             for (name, [price, date]) in list(agriculture.productList.items()):
                 self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
-        if self.opened["liv"]:
+        if self.opened["livestock"]:
             self.Products.addItem("----------[축/수산물]-----------")
             for (name, [price, date]) in list(livestock.productList.items()):
                 self.Products.addItem(name+"\t"+str(price)+"\t"+str(date))
-        if self.opened["man"]:
+        if self.opened["manufactured"]:
             self.Products.addItem("----------[공산품]-----------")
             for (name, price) in list(manufactured.productList.items()):
                 self.Products.addItem(name+"\t"+str(price))
-        if self.opened["lux"]:
-            self.Products.addItem("----------[사치품]-----------")
+        if self.opened["luxury"]:
+            self.Products.addItem("----------[사치재]-----------")
             for (name, price) in list(luxury.productList.items()):
                 self.Products.addItem(name+"\t"+str(price))
 
@@ -404,17 +410,28 @@ class Main_wind(Wind):
 
         # 물건의 클래스 이름을 받아 적절한 이미지 배치
         self.item_class = getclass(self.current_item_name).type
-        print("images/Raw Files/{}/{}.png".format(self.item_class, self.current_item_name))
         self.item_pixmap = QPixmap(
-            "images/Raw Files/{}/{}.png".format(self.item_class, self.current_item_name))  # 픽스맵 불러오기
+            "images/Raw File/{}/{}.png".format(self.item_class, self.current_item_name))  # 픽스맵 불러오기
         self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
-        self.update()  # 새로고침
+        self.refresh()  # 새로고침
 
     def hide_n_show(self, changedCheck):  # Closure를 이용한 clicked.connect(매개변수 함수)
         def folder():  # inner function
-            k = changedCheck.text()[:3].lower()  # 첫 3글자 소문자
+            k = self.cls_kr_en[changedCheck.text()]  # 선택한 목록 이름(한글을 영어로)
             self.opened[k] = not self.opened[k]  # 상태 반전
+            self.item_name.setText("{} 목록을".format(self.cls_en_kr[k]))  # 안내문
+            self.item_price.setText("{}셨습니다.".format(
+                ("펼치" if self.opened[k] else "접으")))  # 안내문
+
+            self.item_pixmap = QPixmap("images/{}.png".format(k))  # 픽스맵 불러오기
+            self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
             self.refresh()  # 새로고침
+
+            try:
+                del self.current_item_name
+                del self.current_item_price
+            except AttributeError:
+                pass
         return folder
 
     def buy_item(self):
