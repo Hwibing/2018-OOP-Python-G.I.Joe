@@ -59,4 +59,5 @@
 ## 9. 기타
 * 자세한 내용은 Readme_Informative와 prices 폴더, news 파일 참고.  
 * 게임 실행 방법 등 자세한 내용은 instruction.md를 확인.
+* 정준이도 일은 많이 했는데, 얘가 커밋을 안 해서 그런거예요...
 <hr>
