@@ -22,13 +22,13 @@ def gamerestart():
     Next_Update.clear()
     News_List.clear()
     Day = 1
-    money.money=500000
+    money.money = 500000
     storage.warehouse.clear()
     storage.warehouse_expire.clear()
-    storage.maxsize=100
-    money.rent=True
-    money.bank=0
-    money.debt=0
+    storage.maxsize = 100
+    money.rent = True
+    money.bank = 0
+    money.debt = 0
 
 
 def place_in_layout(layout: (QHBoxLayout, QVBoxLayout), details: tuple, arrange="spread"):
@@ -342,11 +342,15 @@ class Main_wind(Wind):
         place_in_layout(mid_box, (self.Products, self.item_deal))
 
         low_box = QHBoxLayout()  # 중하부, 각 품목을 클릭하면 줄어들도록
-        # 4개의 체크박스(보기/접기 용도)
-        self.agr_chkbox = QCheckBox("농산물", self); self.agr_chkbox.setShortcut("Q")
-        self.liv_chkbox = QCheckBox("축/수산물", self); self.liv_chkbox.setShortcut("W")
-        self.man_chkbox = QCheckBox("공산품", self); self.man_chkbox.setShortcut("E")
-        self.lux_chkbox = QCheckBox("사치재", self); self.lux_chkbox.setShortcut("R")
+        # 4개의 체크박스(보기/접기 용도), 단축키
+        self.agr_chkbox = QCheckBox("농산물", self)
+        self.agr_chkbox.setShortcut("Q")
+        self.liv_chkbox = QCheckBox("축/수산물", self)
+        self.liv_chkbox.setShortcut("W")
+        self.man_chkbox = QCheckBox("공산품", self)
+        self.man_chkbox.setShortcut("E")
+        self.lux_chkbox = QCheckBox("사치재", self)
+        self.lux_chkbox.setShortcut("R")
         self.checkboxes = (self.agr_chkbox, self.liv_chkbox,
                            self.man_chkbox, self.lux_chkbox)
         for i in self.checkboxes:
@@ -552,7 +556,7 @@ class Main_wind(Wind):
         if money.money < 0:  # 돈이 0보다 적으면
             alert_message(self, "Bankrupt", "파산하였습니다!")
             gamerestart()
-            Day=1
+            Day = 1
             self.restart_button = Moveto_button(
                 "Restart", "Restart game.", self, Intro_wind, "Restart")  # 보이지 않는 버튼
             self.restart_button.click()  # 게임 재시작
@@ -561,7 +565,7 @@ class Main_wind(Wind):
         self.refresh()  # 새로고침
         self.News_button.click()  # 뉴스 띄우기
 
-        (thief, fire)=bad_event_result
+        (thief, fire) = bad_event_result
         if thief:
             alert_message(self, "Thief", "도둑이 당신의 금고를 털었습니다!\n보유 재산이 0원이 됩니다.")
         if fire:
@@ -582,7 +586,7 @@ class Main_wind(Wind):
                     self.item_price.setText(
                         str(self.current_item_price))  # 텍스트 재설정
                     break
-            except (AttributeError,ValueError):  # 만약 아이템이 클릭되어 있지 않았다면
+            except (AttributeError, ValueError):  # 만약 아이템이 클릭되어 있지 않았다면
                 break
 
         super().refresh()  # 상위 클래스의 refresh 불러옴
@@ -823,7 +827,7 @@ class Storage_wind(Wind):
         self._vbox = QVBoxLayout()
         self.up_button = Basic_button(
             "창고 구매" if money.rent else "업그레이드",
-            "더 좋은 창고로 이전합니다. 용량이 늘어나고, 보관 기간이 길어집니다.", self)
+            "창고를 구매합니다. 더 이상 대여료를 지불하지 않아도 됩니다." if money.rent else "더 좋은 창고로 이전합니다. 용량이 늘어납니다.", self)
 
         place_in_layout(self._hbox, (self.up_button, Close_button(
             "닫기", "창고에서 나갑니다.", self)), "center")
@@ -847,11 +851,11 @@ class Storage_wind(Wind):
         """
         if money.ismoneyleft(3000000):
             if money.rent:
-                money.buy_warehouse(3000000) # 창고 구매
-                self.up_button.setText("업그레이드") # 버튼 텍스트 변경
+                money.buy_warehouse(3000000)  # 창고 구매
+                self.up_button.setText("업그레이드")  # 버튼 텍스트 변경
             else:
-                money.money-=3000000 # 돈 감소
-                storage.maxsize+=80 # 용량 늘림
+                money.money -= 3000000  # 돈 감소
+                storage.maxsize += 80  # 용량 늘림
         self.refresh()  # 새로고침
 
     def refresh(self):
