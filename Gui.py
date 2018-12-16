@@ -129,6 +129,7 @@ def set_background_color(changing_object, color):
 def gen_items_in_list(list_widget: QListWidget):
     """
     list_widget 안의 모든 원소를 순서대로 반환하는 제너레이터입니다.
+    메모리가 빡세다면 이 함수를 이용하면 됩니다.
     :parameter list_widget: 아이템을 순서대로 보고 싶은 QListWidget 객체입니다. 
     """
     for i in range(list_widget.count()):
@@ -268,8 +269,6 @@ class Main_wind(Wind):
 
         self.Products.setFixedSize(600, 450)  # 크기 고정
         # self.Products.setFont(QFont("ㅁㄴㅇㄹ")) # 폰트 설정
-        self.Products.itemSelectionChanged.connect(
-            self.selectionChanged_event)  # 선택 아이템이 바뀌었을 때
 
         self.Info_text = Text("{}번째 주\n남은 돈: {}\n창고 용량: {}/{}".format(
             Day, money.money, storage.quantity, storage.maxsize), self)  # 정보 텍스트
@@ -360,6 +359,8 @@ class Main_wind(Wind):
         self.Buy_max.clicked.connect(self.max_buy)
         self.Sell_all.clicked.connect(self.all_sell)
         self.Next_day_button.clicked.connect(self.next_day)
+
+        self.Products.itemSelectionChanged.connect(self.selectionChanged_event)
         for i in self.checkboxes:
             i.stateChanged.connect(self.hide_n_show(i))
 
@@ -391,32 +392,36 @@ class Main_wind(Wind):
     def selectionChanged_event(self):
         """
         리스트(물건 목록)에서 선택한 아이템이 바뀌었을 때 호출됩니다.
-        하는 일: 텍스트 바꾸기, 이미지 바꾸기, 현 아이템 바꾸기
+        하는 일: 선택 아이템 이름/가격 받기, 이미지 바꾸기, 텍스트 띄우기
         """
         try:
-            k = str(self.Products.currentItem().text())
-        except AttributeError:
-            return
-        else:
-            if "-" in k or "τ" in k:
+            self.selectedItemText = str(
+                self.Products.currentItem().text())  # 선택된 아이템의 텍스트를 받아온다
+        except AttributeError:  # 그런 거 없다면
+            return  # 리턴
+        else:  # 그런 거 있다면
+            # 만약 물건이 아니라면(안내 텍스트면)
+            if "-" in self.selectedItemText or "τ" in self.selectedItemText:
                 return
-            k = k.split("\t")
+            self.selectedItemText = self.selectedItemText.split("\t")  # 탭으로 분리
 
-        self.current_item_name = str(k[0].strip("\t"))  # 아이템 이름
+        self.current_item_name = str(
+            self.selectedItemText[0].strip("\t"))  # 아이템 이름
         self.current_item_price = int(
-            k[1].strip("\t").replace("\t", ""))  # 아이템 가격
-        self.item_name.setText(self.current_item_name)  # 이름을 띄우고
-        self.item_price.setText(str(self.current_item_price)+" Tau")  # 가격도 띄우고
+            self.selectedItemText[1].strip("\t"))  # 아이템 가격
+        self.item_name.setText(self.current_item_name)  # 아이템 이름 띄우기
+        self.item_price.setText(str(self.current_item_price))  # 아이템 가격 띄우기
 
         # 물건의 클래스 이름을 받아 적절한 이미지 배치
         self.item_class = getclass(self.current_item_name).type
         self.item_pixmap = QPixmap(
             "images/Resized/{}/{}.png".format(self.item_class, self.current_item_name))  # 픽스맵 불러오기
         self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
-        self.refresh()  # 새로고침
+        self.update()  # 새로고침, 클릭 유지를 위해 refresh X
 
-    def hide_n_show(self, changedCheck):  # Closure를 이용한 clicked.connect(매개변수 함수)
+    def hide_n_show(self, changedCheck):  # Closure
         def folder():  # inner function
+            self.refresh()  # 새로고침하고 시작
             k = self.cls_kr_en[changedCheck.text()]  # 선택한 목록 이름(한글을 영어로)
             self.opened[k] = not self.opened[k]  # 상태 반전
             self.item_name.setText("{} 목록을".format(self.cls_en_kr[k]))  # 안내문
@@ -425,13 +430,14 @@ class Main_wind(Wind):
 
             self.item_pixmap = QPixmap("images/{}.png".format(k))  # 픽스맵 불러오기
             self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
-            self.refresh()  # 새로고침
 
-            try:
+            try:  # 아이템 선택 안 한걸로
                 del self.current_item_name
                 del self.current_item_price
-            except AttributeError:
+            except AttributeError:  # 원래 안 했으면
                 pass
+            self.refresh()  # 새로고침
+
         return folder
 
     def buy_item(self):
@@ -454,7 +460,7 @@ class Main_wind(Wind):
                     self.current_item_name), self.num)  # 그럼 사세요
                 self.refresh()
                 if not self.result:  # 만약 구매에 실패하면?
-                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n돈 혹은 창고를 확인해주세요.")
+                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n돈 혹은 창고 용량을 확인해주세요.")
             else:  # 아녀
                 pass  # 지나가세요
         else:
@@ -498,13 +504,18 @@ class Main_wind(Wind):
     def all_sell(self):
         # 창고에 있는 물건의 개수를 입력해줍니다.
         try:
-            pass
+            # 창고에서 아이템의 개수를 받아 전달
+            self.numCount.setText(
+                str(storage.warehouse[self.current_item_name]))
         except AttributeError:
             alert_message(self, "Error", "아이템을 선택해주세요.")
+        except KeyError:
+            alert_message(self, "Error", "창고에 없는 물건입니다.")
 
     def next_day(self):
         """
         다음 날로 넘어갑니다. Day를 증가시키고, storage의 유통기한을 1씩 없앱니다.
+        선택된 아이템의 가격을 변경시켜줍니다.
         파산을 감지합니다. (돈<0)
         Main Window를 제외한 모든 창을 닫고, 새로 뉴스를 띄웁니다.
         """
@@ -519,15 +530,15 @@ class Main_wind(Wind):
         opened_window_list.clear()  # 딕셔너리를 비우고
         opened_window_list[self.name] = self  # 자신을 넣는다
 
-        self.refresh()  # 다시 창 띄우기
         if money.money < 0:  # 돈이 0보다 적으면
-            QMessageBox().about(self, "Bankrupt", "You are bankrupt!")  # 파산 알림
+            alert_message(self, "Bankrupt", "파산하였습니다!")
             self.restart_button = Moveto_button(
                 "Restart", "Restart game.", self, Intro_wind, "Restart")  # 보이지 않는 버튼
             self.restart_button.click()  # 게임 재시작
             raise NotImplementedError  # 변수 초기화
-        self.News_button.click()  # 뉴스 띄우기
 
+        self.refresh()  # 새로고침
+        self.News_button.click()  # 뉴스 띄우기
         if bad_event_result == (True,):
             alert_message(self, "Thief", "도둑이 당신의 금고를 털었습니다!\n보유 재산이 0원이 됩니다.")
 
@@ -535,7 +546,20 @@ class Main_wind(Wind):
         # 상위 클래스로부터 오버라이드합니다.
         self.Info_text.setText("{}번째 주\n남은 돈: {}\n창고 용량: {}/{}".format(
             Day, money.money, storage.quantity, storage.maxsize))  # 텍스트 재설정
+
+        # 자고 일어나도 클릭은 유지 + 표시된 가격은 업데이트
         self.showProducts()  # 사진 다시 띄우기, 리스트 다시 출력.
+        for i in gen_items_in_list(self.Products):  # 품목을 하나씩 살펴보며
+            try:
+                if(self.current_item_name in i.text()):  # 선택되어 있는 항목과 일치하면(이름 들어있음)
+                    self.current_item_price = int(
+                        i.text().split("\t")[1].strip("\t"))  # 아이템 가격 업데이트
+                    self.item_price.setText(
+                        str(self.current_item_price))  # 텍스트 재설정
+                    break
+            except AttributeError:  # 만약 아이템이 클릭되어 있지 않았다면
+                break
+
         super().refresh()  # 상위 클래스의 refresh 불러옴
 
 
