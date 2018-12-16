@@ -548,18 +548,19 @@ class Main_wind(Wind):
             Day, money.money, storage.quantity, storage.maxsize))  # 텍스트 재설정
 
         # 자고 일어나도 클릭은 유지 + 표시된 가격은 업데이트
+        self.showProducts()  # 사진 다시 띄우기, 리스트 다시 출력.
         for i in gen_items_in_list(self.Products):  # 품목을 하나씩 살펴보며
             try:
                 if(self.current_item_name in i.text()):  # 선택되어 있는 항목과 일치하면(이름 들어있음)
                     self.current_item_price = int(
                         i.text().split("\t")[1].strip("\t"))  # 아이템 가격 업데이트
+                    print(self.current_item_price)
                     self.item_price.setText(
                         str(self.current_item_price))  # 텍스트 재설정
                     break
             except AttributeError:  # 만약 아이템이 클릭되어 있지 않았다면
                 break
 
-        self.showProducts()  # 사진 다시 띄우기, 리스트 다시 출력.
         super().refresh()  # 상위 클래스의 refresh 불러옴
 
 
