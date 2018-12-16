@@ -57,6 +57,6 @@
  * 시스템 디자인, 코딩
 
 ## 9. 기타
-자세한 내용은 Readme_Informative와 prices 폴더, news 파일 참고
-
+* 자세한 내용은 Readme_Informative와 prices 폴더, news 파일 참고.  
+* 게임 실행 방법 등 자세한 내용은 instruction.md를 확인.
 <hr>
