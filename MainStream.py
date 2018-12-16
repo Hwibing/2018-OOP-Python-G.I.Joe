@@ -3,21 +3,19 @@ from Ctrl import *
 import random
 
 
-# Initialize Game
-def gamerestart():
-    global agriculture, livestock, luxury, manufactured, allproduct, news_normal, news_disaster, info_global, info_specific, Next_Update, News_List, Day, money, storage, Info_Cost
-    (agriculture, livestock, luxury, manufactured) = init()
-    allproduct = [agriculture, livestock, luxury, manufactured]
-    (news_normal, news_disaster) = readnews()
-    (info_global, info_specific) = readinfo()
-    Next_Update = []
-    News_List = []
-    Day = 1
-    money = Finance(500000)
-    storage = Storage(100)
-    Info_Cost = 25000
+(agriculture, livestock, luxury, manufactured) = init()
+allproduct = [agriculture, livestock, luxury, manufactured]
+(news_normal, news_disaster) = readnews()
+(info_global, info_specific) = readinfo()
+Next_Update = []
+News_List = []
+Day = 1
+money = Finance(500000)
+storage = Storage(100)
+Info_Cost = 25000
 
-gamerestart()
+# Initialize Game
+
 
 
 def buy(name, cls, number):
@@ -137,9 +135,14 @@ def sleep():
     
     # Random Bad Event
     thief_event=(random.randint(1,100)<=1)
+    fire_event=(random.randint(1,100)<=1)
     if thief_event:
         money.money=0
-    return (thief_event,)
+    if fire_event:
+        storage.warehouse.clear()
+        storage.warehouse_expire.clear()
+        storage.quantity=0
+    return (thief_event,fire_event)
 
 
 def getinfo():

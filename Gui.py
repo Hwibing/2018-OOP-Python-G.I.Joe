@@ -13,6 +13,24 @@ from MainStream import *
 opened_window_list = dict()  # 열려 있는 창들을 모아 놓은 딕셔너리(이름이 key, 객체가 value)
 
 
+def gamerestart():
+    global agriculture, livestock, luxury, manufactured, allproduct, news_normal, news_disaster, info_global, info_specific, Next_Update, News_List, Day, money, storage, Info_Cost, Day
+    (agriculture, livestock, luxury, manufactured) = init()
+    allproduct = [agriculture, livestock, luxury, manufactured]
+    (news_normal, news_disaster) = readnews()
+    (info_global, info_specific) = readinfo()
+    Next_Update.clear()
+    News_List.clear()
+    Day = 1
+    money.money=500000
+    storage.warehouse.clear()
+    storage.warehouse_expire.clear()
+    storage.maxsize=100
+    money.rent=True
+    money.bank=0
+    money.debt=0
+
+
 def place_in_layout(layout: (QHBoxLayout, QVBoxLayout), details: tuple, arrange="spread"):
     """
     레이아웃과 담을 것들을 받아 배치합니다. (Stretch 이용)
@@ -532,15 +550,21 @@ class Main_wind(Wind):
 
         if money.money < 0:  # 돈이 0보다 적으면
             alert_message(self, "Bankrupt", "파산하였습니다!")
+            gamerestart()
+            Day=1
             self.restart_button = Moveto_button(
                 "Restart", "Restart game.", self, Intro_wind, "Restart")  # 보이지 않는 버튼
             self.restart_button.click()  # 게임 재시작
-            raise NotImplementedError  # 변수 초기화
+            return
 
         self.refresh()  # 새로고침
         self.News_button.click()  # 뉴스 띄우기
-        if bad_event_result == (True,):
+
+        (thief, fire)=bad_event_result
+        if thief:
             alert_message(self, "Thief", "도둑이 당신의 금고를 털었습니다!\n보유 재산이 0원이 됩니다.")
+        if fire:
+            alert_message(self, "Fire", "창고에 화재가 발생했습니다!\n창고의 모든 물건이 사라집니다.")
 
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
@@ -557,7 +581,7 @@ class Main_wind(Wind):
                     self.item_price.setText(
                         str(self.current_item_price))  # 텍스트 재설정
                     break
-            except AttributeError:  # 만약 아이템이 클릭되어 있지 않았다면
+            except (AttributeError,ValueError):  # 만약 아이템이 클릭되어 있지 않았다면
                 break
 
         super().refresh()  # 상위 클래스의 refresh 불러옴
@@ -814,12 +838,17 @@ class Storage_wind(Wind):
         창고를 업그레이드해주는 함수입니다.
         이 함수가 한 번이라도 호출되었다면 버튼이 '업그레이드'라, 아니면 '창고 구매'라고 뜹니다.
         """
-        money.buy_warehouse(3000000)  # 창고 구매
+        if money.ismoneyleft(3000000):
+            if money.rent:
+                money.buy_warehouse(3000000) # 창고 구매
+                self.up_button.setText("업그레이드") # 버튼 텍스트 변경
+            else:
+                money.money-=3000000 # 돈 감소
+                storage.maxsize+=80 # 용량 늘림
         self.refresh()  # 새로고침
 
     def refresh(self):
         # 상위 클래스로부터 오버라이드합니다.
-        self.up_button.setText("업그레이드")  # 버튼 텍스트 바꿔주기
         self.origin.refresh()
         super().refresh()
 
