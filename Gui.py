@@ -758,6 +758,7 @@ class News_wind(List_wind):
         self.width = 600
         self.setStyleSheet("background-color: white;")
 
+
 class Predict_wind(Wind):
     """
     정보를 예측해주는 창입니다. Wind를 상속합니다.
