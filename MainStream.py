@@ -15,7 +15,18 @@ storage = Storage(100)
 Info_Cost = 25000
 
 
-
+def buy(name, cls, number):
+    if storage.quantity + number <= storage.maxsize:
+        if money.buy(name, cls, number):
+            if storage.buy(name, cls, number):
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        print('Storage Overflow')
+        return False
 
 
 def sell(name, cls, number):
