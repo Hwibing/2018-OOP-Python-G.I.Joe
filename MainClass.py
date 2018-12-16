@@ -79,9 +79,9 @@ class Finance:
         if self.debt:
             self.money -= int(self.debt * 0.1)
         if self.bank:
-            self.money += int(self.bank * 0.05)
+            self.money += int(self.bank * 0.03)
         if self.rent:
-            self.money -= 25000
+            self.money -= 15000
 
 
 class Storage:
