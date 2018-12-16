@@ -419,7 +419,7 @@ class Main_wind(Wind):
         self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
         self.update()  # 새로고침, 클릭 유지를 위해 refresh X
 
-    def hide_n_show(self, changedCheck):  # Closure를 이용한 clicked.connect(매개변수 함수)
+    def hide_n_show(self, changedCheck):  # Closure
         def folder():  # inner function
             self.refresh()  # 새로고침하고 시작
             k = self.cls_kr_en[changedCheck.text()]  # 선택한 목록 이름(한글을 영어로)
@@ -430,13 +430,14 @@ class Main_wind(Wind):
 
             self.item_pixmap = QPixmap("images/{}.png".format(k))  # 픽스맵 불러오기
             self.ProductImageLabel.setPixmap(self.item_pixmap)  # 픽스맵 띄우기
-            self.refresh()  # 새로고침
 
-            try:
+            try:  # 아이템 선택 안 한걸로
                 del self.current_item_name
                 del self.current_item_price
-            except AttributeError:
+            except AttributeError:  # 원래 안 했으면
                 pass
+            self.refresh()  # 새로고침
+
         return folder
 
     def buy_item(self):
@@ -459,7 +460,7 @@ class Main_wind(Wind):
                     self.current_item_name), self.num)  # 그럼 사세요
                 self.refresh()
                 if not self.result:  # 만약 구매에 실패하면?
-                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n돈 혹은 창고를 확인해주세요.")
+                    QMessageBox().about(self, "Error", "그럴 수 없습니다.\n돈 혹은 창고 용량을 확인해주세요.")
             else:  # 아녀
                 pass  # 지나가세요
         else:
@@ -504,7 +505,8 @@ class Main_wind(Wind):
         # 창고에 있는 물건의 개수를 입력해줍니다.
         try:
             # 창고에서 아이템의 개수를 받아 전달
-            self.numCount.setText(str(storage.warehouse[self.current_item_name]))
+            self.numCount.setText(
+                str(storage.warehouse[self.current_item_name]))
         except AttributeError:
             alert_message(self, "Error", "아이템을 선택해주세요.")
         except KeyError:
