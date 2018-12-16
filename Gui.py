@@ -814,7 +814,7 @@ class Storage_wind(Wind):
         창고를 업그레이드해주는 함수입니다.
         이 함수가 한 번이라도 호출되었다면 버튼이 '업그레이드'라, 아니면 '창고 구매'라고 뜹니다.
         """
-        money.buy_warehouse(0)  # 창고 구매
+        money.buy_warehouse(3000000)  # 창고 구매
         self.refresh()  # 새로고침
 
     def refresh(self):
