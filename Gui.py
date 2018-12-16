@@ -343,10 +343,10 @@ class Main_wind(Wind):
 
         low_box = QHBoxLayout()  # 중하부, 각 품목을 클릭하면 줄어들도록
         # 4개의 체크박스(보기/접기 용도)
-        self.agr_chkbox = QCheckBox("농산물", self)
-        self.liv_chkbox = QCheckBox("축/수산물", self)
-        self.man_chkbox = QCheckBox("공산품", self)
-        self.lux_chkbox = QCheckBox("사치재", self)
+        self.agr_chkbox = QCheckBox("농산물", self); self.agr_chkbox.setShortcut("Q")
+        self.liv_chkbox = QCheckBox("축/수산물", self); self.liv_chkbox.setShortcut("W")
+        self.man_chkbox = QCheckBox("공산품", self); self.man_chkbox.setShortcut("E")
+        self.lux_chkbox = QCheckBox("사치재", self); self.lux_chkbox.setShortcut("R")
         self.checkboxes = (self.agr_chkbox, self.liv_chkbox,
                            self.man_chkbox, self.lux_chkbox)
         for i in self.checkboxes:
