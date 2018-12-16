@@ -554,7 +554,6 @@ class Main_wind(Wind):
                 if(self.current_item_name in i.text()):  # 선택되어 있는 항목과 일치하면(이름 들어있음)
                     self.current_item_price = int(
                         i.text().split("\t")[1].strip("\t"))  # 아이템 가격 업데이트
-                    print(self.current_item_price)
                     self.item_price.setText(
                         str(self.current_item_price))  # 텍스트 재설정
                     break
