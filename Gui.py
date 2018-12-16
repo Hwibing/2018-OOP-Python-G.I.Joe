@@ -14,6 +14,7 @@ opened_window_list = dict()  # 열려 있는 창들을 모아 놓은 딕셔너�
 
 
 def gamerestart():
+    # 게임 재시작 시 초기화 함수
     global agriculture, livestock, luxury, manufactured, allproduct, news_normal, news_disaster, info_global, info_specific, Next_Update, News_List, Day, money, storage, Info_Cost, Day
     (agriculture, livestock, luxury, manufactured) = init()
     allproduct = [agriculture, livestock, luxury, manufactured]
@@ -469,8 +470,8 @@ class Main_wind(Wind):
         self.num이 유효한 값인지 확인하고, 선택한 아이템이 있는지도 확인합니다.
         결정 직전에 되묻습니다. 취소할 수 있습니다.
         """
-        self.num = self.numCount.text()
-        self.num = only_positive_int(self.num)
+        self.num = self.numCount.text() # 텍스트 따오기
+        self.num = only_positive_int(self.num) # 유효한 값인지 받아오기
         if self.num:  # 유효한 값일 경우
             try:
                 ans = YN_question(self, "Confirm", "정말 사시겠어요?\n총 가격: %d Tau" % (
