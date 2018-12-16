@@ -369,6 +369,7 @@ class Main_wind(Wind):
         self.width = 1280
         self.height = 720
         self.setLayout(vbox)
+        self.setStyleSheet("background-color: white;")
 
     def btnClickConnect(self):
         # 상위 클래스로부터 오버라이드합니다.
@@ -616,6 +617,7 @@ class Intro_wind(Wind):
         self.y_loc = 300
         self.width = 200
         self.height = 150
+        self.setStyleSheet("background-color: white;")
 
     def btnClickConnect(self):
         # 상위 클래스로부터 오버라이드합니다.
@@ -662,6 +664,7 @@ class Bank_Wind(Wind):
         self.y_loc = 250
         self.width = 500
         self.height = 200
+        self.setStyleSheet("background-color: white;")
 
     def btnClickConnect(self):
         # 상위 클래스로부터 오버라이드합니다.
@@ -735,6 +738,7 @@ class List_wind(Wind):
         self.y_loc = 100
         self.width = 400
         self.height = 300
+        self.setStyleSheet("background-color: white;")
 
     def btnClickConnect(self):
         # 상위 클래스로부터 오버라이드합니다.
@@ -752,7 +756,7 @@ class News_wind(List_wind):
         for i in News_List:  # 뉴스 리스트(문자열 원소 iterable)에서 하나씩 꺼내어
             self.List.addItem(i)  # 뉴스를 리스트에 띄운다
         self.width = 600
-
+        self.setStyleSheet("background-color: white;")
 
 class Predict_wind(Wind):
     """
@@ -782,6 +786,7 @@ class Predict_wind(Wind):
         self.y_loc = 240
         self.width = 600
         self.height = 360
+        self.setStyleSheet("background-color: white;")
 
     def btnClickConnect(self):
         # 상위 클래스로부터 오버라이드합니다.
@@ -828,6 +833,7 @@ class Storage_wind(Wind):
         self.y_loc = 100
         self.width = 400
         self.height = 400
+        self.setStyleSheet("background-color: white;")
 
     def btnClickConnect(self):
         # 상위 클래스로부터 오버라이드합니다.
@@ -878,6 +884,7 @@ class Push_button(QPushButton):
         """
         self.setToolTip(tooltip)  # 툴팁 설정
         self.setFixedSize(self.sizeHint())  # 글씨에 따라 버튼 크기 조정
+        self.setStyleSheet("background-color: white;")
 
     def utility_set(self, window):
         pass
