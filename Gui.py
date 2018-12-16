@@ -311,7 +311,7 @@ class Main_wind(Wind):
             "예측", "내일의 예측을 보러 갑니다.", self, Predict_wind, "Predict", self)  # 예측 버튼
 
         self.Next_day_button = Basic_button(
-            "잠자기", "다음 날로 넘어갑니다", self)  # '다음 날' 버튼
+            "잠자기", "다음 주로 넘어갑니다", self)  # '다음 주' 버튼
         self.Next_day_button.setShortcut("Ctrl+S")
         self.End_button = Quit_button(
             "종료", "저장되지 않습니다.", self)  # '끝내기' 버튼
@@ -514,7 +514,7 @@ class Main_wind(Wind):
 
     def next_day(self):
         """
-        다음 날로 넘어갑니다. Day를 증가시키고, storage의 유통기한을 1씩 없앱니다.
+        다음 주로 넘어갑니다. Day를 증가시키고, storage의 유통기한을 1씩 없앱니다.
         선택된 아이템의 가격을 변경시켜줍니다.
         파산을 감지합니다. (돈<0)
         Main Window를 제외한 모든 창을 닫고, 새로 뉴스를 띄웁니다.
@@ -741,7 +741,7 @@ class Predict_wind(Wind):
         self.Prediction_list = QListWidget()
         self.Prediction_list.setFixedSize(540, 270)
         self.get_info_button = Basic_button(
-            "정보 얻기", "돈을 지불하고 내일 무슨 일이 일어날지 알아봅니다", self)
+            "정보 얻기", "돈을 지불하고 다음 주에 무슨 일이 일어날지 알아봅니다", self)
 
         self.hbox_1 = QHBoxLayout()
         self.hbox_2 = QHBoxLayout()
