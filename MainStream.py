@@ -2,17 +2,22 @@ from MainClass import *
 from Ctrl import *
 import random
 
+
 # Initialize Game
-(agriculture, livestock, luxury, manufactured) = init()
-allproduct = [agriculture, livestock, luxury, manufactured]
-(news_normal, news_disaster) = readnews()
-(info_global, info_specific) = readinfo()
-Next_Update = []
-News_List = []
-Day = 1
-money = Finance(500000)
-storage = Storage(100)
-Info_Cost = 25000
+def gamerestart():
+    global allproduct, news_normal, news_disaster, info_global, info_specific, Next_Update, News_List, Day, money, storage, Info_Cost
+    (agriculture, livestock, luxury, manufactured) = init()
+    allproduct = [agriculture, livestock, luxury, manufactured]
+    (news_normal, news_disaster) = readnews()
+    (info_global, info_specific) = readinfo()
+    Next_Update = []
+    News_List = []
+    Day = 1
+    money = Finance(500000)
+    storage = Storage(100)
+    Info_Cost = 25000
+
+gamerestart()
 
 
 def buy(name, cls, number):
