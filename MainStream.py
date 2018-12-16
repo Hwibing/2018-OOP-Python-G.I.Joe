@@ -87,7 +87,11 @@ def sleep():
     News_List.clear()
 
     randnews = pick_news(news_normal)
-
+    for [news, rate] in randnews:
+        name = pick_random(allproduct)
+        cls = getclass(name[0])
+        cls.update(rate, name)
+        News_List.append(news.replace('(?)', name[0]))
 
     if random.randint(1, 10) <= 1:  # 10% 확률로 disaster event 발생
         disastertypes = list(news_disaster.keys())
